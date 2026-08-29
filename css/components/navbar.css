@@ -1,0 +1,204 @@
+/* ============================================================
+   MAPEL - components/navbar.css
+   Bar atas: judul aplikasi, tanggal, lonceng notifikasi, dan
+   identitas user. Duduk di kanan sidebar, latar putih polos
+   supaya kontras dengan sidebar gelap & konten "kertas".
+   ============================================================ */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: 72px;
+  padding: 0 var(--space-6);
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-paper-line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar__title {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-900);
+}
+
+.navbar__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.navbar__breadcrumb-item {
+  color: var(--color-paper-muted);
+  font-weight: 500;
+}
+
+.navbar__breadcrumb-item--active {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.navbar__breadcrumb-sep {
+  color: var(--color-paper-line);
+}
+
+.navbar__end {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.navbar__date {
+  font-size: var(--text-xs);
+  color: var(--color-paper-muted);
+  white-space: nowrap;
+}
+
+.navbar__bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  color: var(--color-ink-700);
+  transition: background var(--transition-fast);
+}
+
+.navbar__bell:hover {
+  background: var(--color-paper-dim);
+}
+
+.navbar__bell-dot {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-stamp);
+  border: 1.5px solid #ffffff;
+}
+
+.navbar__account {
+  position: relative;
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--color-paper-line);
+}
+
+.navbar__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  margin: calc(var(--space-1) * -1) calc(var(--space-2) * -1);
+  transition: background var(--transition-fast);
+}
+
+.navbar__identity:hover {
+  background: var(--color-paper-dim);
+}
+
+.navbar__chevron {
+  display: inline-flex;
+  color: var(--color-paper-muted);
+  flex-shrink: 0;
+}
+
+.navbar__popup {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid var(--color-paper-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  z-index: 20;
+}
+
+.navbar__popup-header {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-paper-line);
+}
+
+.navbar__popup-name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+.navbar__popup-role {
+  font-size: var(--text-xs);
+  color: var(--color-paper-muted);
+}
+
+.navbar__popup-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink-800);
+  transition: background var(--transition-fast);
+}
+
+.navbar__popup-item:hover {
+  background: var(--color-paper-dim);
+}
+
+.navbar__popup-item--danger {
+  color: var(--color-error);
+}
+
+.navbar__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-gold);
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+.navbar__identity-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.navbar__name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+.navbar__role {
+  font-size: var(--text-xs);
+  color: var(--color-paper-muted);
+}
+
+@media (max-width: 880px) {
+  .navbar__date {
+    display: none;
+  }
+}

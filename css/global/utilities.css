@@ -1,0 +1,32 @@
+/* ============================================================
+   MAPEL - global/utilities.css
+   Kelas layout dasar dipakai di semua halaman terproteksi
+   (bukan login). Struktur: sidebar tetap di kiri, navbar +
+   konten halaman di kanan.
+   ============================================================ */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.layout__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout__content {
+  flex: 1;
+  padding: var(--space-6);
+  background: var(--color-paper-dim);
+}
+
+.u-flex {
+  display: flex;
+}
+
+.u-hidden {
+  display: none !important;
+}

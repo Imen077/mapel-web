@@ -1,0 +1,77 @@
+/* ============================================================
+   MAPEL - components/dropdown.css
+   Kontrol filter (select & search box) dipakai di filter-bar
+   halaman Monitoring/Antrian. Dinamai "dropdown" karena inti
+   visualnya select custom-styled, tapi filenya juga menaungi
+   kotak pencarian di sebelahnya supaya satu tempat.
+   ============================================================ */
+
+.filter-bar__select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-bar__select {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 120px;
+  padding: var(--space-3) var(--space-7) var(--space-3) var(--space-4);
+  background: #ffffff;
+  border: 1px solid var(--color-paper-line);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-ink-800);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-bar__select:focus {
+  outline: none;
+  border-color: var(--color-stamp);
+}
+
+.filter-bar__select-wrap--status .filter-bar__select {
+  min-width: 200px;
+}
+
+.filter-bar__select-chevron {
+  position: absolute;
+  right: var(--space-3);
+  display: inline-flex;
+  color: var(--color-paper-muted);
+  pointer-events: none;
+}
+
+.filter-bar__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 220px;
+  padding: var(--space-3) var(--space-4);
+  background: #ffffff;
+  border: 1px solid var(--color-paper-line);
+  border-radius: var(--radius-md);
+  color: var(--color-paper-muted);
+  transition: border-color var(--transition-fast);
+}
+
+.filter-bar__search:focus-within {
+  border-color: var(--color-stamp);
+}
+
+.filter-bar__search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-ink-800);
+}
+
+.filter-bar__search input::placeholder {
+  color: var(--color-paper-muted);
+}

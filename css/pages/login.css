@@ -1,0 +1,316 @@
+/* ============================================================
+   MAPEL - pages/login.css
+   Layout split: panel kiri gelap (brand + jejak rute disposisi
+   ala lembar disposisi fisik), panel kanan kertas (form masuk).
+   ============================================================ */
+
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) 1fr;
+}
+
+/* ---------- Panel kiri: brand + rute ---------- */
+
+.auth-brand {
+  background-color: var(--color-ink-900);
+  color: var(--color-paper);
+  padding: var(--space-7) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-7);
+  position: relative;
+}
+
+.auth-brand::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(180deg, transparent, rgba(0,0,0,0.25));
+}
+
+.auth-brand__eyebrow {
+  color: var(--color-gold);
+  margin-bottom: var(--space-3);
+}
+
+.auth-brand__logo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.auth-brand__logo {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+.auth-brand__wordmark {
+  font-size: var(--text-3xl);
+  color: var(--color-gold);
+  margin-bottom: 0;
+}
+
+.auth-brand__desc {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ink-muted);
+  max-width: 32ch;
+}
+
+/* Jejak rute disposisi */
+.auth-route {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-route__node {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  position: relative;
+  padding-bottom: var(--space-6);
+}
+
+.auth-route__node:last-child {
+  padding-bottom: 0;
+}
+
+.auth-route__node:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 22px;
+  bottom: 0;
+  border-left: 1px dashed var(--color-ink-700);
+}
+
+.auth-route__dot {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-gold);
+  background-color: var(--color-ink-900);
+  box-shadow: 0 0 0 3px rgba(166, 134, 47, 0.15);
+}
+
+.auth-route__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+  color: var(--color-ink-muted);
+}
+
+/* ---------- Panel kanan: form ---------- */
+
+.auth-panel {
+  background-color: var(--color-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-card__heading {
+  font-size: var(--text-2xl);
+  color: var(--color-gold);
+  margin-bottom: var(--space-2);
+}
+
+.auth-card__subheading {
+  font-size: var(--text-sm);
+  color: var(--color-paper-muted);
+  margin-bottom: var(--space-6);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-group label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-paper-muted);
+}
+
+.form-group input {
+  height: 44px;
+  padding: 0 var(--space-1);
+  background-color: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--color-paper-line);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-ink-800);
+  transition: border-color var(--transition-base);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-bottom-color: var(--color-stamp);
+}
+
+.auth-password-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: 1.5px solid var(--color-paper-line);
+  transition: border-color var(--transition-base);
+}
+
+.auth-password-field:focus-within {
+  border-bottom-color: var(--color-stamp);
+}
+
+.auth-password-field input {
+  flex: 1;
+  min-width: 0;
+  border-bottom: none;
+}
+
+.auth-password-toggle {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-paper-muted);
+  padding: var(--space-2) 0;
+  white-space: nowrap;
+}
+
+.auth-password-toggle:hover {
+  color: var(--color-ink-800);
+}
+
+.auth-error {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  background-color: var(--color-error-soft);
+  border-left: 3px solid var(--color-error);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+}
+
+.auth-error[hidden] {
+  display: none;
+}
+
+.auth-submit {
+  margin-top: var(--space-2);
+}
+
+/* ---------- Akun demo ---------- */
+
+.auth-demo {
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--color-paper-line);
+  padding-top: var(--space-4);
+}
+
+.auth-demo summary {
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-paper-muted);
+}
+
+.auth-demo summary:hover {
+  color: var(--color-ink-800);
+}
+
+.auth-demo__list {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.auth-demo__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  padding: var(--space-1) 0;
+}
+
+.auth-demo__list code {
+  color: var(--color-ink-800);
+}
+
+.auth-demo__list span {
+  color: var(--color-paper-muted);
+  text-align: right;
+}
+
+.auth-demo__note {
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-paper-muted);
+}
+
+.auth-demo__note code {
+  color: var(--color-stamp);
+}
+
+/* ---------- Responsif ---------- */
+
+@media (max-width: 880px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-brand {
+    padding: var(--space-5);
+    gap: var(--space-5);
+  }
+
+  .auth-brand__desc {
+    display: none;
+  }
+
+  .auth-route {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+  }
+
+  .auth-route__node {
+    padding-bottom: 0;
+    width: auto;
+  }
+
+  .auth-route__node::before {
+    display: none;
+  }
+
+  .auth-route__label {
+    display: none;
+  }
+
+  .auth-panel {
+    padding: var(--space-5);
+  }
+}

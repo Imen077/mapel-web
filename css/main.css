@@ -1,0 +1,45 @@
+/* ============================================================
+   MAPEL - main.css
+   Satu-satunya stylesheet yang di-link tiap halaman. Semua
+   file lain diimpor dari sini, jadi kalau nambah/isi file CSS
+   baru di global/components/pages, cukup daftarkan di sini
+   sekali -- tidak perlu ubah tiap file .html.
+
+   Font Google Fonts JUGA diimpor di sini (bukan lewat <link>
+   di tiap HTML) supaya nggak gampang kehapus kalau file HTML
+   di-generate ulang -- pernah kejadian link fontnya hilang dari
+   semua 37 file HTML dua kali gara-gara itu.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+/* Global */
+@import url('global/reset.css');
+@import url('global/variables.css');
+@import url('global/typography.css');
+@import url('global/utilities.css');
+
+/* Components */
+@import url('components/button.css');
+@import url('components/card.css');
+@import url('components/badge.css');
+@import url('components/table.css');
+@import url('components/navbar.css');
+@import url('components/dropdown.css');
+@import url('components/modal.css');
+@import url('components/notification.css');
+@import url('components/pagination.css');
+@import url('components/timeline.css');
+@import url('components/sidebar/sidebar-lo.css');
+@import url('components/sidebar/sidebar-pegawai.css');
+@import url('components/sidebar/sidebar-kasatker-dll.css');
+
+/* Pages */
+@import url('pages/login.css');
+@import url('pages/dashboard.css');
+@import url('pages/antrian.css');
+@import url('pages/monitoring.css');
+@import url('pages/detail.css');
+@import url('pages/pengajuan.css');
+@import url('pages/library.css');
+@import url('pages/pengaturan.css');

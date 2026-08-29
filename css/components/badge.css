@@ -1,0 +1,63 @@
+/* ============================================================
+   MAPEL - components/badge.css
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.badge-success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.badge-error {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+}
+
+.badge-gold {
+  background: var(--color-gold-soft);
+  color: #8a641f;
+}
+
+.badge-stamp {
+  background: var(--color-stamp-soft);
+  color: var(--color-stamp-dark);
+}
+
+/* Varian dinamis: warnanya di-set inline lewat custom property
+   (--tint-bg / --tint-text), dipakai buat badge status Monitoring
+   yang jumlah & warnanya beda-beda (lihat data/proposal.js). Gak
+   perlu bikin class terpisah tiap status. */
+.badge--tint {
+  background: var(--tint-bg);
+  color: var(--tint-text);
+}
+
+/* Badge angka peringkat (dipakai di list Top Download / Top View) */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+  background: var(--color-paper-dim);
+  color: var(--color-paper-muted);
+}
+
+.rank-badge--top {
+  background: var(--color-gold);
+  color: var(--color-ink-900);
+}

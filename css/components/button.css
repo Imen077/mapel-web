@@ -1,0 +1,58 @@
+/* ============================================================
+   MAPEL - components/button.css
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-primary {
+  background: var(--color-stamp);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--color-stamp-dark);
+}
+
+.btn-gold {
+  background: var(--color-gold);
+  color: var(--color-ink-900);
+}
+
+.btn-gold:hover {
+  background: #c8933a;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-ink-800);
+  border: 1px solid var(--color-paper-line);
+}
+
+.btn-ghost:hover {
+  background: var(--color-paper-dim);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

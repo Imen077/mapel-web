@@ -1,0 +1,54 @@
+/* ============================================================
+   MAPEL - pages/antrian.css
+   Sub-nav (tab) buat pindah antara Antrian Proposal PL &
+   Antrian Konsep PL, dipakai initAntrianPage() di
+   js/pages/antrian.js.
+   ============================================================ */
+
+.page-antrian {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--max-width-content);
+}
+
+.subnav {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  width: fit-content;
+  background: var(--color-paper-dim);
+  border-radius: var(--radius-full);
+}
+
+.subnav__item {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-paper-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.subnav__item:hover {
+  color: var(--color-ink-900);
+}
+
+.subnav__item--active {
+  background: var(--color-ink-900);
+  color: #ffffff;
+}
+
+.page-antrian__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.page-antrian__title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--color-ink-900);
+}

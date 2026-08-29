@@ -1,0 +1,102 @@
+/* ============================================================
+   MAPEL - pages/monitoring.css
+   Halaman Monitoring: judul + kartu ringkasan status ("stat
+   tile") + tabel (filter bar + data-table di table.css/
+   dropdown.css) + pagination (pagination.css).
+   ============================================================ */
+
+.monitoring-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--max-width-content);
+}
+
+.monitoring-page__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.monitoring-page__title {
+  color: var(--color-ink-900);
+  font-size: var(--text-2xl);
+}
+
+/* ---------- Kartu ringkasan status ---------- */
+
+.stat-tile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.stat-tile {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  /* Lebar tetap (bukan flex-grow) supaya semua kartu sama besar --
+     kalau pakai flex-grow, baris terakhir yang jumlah kartunya
+     lebih sedikit jadi melebar sendiri membagi sisa ruang. 4 kolom
+     di layar lebar, menyempit otomatis lewat media query di bawah. */
+  flex: 0 0 calc((100% - 3 * var(--space-4)) / 4);
+  padding: var(--space-5);
+  background: var(--color-paper);
+  border: 1px solid var(--color-paper-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.stat-tile__blob {
+  position: absolute;
+  top: -32px;
+  right: -32px;
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  background: var(--blob-color, var(--color-paper-line));
+  opacity: 0.55;
+}
+
+.stat-tile__value {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.stat-tile__label {
+  position: relative;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  line-height: 1.25;
+}
+
+/* ---------- Filter bar (di atas tabel) ---------- */
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-paper-line);
+}
+
+@media (max-width: 1100px) {
+  .stat-tile {
+    flex-basis: calc((100% - var(--space-4)) / 2);
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-tile {
+    flex-basis: 100%;
+  }
+}
