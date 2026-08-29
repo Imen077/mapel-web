@@ -18,7 +18,11 @@ export const SUBMISSION_STATUS = {
   KOREKSI_ORTALA: 'koreksi-ortala',
   PENGESAHAN_SATKER: 'pengesahan-satker',
   LEGISLASI: 'legislasi',
-  INDEKSASI: 'indeksasi'
+  INDEKSASI: 'indeksasi',
+  // Ditolak final oleh Kepala Biro Ortala di UJUNG rantai reviu --
+  // beda dari DITOLAK_KASATKER yang gugur di awal (tahap disposisi,
+  // sebelum sempat masuk rantai reviu Ortala sama sekali).
+  TIDAK_DISETUJUI: 'tidak-disetujui'
 };
 
 /**
@@ -39,7 +43,13 @@ export function buildStatusMeta(draftLabel) {
     { key: SUBMISSION_STATUS.KOREKSI_ORTALA, label: 'Koreksi Ortala', bg: '#FCE4EF', text: '#B03A6E', blob: '#F5B8D3' },
     { key: SUBMISSION_STATUS.PENGESAHAN_SATKER, label: 'Pengesahan Satker', bg: '#E4E8F9', text: '#3B4F9E', blob: '#C2CCF0' },
     { key: SUBMISSION_STATUS.LEGISLASI, label: 'Legislasi', bg: '#F1E4F7', text: '#7A3FA0', blob: '#DFC0EF' },
-    { key: SUBMISSION_STATUS.INDEKSASI, label: 'Indeksasi', bg: '#DEF5EA', text: '#1F8A63', blob: '#A9E8C7' }
+    { key: SUBMISSION_STATUS.INDEKSASI, label: 'Indeksasi', bg: '#DEF5EA', text: '#1F8A63', blob: '#A9E8C7' },
+    // hidden: true -- status ini cuma dipakai lewat kartu gabungan
+    // "Tidak Disetujui" di Monitoring Proposal PL (lihat
+    // PROPOSAL_CARD_GROUPS di js/pages/monitoring.js), jadi tidak
+    // ikut nongol di daftar kartu/filter default (dipakai apa
+    // adanya oleh Monitoring Konsep PL).
+    { key: SUBMISSION_STATUS.TIDAK_DISETUJUI, label: 'Tidak Disetujui', bg: '#F8DCD6', text: '#A93226', blob: '#EFAFA1', hidden: true }
   ];
 }
 

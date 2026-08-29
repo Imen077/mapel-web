@@ -42,6 +42,15 @@
   background: #c8933a;
 }
 
+.btn-dark {
+  background: var(--color-ink-900);
+  color: #ffffff;
+}
+
+.btn-dark:hover {
+  background: var(--color-ink-800);
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--color-ink-800);

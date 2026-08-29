@@ -40,10 +40,11 @@ export function createSubmissionService({ statusMeta, items }) {
    * @param {string} [params.search]
    * @param {string} [params.status] - key status, atau '' buat semua
    * @param {string|number} [params.year] - atau '' buat semua tahun
+   * @param {string} [params.assignedTo] - nama pembuat (item.createdBy), atau '' buat semua -- dipakai toggle "Assign to Me"
    * @param {number} [params.page] - 1-indexed
    * @param {number} [params.pageSize]
    */
-  function getFiltered({ search = '', status = '', year = '', page = 1, pageSize = 7 } = {}) {
+  function getFiltered({ search = '', status = '', year = '', assignedTo = '', page = 1, pageSize = 7 } = {}) {
     const term = search.trim().toLowerCase();
 
     let rows = items.filter((item) => submittedStatuses.includes(item.status));
@@ -58,6 +59,9 @@ export function createSubmissionService({ statusMeta, items }) {
     }
     if (year) {
       rows = rows.filter((item) => item.createdAt.slice(0, 4) === String(year));
+    }
+    if (assignedTo) {
+      rows = rows.filter((item) => item.createdBy === assignedTo);
     }
 
     const total = rows.length;

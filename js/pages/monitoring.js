@@ -9,8 +9,10 @@
 // ============================================================
 
 import { router } from '../core/router.js';
+import { ROLES } from '../core/role.js';
 import { proposalService, PROPOSAL_STATUS_META } from '../../data/proposal.js';
 import { konsepService, KONSEP_STATUS_META } from '../../data/konsep.js';
+import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateLongID } from '../core/format.js';
 
 const PAGE_SIZE = 7;
@@ -20,6 +22,53 @@ const CHEVRON_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none
 const ARROW_LEFT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m14.5 5-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ARROW_RIGHT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9.5 5 7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const PLUS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+// Proyeksi label+warna badge tabel Monitoring Proposal PL -- status
+// mentah yang sudah "digabung" secara tampilan di PROPOSAL_CARD_GROUPS
+// (final/pengesahan-satker/legislasi/indeksasi -> "Disetujui",
+// koreksi-ortala -> "Proses Reviu") juga perlu tampil dengan label
+// gabungan yang sama di badge status tabel, bukan label aslinya per
+// status. Status yang tidak disebut di sini tetap pakai label/warna
+// asli dari PROPOSAL_STATUS_META (lihat renderTableRows).
+const PROPOSAL_STATUS_LABEL_OVERRIDES = {
+  [SUBMISSION_STATUS.FINAL]: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' },
+  [SUBMISSION_STATUS.PENGESAHAN_SATKER]: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' },
+  [SUBMISSION_STATUS.LEGISLASI]: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' },
+  [SUBMISSION_STATUS.INDEKSASI]: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' },
+  [SUBMISSION_STATUS.KOREKSI_ORTALA]: { label: 'Proses Reviu', bg: '#EFE7FA', text: '#6C3FB5' },
+  [SUBMISSION_STATUS.TIDAK_DISETUJUI]: { label: 'Tidak Disetujui', bg: '#F8DCD6', text: '#A93226' }
+};
+
+// Kartu ringkasan khusus Monitoring Proposal PL -- beda dari Konsep
+// PL (yang masih pakai 11 kartu 1:1 per status, lihat PROPOSAL_STATUS_META
+// di bawah). Beberapa status digabung jadi satu kartu:
+// - "Proses Reviu" = PROSES_REVIU + KOREKSI_ORTALA (masih bolak-balik direviu)
+// - "Disetujui" = FINAL + PENGESAHAN_SATKER + LEGISLASI + INDEKSASI
+//   (semua tahap SETELAH disahkan Kepala Biro Ortala di ujung rantai reviu)
+// - "Tidak Disetujui" = TIDAK_DISETUJUI (ditolak final oleh Kepala Biro
+//   Ortala di ujung rantai reviu -- beda dari "Ditolak Kasatker" yang
+//   gugur di awal, sebelum sempat masuk rantai reviu Ortala)
+const PROPOSAL_CARD_GROUPS = [
+  { label: 'Konsep', statuses: [SUBMISSION_STATUS.DRAFT], text: '#2B935B', blob: '#E7E9EC' },
+  { label: 'Menunggu Persetujuan', statuses: [SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN], text: '#12664D', blob: '#DCF3E7' },
+  { label: 'Dikirim', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#A1721C', blob: '#FBEED0' },
+  { label: 'Koreksi Satker', statuses: [SUBMISSION_STATUS.KOREKSI_SATKER], text: '#C15343', blob: '#FBDAD5' },
+  { label: 'Ditolak Kasatker', statuses: [SUBMISSION_STATUS.DITOLAK_KASATKER], text: '#9F7327', blob: '#F7E7C4' },
+  { label: 'Proses Reviu', statuses: [SUBMISSION_STATUS.PROSES_REVIU, SUBMISSION_STATUS.KOREKSI_ORTALA], text: '#BD5444', blob: '#FBDAD5' },
+  {
+    label: 'Disetujui',
+    statuses: [
+      SUBMISSION_STATUS.FINAL,
+      SUBMISSION_STATUS.PENGESAHAN_SATKER,
+      SUBMISSION_STATUS.LEGISLASI,
+      SUBMISSION_STATUS.INDEKSASI
+    ],
+    text: '#888A92',
+    blob: '#EDEEF0'
+  },
+  { label: 'Tidak Disetujui', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#C0392B', blob: '#DCF3E7' }
+];
 
 // Konfigurasi per tipe monitoring -- cukup tambah entri baru di
 // sini kalau nanti ada varian lain, tidak perlu ubah logic render.
@@ -27,6 +76,15 @@ const MONITORING_CONFIG = {
   'proposal-pl': {
     service: proposalService,
     statusMeta: PROPOSAL_STATUS_META,
+    cardGroups: PROPOSAL_CARD_GROUPS,
+    statusLabelOverrides: PROPOSAL_STATUS_LABEL_OVERRIDES,
+    // Toggle "Assign to Me"/"Belum ada Konsep PL" + tombol "Buat
+    // Proposal Baru" cuma relevan buat LO Biro TI (yang mengajukan),
+    // bukan buat role reviewer lain yang cuma memantau -- dicek lagi
+    // pakai user.role saat render, bukan cuma dari config ini.
+    loBiroTiControls: true,
+    createRoute: '/pages/lo-biro-ti/pengajuan/proposal-pl.html',
+    createLabel: '+ Buat Proposal Baru',
     title: 'Monitoring Proposal Perangkat Lunak',
     subtitle: 'Pantau progres seluruh proposal yang telah diajukan, mulai dari pengajuan hingga persetujuan akhir.',
     searchPlaceholder: 'Cari proposal ...',
@@ -50,6 +108,7 @@ function getMonitoringType(pathname) {
 
 function renderStatCards(statusMeta, counts) {
   const cards = statusMeta
+    .filter((meta) => !meta.hidden)
     .map(
       (meta) => `
         <div class="stat-tile">
@@ -64,18 +123,78 @@ function renderStatCards(statusMeta, counts) {
   return `<div class="stat-tile-grid">${cards}</div>`;
 }
 
-function renderFilterBar({ statusMeta, years, selectedYear, search, selectedStatus, searchPlaceholder }) {
+/**
+ * Varian kartu ringkasan yang jumlahnya dihitung dari GABUNGAN
+ * beberapa status sekaligus (lihat PROPOSAL_CARD_GROUPS), dipakai
+ * khusus Monitoring Proposal PL. Beda dari renderStatCards() yang
+ * strict 1 kartu = 1 status.
+ * @param {{label:string, statuses:string[], text:string, blob:string}[]} cardGroups
+ * @param {Record<string, number>} counts
+ */
+function renderStatCardsGrouped(cardGroups, counts) {
+  const cards = cardGroups
+    .map((group) => {
+      const total = group.statuses.reduce((sum, key) => sum + (counts[key] ?? 0), 0);
+      return `
+        <div class="stat-tile">
+          <span class="stat-tile__blob" style="--blob-color:${group.blob}" aria-hidden="true"></span>
+          <span class="stat-tile__value" style="color:${group.text}">${total}</span>
+          <span class="stat-tile__label">${group.label}</span>
+        </div>
+      `;
+    })
+    .join('');
+
+  return `<div class="stat-tile-grid">${cards}</div>`;
+}
+
+function renderFilterBar({
+  statusMeta,
+  years,
+  selectedYear,
+  search,
+  selectedStatus,
+  searchPlaceholder,
+  showLoControls,
+  belumAdaKonsep,
+  assignToMe,
+  createLabel
+}) {
   const yearOptions = years
     .map((y) => `<option value="${y}"${String(y) === String(selectedYear) ? ' selected' : ''}>${y}</option>`)
     .join('');
 
   const statusOptions = statusMeta
-    .filter((meta) => meta.key !== 'draft')
+    .filter((meta) => meta.key !== 'draft' && !meta.hidden)
     .map(
       (meta) =>
         `<option value="${meta.key}"${meta.key === selectedStatus ? ' selected' : ''}>${meta.label}</option>`
     )
     .join('');
+
+  // Toggle "Belum ada Konsep PL" & tombol "Buat Proposal Baru" cuma
+  // buat LO Biro TI (lihat loBiroTiControls di MONITORING_CONFIG +
+  // pengecekan role di initMonitoringTable). "Belum ada Konsep PL"
+  // untuk sekarang BARU UI-nya saja -- logic filternya nyusul begitu
+  // ada relasi proposal<->konsep di data (lihat TODO di bindEvents).
+  const loControls = showLoControls
+    ? `
+      <div class="filter-bar__toggles">
+        <label class="toggle">
+          <input type="checkbox" class="toggle__input" id="filter-belum-konsep" ${belumAdaKonsep ? 'checked' : ''}>
+          <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          <span class="toggle__label">Belum ada Konsep PL</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" class="toggle__input" id="filter-assign-me" ${assignToMe ? 'checked' : ''}>
+          <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          <span class="toggle__label">Assign to Me</span>
+        </label>
+      </div>
+      <span class="filter-bar__spacer"></span>
+      <button class="btn btn-dark" type="button" id="btn-create-proposal">${PLUS_ICON}${createLabel}</button>
+    `
+    : '';
 
   return `
     <div class="filter-bar">
@@ -99,11 +218,13 @@ function renderFilterBar({ statusMeta, years, selectedYear, search, selectedStat
         </select>
         <span class="filter-bar__select-chevron">${CHEVRON_ICON}</span>
       </div>
+
+      ${loControls}
     </div>
   `;
 }
 
-function renderTableRows(service, rows, startIndex) {
+function renderTableRows(service, rows, startIndex, labelOverrides) {
   if (!rows.length) {
     return `
       <tr>
@@ -114,7 +235,8 @@ function renderTableRows(service, rows, startIndex) {
 
   return rows
     .map((item, i) => {
-      const meta = service.getStatusMeta(item.status);
+      const baseMeta = service.getStatusMeta(item.status);
+      const meta = { ...baseMeta, ...(labelOverrides?.[item.status] || {}) };
       return `
         <tr>
           <td>${startIndex + i + 1}.</td>
@@ -169,10 +291,24 @@ function renderPagination(page, totalPages) {
 /**
  * @param {HTMLElement} root
  * @param {{service:Object, statusMeta:Array, title:string, subtitle:string, searchPlaceholder:string}} config
+ * @param {Session} user
  */
-function initMonitoringTable(root, config) {
-  const { service, statusMeta, title, subtitle, searchPlaceholder, titleColumnLabel } = config;
-  const state = { search: '', status: '', year: '', page: 1 };
+function initMonitoringTable(root, config, user) {
+  const {
+    service,
+    statusMeta,
+    cardGroups,
+    statusLabelOverrides,
+    loBiroTiControls,
+    createRoute,
+    createLabel,
+    title,
+    subtitle,
+    searchPlaceholder,
+    titleColumnLabel
+  } = config;
+  const showLoControls = Boolean(loBiroTiControls) && user?.role === ROLES.LO_BIRO_TI;
+  const state = { search: '', status: '', year: '', page: 1, assignToMe: false, belumAdaKonsep: false };
   const years = service.getAvailableYears();
 
   function renderAll() {
@@ -180,6 +316,7 @@ function initMonitoringTable(root, config) {
       search: state.search,
       status: state.status,
       year: state.year,
+      assignedTo: state.assignToMe ? user?.name : '',
       page: state.page,
       pageSize: PAGE_SIZE
     });
@@ -195,7 +332,7 @@ function initMonitoringTable(root, config) {
           <p class="dashboard__subtitle">${subtitle}</p>
         </div>
 
-        ${renderStatCards(statusMeta, counts)}
+        ${cardGroups ? renderStatCardsGrouped(cardGroups, counts) : renderStatCards(statusMeta, counts)}
 
         <div class="card data-table-card">
           ${renderFilterBar({
@@ -204,7 +341,11 @@ function initMonitoringTable(root, config) {
             selectedYear: state.year,
             search: state.search,
             selectedStatus: state.status,
-            searchPlaceholder
+            searchPlaceholder,
+            showLoControls,
+            belumAdaKonsep: state.belumAdaKonsep,
+            assignToMe: state.assignToMe,
+            createLabel
           })}
           <div class="data-table-wrap">
             <table class="data-table">
@@ -221,7 +362,7 @@ function initMonitoringTable(root, config) {
                 </tr>
               </thead>
               <tbody>
-                ${renderTableRows(service, rows, startIndex)}
+                ${renderTableRows(service, rows, startIndex, statusLabelOverrides)}
               </tbody>
             </table>
           </div>
@@ -238,6 +379,9 @@ function initMonitoringTable(root, config) {
     const searchInput = root.querySelector('#filter-search');
     const yearSelect = root.querySelector('#filter-year');
     const statusSelect = root.querySelector('#filter-status');
+    const assignMeToggle = root.querySelector('#filter-assign-me');
+    const belumKonsepToggle = root.querySelector('#filter-belum-konsep');
+    const createBtn = root.querySelector('#btn-create-proposal');
 
     let debounceTimer;
     searchInput?.addEventListener('input', (event) => {
@@ -265,6 +409,24 @@ function initMonitoringTable(root, config) {
       state.status = event.target.value;
       state.page = 1;
       renderAll();
+    });
+
+    assignMeToggle?.addEventListener('change', (event) => {
+      state.assignToMe = event.target.checked;
+      state.page = 1;
+      renderAll();
+    });
+
+    // TODO: belum ada relasi proposal<->konsep di data, jadi toggle
+    // ini baru menyimpan state UI-nya saja dan belum benar-benar
+    // menyaring tabel. Sambungkan ke logic filter begitu field relasi
+    // (mis. proposalId di data/konsep.js) sudah ada.
+    belumKonsepToggle?.addEventListener('change', (event) => {
+      state.belumAdaKonsep = event.target.checked;
+    });
+
+    createBtn?.addEventListener('click', () => {
+      if (createRoute) router.navigate(createRoute);
     });
 
     root.querySelectorAll('.pagination__page[data-page], .pagination__arrow[data-page]').forEach((btn) => {
@@ -296,5 +458,5 @@ export function initMonitoringPage(root, user) {
     return;
   }
 
-  initMonitoringTable(root, config);
+  initMonitoringTable(root, config, user);
 }
