@@ -4,23 +4,53 @@
 // (dipola sama seperti js/pages/monitoring.js, komponennya di-
 // reuse: filter-bar, data-table, badge, pagination). Bedanya sama
 // Monitoring: Antrian menampilkan daftar milik pembuatnya sendiri
-// TERMASUK yang masih draft, plus kolom "Nomor Pengajuan" dan
-// "Koreksi Ke-".
+// TERMASUK yang masih draft, plus kolom "Nomor Pengajuan".
 //
-// Baru varian Konsep PL yang diisi; Antrian Proposal PL masih
-// placeholder, menyusul.
+// Konsep PL punya 1 kolom ekstra ("Koreksi Ke-") yang tidak ada di
+// Proposal PL -- lihat parameter showKoreksi di renderTableRows().
+// Proposal PL juga tampil dengan format tanggal beda (presisi detik
+// + nama hari, lihat formatDateTimeFullID) sesuai desain yang sudah
+// disepakati, dan label status "Konsep"/"Disetujui"/"Proses Reviu"
+// di badge tabelnya digabung dari beberapa status mentah sekaligus
+// (lihat PROPOSAL_STATUS_LABEL_OVERRIDES, sama polanya dengan
+// PROPOSAL_STATUS_LABEL_OVERRIDES di js/pages/monitoring.js).
 // ============================================================
 
 import { router } from '../core/router.js';
 import { antrianKonsepService } from '../../data/antrian-konsep.js';
+import { antrianProposalService } from '../../data/antrian-proposal.js';
 import { KONSEP_STATUS_META } from '../../data/konsep.js';
-import { formatDateTimeLongID } from '../core/format.js';
+import { PROPOSAL_STATUS_META } from '../../data/proposal.js';
+import { SUBMISSION_STATUS } from '../../data/status.js';
+import { formatDateTimeLongID, formatDateTimeFullID } from '../core/format.js';
 
 const PAGE_SIZE = 10;
 
 const SEARCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const CHEVRON_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+// Status mentah yang tampil DIGABUNG secara label di badge tabel
+// Antrian Proposal PL (bukan label asli PROPOSAL_STATUS_META):
+// - DRAFT -> "Konsep" (draftLabel asli PROPOSAL_STATUS_META
+//   sebenarnya "Proposal", tapi di Antrian konsisten disebut
+//   "Konsep" apapun tipe objeknya)
+// - FINAL/PENGESAHAN_SATKER/LEGISLASI/INDEKSASI -> "Disetujui"
+//   (semua tahap SETELAH disahkan Kepala Biro Ortala)
+// - KOREKSI_ORTALA -> "Proses Reviu" (masih bolak-balik direviu,
+//   warnanya disamakan dgn PROSES_REVIU biar konsisten)
+// - TIDAK_DISETUJUI -> ditampilkan apa adanya (default hidden:true
+//   di status.js karena biasanya cuma dipakai kartu gabungan
+//   Monitoring, tapi Antrian perlu menampilkannya per-baris)
+const PROPOSAL_STATUS_LABEL_OVERRIDES = {
+  [SUBMISSION_STATUS.DRAFT]: { label: 'Konsep' },
+  [SUBMISSION_STATUS.FINAL]: { label: 'Disetujui' },
+  [SUBMISSION_STATUS.PENGESAHAN_SATKER]: { label: 'Disetujui' },
+  [SUBMISSION_STATUS.LEGISLASI]: { label: 'Disetujui' },
+  [SUBMISSION_STATUS.INDEKSASI]: { label: 'Disetujui' },
+  [SUBMISSION_STATUS.KOREKSI_ORTALA]: { label: 'Proses Reviu', bg: '#EFE7FA', text: '#6C3FB5' },
+  [SUBMISSION_STATUS.TIDAK_DISETUJUI]: { label: 'Tidak Disetujui', bg: '#F8DCD6', text: '#A93226' }
+};
 
 /** Ambil key halaman ('proposal-pl' | 'konsep-pl') dari path saat ini. */
 function getPageKey(pathname) {
@@ -73,14 +103,30 @@ function renderKoreksiBadge(count) {
   return `<span class="${cls}">${count}</span>`;
 }
 
-function renderTableRows(service, rows, startIndex) {
+/**
+ * @param {Object} service
+ * @param {Array} rows
+ * @param {number} startIndex
+ * @param {Object} [options]
+ * @param {boolean} [options.showKoreksi] - default true (Konsep PL). Proposal PL
+ *   tidak punya kolom "Koreksi Ke-" di desainnya, jadi false di sana.
+ * @param {Object} [options.labelOverrides] - status -> {label, bg?, text?} buat
+ *   badge tabel (lihat PROPOSAL_STATUS_LABEL_OVERRIDES). Kosong = pakai label asli.
+ * @param {(dateInput:string) => string} [options.dateFormatter] - default formatDateTimeLongID.
+ */
+function renderTableRows(service, rows, startIndex, options = {}) {
+  const { showKoreksi = true, labelOverrides = {}, dateFormatter = formatDateTimeLongID } = options;
+  const colspan = showKoreksi ? 10 : 9;
+
   if (!rows.length) {
-    return `<tr><td class="data-table__empty" colspan="10">Tidak ada data yang cocok dengan filter ini.</td></tr>`;
+    return `<tr><td class="data-table__empty" colspan="${colspan}">Tidak ada data yang cocok dengan filter ini.</td></tr>`;
   }
 
   return rows
     .map((item, i) => {
-      const meta = service.getStatusMeta(item.status);
+      const baseMeta = service.getStatusMeta(item.status);
+      const meta = { ...baseMeta, ...(labelOverrides[item.status] || {}) };
+      const koreksiCell = showKoreksi ? `<td>${renderKoreksiBadge(item.koreksiKe)}</td>` : '';
       return `
         <tr>
           <td>${startIndex + i + 1}.</td>
@@ -88,9 +134,9 @@ function renderTableRows(service, rows, startIndex) {
           <td>${item.nomorPengajuan || '-'}</td>
           <td><span class="data-table__title">${item.title}</span></td>
           <td>${item.jenis}</td>
-          <td>${renderKoreksiBadge(item.koreksiKe)}</td>
-          <td>${item.employeeId}-${item.createdBy}</td>
-          <td>${formatDateTimeLongID(item.createdAt)}</td>
+          ${koreksiCell}
+          <td class="data-table__cell--nowrap">${item.employeeId}-${item.createdBy}</td>
+          <td>${dateFormatter(item.createdAt)}</td>
           <td>
             <span class="badge badge--tint" style="--tint-bg:${meta.bg};--tint-text:${meta.text}">${meta.label}</span>
           </td>
@@ -245,6 +291,130 @@ function initAntrianKonsepTable(root, user) {
 }
 
 /**
+ * Sama polanya dengan initAntrianKonsepTable() di atas -- bedanya:
+ * tanpa kolom "Koreksi Ke-" (showKoreksi:false), badge status pakai
+ * PROPOSAL_STATUS_LABEL_OVERRIDES, dan format tanggal pakai
+ * formatDateTimeFullID (presisi detik + nama hari), sesuai desain
+ * Antrian Proposal PL yang sudah disepakati.
+ * @param {HTMLElement} root
+ * @param {Session} user
+ */
+function initAntrianProposalTable(root, user) {
+  const service = antrianProposalService;
+  const years = service.getAvailableYears();
+  const state = { search: '', status: '', year: '', page: 1 };
+
+  function renderAll() {
+    const { rows, totalPages, page } = service.getFiltered({
+      search: state.search,
+      status: state.status,
+      year: state.year,
+      page: state.page,
+      pageSize: PAGE_SIZE,
+      includeDraft: true
+    });
+    state.page = page;
+
+    const startIndex = (page - 1) * PAGE_SIZE;
+
+    root.innerHTML = `
+      <div class="page-antrian">
+        <div class="page-antrian__body">
+          <h1 class="page-antrian__title">Antrian Proposal Perangkat Lunak</h1>
+        </div>
+
+        <div class="card data-table-card data-table-card--compact">
+          ${renderFilterBar({
+            years,
+            selectedYear: state.year,
+            search: state.search,
+            statusMeta: PROPOSAL_STATUS_META,
+            selectedStatus: state.status,
+            searchPlaceholder: 'Cari Proposal ...'
+          })}
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nomor</th>
+                  <th>Satuan Kerja</th>
+                  <th>Nomor Pengajuan</th>
+                  <th>Judul Proposal</th>
+                  <th>Jenis</th>
+                  <th>Dibuat Oleh</th>
+                  <th>Tanggal Dibuat</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${renderTableRows(service, rows, startIndex, {
+                  showKoreksi: false,
+                  labelOverrides: PROPOSAL_STATUS_LABEL_OVERRIDES,
+                  dateFormatter: formatDateTimeFullID
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="data-table-card__footer">
+            ${totalPages > 1 ? renderPagination(page, totalPages) : ''}
+          </div>
+        </div>
+      </div>
+    `;
+
+    bindEvents();
+  }
+
+  function bindEvents() {
+    const searchInput = root.querySelector('#filter-search');
+    const yearSelect = root.querySelector('#filter-year');
+    const statusSelect = root.querySelector('#filter-status');
+
+    let debounceTimer;
+    searchInput?.addEventListener('input', (event) => {
+      clearTimeout(debounceTimer);
+      const value = event.target.value;
+      debounceTimer = setTimeout(() => {
+        state.search = value;
+        state.page = 1;
+        renderAll();
+        const el = root.querySelector('#filter-search');
+        if (el) {
+          el.focus();
+          el.setSelectionRange(el.value.length, el.value.length);
+        }
+      }, 300);
+    });
+
+    yearSelect?.addEventListener('change', (event) => {
+      state.year = event.target.value;
+      state.page = 1;
+      renderAll();
+    });
+
+    statusSelect?.addEventListener('change', (event) => {
+      state.status = event.target.value;
+      state.page = 1;
+      renderAll();
+    });
+
+    root.querySelectorAll('.pagination__page[data-page], .pagination__text-btn[data-page]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetPage = Number(btn.getAttribute('data-page'));
+        if (!Number.isNaN(targetPage)) {
+          state.page = targetPage;
+          renderAll();
+        }
+      });
+    });
+  }
+
+  renderAll();
+}
+
+/**
  * @param {HTMLElement} root - elemen tempat konten antrian dipasang
  * @param {Session} user
  */
@@ -258,12 +428,5 @@ export function initAntrianPage(root, user) {
     return;
   }
 
-  root.innerHTML = `
-    <div class="page-antrian">
-      <div class="page-antrian__body">
-        <h1 class="page-antrian__title">Antrian Proposal PL</h1>
-        <p class="dashboard__subtitle">Daftar antrian sedang dalam pengembangan.</p>
-      </div>
-    </div>
-  `;
+  initAntrianProposalTable(root, user);
 }

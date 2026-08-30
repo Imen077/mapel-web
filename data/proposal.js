@@ -65,7 +65,11 @@ const JUDUL_LIST = [
   'Sistem Monitoring Proyek TI',
   'e-Katalog Perangkat Lunak Internal',
   'Aplikasi Helpdesk Layanan TI',
-  'Sistem Informasi Kinerja Satker'
+  'Sistem Informasi Kinerja Satker',
+  // 2 judul ekstra (di luar STATUS_SEQUENCE) -- khusus jadi draft/
+  // "Konsep", lihat DRAFT_COUNT di bawah.
+  'Aplikasi Presensi Wajah Pegawai',
+  'Sistem Rekonsiliasi Data Keuangan'
 ];
 
 // Sebaran status dummy -- dibuat manual (bukan acak polos) biar
@@ -109,20 +113,99 @@ function daysBeforeISO(baseDate, offsetDays) {
   return d.toISOString().slice(0, 10);
 }
 
+// ID pegawai pembuat (dummy, cuma buat tampilan), dipasangkan sama
+// nama (item.employeeId + '-' + item.createdBy) di kolom "Dibuat
+// Oleh" tabel Antrian -- indeksnya harus sinkron sama NAMA_LIST.
+const EMPLOYEE_ID_LIST = [
+  '240004492',
+  'K00000118',
+  '240015523',
+  '240021847',
+  'K00003392',
+  '240033215',
+  '240040567',
+  'K00007741'
+];
+
+/** @param {number} nameIndex - index di NAMA_LIST/EMPLOYEE_ID_LIST */
+function buildEmployeeId(nameIndex) {
+  return EMPLOYEE_ID_LIST[nameIndex] || `EMP-${String(nameIndex + 1).padStart(2, '0')}`;
+}
+
+/**
+ * Jam dummy yang deterministik (bukan acak tiap reload) buat kolom
+ * "Tanggal Dibuat" Antrian, yang butuh presisi jam:menit:detik
+ * (beda dari Monitoring yang cukup tanggal doang, lihat
+ * formatDateTimeFullID di js/core/format.js).
+ * @param {number} i - index item di SEED_PROPOSALS
+ */
+function buildTimeOfDay(i) {
+  const hour = (i * 7 + 8) % 24;
+  const minute = (i * 13 + 11) % 60;
+  const second = (i * 19 + 29) % 60;
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+}
+
+// Tahap SEBELUM proposal resmi "dikirim" & masuk rantai disposisi --
+// item di tahap ini belum punya nomor pengajuan resmi (kolom "Nomor
+// Pengajuan" di Antrian dikosongkan). Beda dari Konsep PL yang
+// nomorPengajuan-nya keisi lebih awal (lihat data/konsep.js) --
+// aturan ini diambil dari contoh desain Antrian Proposal PL yang
+// sudah disepakati.
+const PRE_SUBMISSION_STATUSES = [
+  SUBMISSION_STATUS.DRAFT,
+  SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN,
+  SUBMISSION_STATUS.KOREKSI_SATKER,
+  SUBMISSION_STATUS.DITOLAK_KASATKER
+];
+
 const BASE_DATE = '2026-07-22';
 const BASE_NUMBER = 41;
 
-export const SEED_PROPOSALS = JUDUL_LIST.map((title, i) => {
+export const SEED_PROPOSALS = JUDUL_LIST.slice(0, STATUS_SEQUENCE.length).map((title, i) => {
   const nomor = BASE_NUMBER - i;
+  const nameIndex = i % NAMA_LIST.length;
   return {
     id: `PO-2026-${String(nomor).padStart(3, '0')}`,
     unit: UNIT_LIST[i % UNIT_LIST.length],
     title,
     jenis: JENIS_LIST[i % JENIS_LIST.length],
-    createdBy: NAMA_LIST[i % NAMA_LIST.length],
-    createdAt: daysBeforeISO(BASE_DATE, i * 2),
-    status: STATUS_SEQUENCE[i % STATUS_SEQUENCE.length]
+    createdBy: NAMA_LIST[nameIndex],
+    employeeId: buildEmployeeId(nameIndex),
+    createdAt: `${daysBeforeISO(BASE_DATE, i * 2)}T${buildTimeOfDay(i)}`,
+    status: STATUS_SEQUENCE[i]
   };
+});
+
+const DRAFT_COUNT = 2;
+JUDUL_LIST.slice(STATUS_SEQUENCE.length).forEach((title, i) => {
+  if (i >= DRAFT_COUNT) return;
+  const nameIndex = i % NAMA_LIST.length;
+  SEED_PROPOSALS.push({
+    id: `PO-2026-DRAFT-${String(i + 1).padStart(2, '0')}`,
+    unit: UNIT_LIST[i % UNIT_LIST.length],
+    title,
+    jenis: JENIS_LIST[i % JENIS_LIST.length],
+    createdBy: NAMA_LIST[nameIndex],
+    employeeId: buildEmployeeId(nameIndex),
+    createdAt: `${daysBeforeISO(BASE_DATE, (STATUS_SEQUENCE.length + i) * 2)}T${buildTimeOfDay(STATUS_SEQUENCE.length + i)}`,
+    status: SUBMISSION_STATUS.DRAFT
+  });
+});
+
+// Nomor pengajuan resmi (beda dari "id" internal): SENGAJA dihitung
+// terpisah, cuma jalan buat item yang sudah lewat PRE_SUBMISSION_STATUSES
+// (lihat definisinya di atas) -- makanya angkanya urut rapat 001, 002,
+// 003... tanpa lompat, walau di antara nomor-nomor itu ada baris lain
+// yang nomor pengajuannya masih kosong ("-").
+let submittedCounter = 0;
+SEED_PROPOSALS.forEach((item) => {
+  if (PRE_SUBMISSION_STATUSES.includes(item.status)) {
+    item.nomorPengajuan = null;
+    return;
+  }
+  submittedCounter += 1;
+  item.nomorPengajuan = `PO-2026-${String(submittedCounter).padStart(3, '0')}`;
 });
 
 export const proposalService = createSubmissionService({

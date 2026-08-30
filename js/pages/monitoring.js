@@ -84,7 +84,13 @@ const MONITORING_CONFIG = {
     // pakai user.role saat render, bukan cuma dari config ini.
     loBiroTiControls: true,
     createRoute: '/pages/lo-biro-ti/pengajuan/proposal-pl.html',
-    createLabel: '+ Buat Proposal Baru',
+    createLabel: 'Buat Proposal Baru',
+    // Tabelnya dibikin lebih rapat/kecil, dipola sama seperti tabel
+    // Antrian Konsep PL (lihat .data-table-card--compact di
+    // css/pages/antrian.css -- classnya sengaja ditaruh di file itu
+    // karena dulu pertama kali dibikin buat Antrian, sekarang dipakai
+    // bareng di sini juga).
+    compactTable: true,
     title: 'Monitoring Proposal Perangkat Lunak',
     subtitle: 'Pantau progres seluruh proposal yang telah diajukan, mulai dari pengajuan hingga persetujuan akhir.',
     searchPlaceholder: 'Cari proposal ...',
@@ -302,6 +308,7 @@ function initMonitoringTable(root, config, user) {
     loBiroTiControls,
     createRoute,
     createLabel,
+    compactTable,
     title,
     subtitle,
     searchPlaceholder,
@@ -334,7 +341,7 @@ function initMonitoringTable(root, config, user) {
 
         ${cardGroups ? renderStatCardsGrouped(cardGroups, counts) : renderStatCards(statusMeta, counts)}
 
-        <div class="card data-table-card">
+        <div class="card data-table-card${compactTable ? ' data-table-card--compact' : ''}">
           ${renderFilterBar({
             statusMeta,
             years,

@@ -1,8 +1,9 @@
 /* ============================================================
    MAPEL - pages/antrian.css
-   Sub-nav (tab) buat pindah antara Antrian Proposal PL &
-   Antrian Konsep PL, dipakai initAntrianPage() di
-   js/pages/antrian.js.
+   Halaman Antrian (Proposal PL & Konsep PL), dirender oleh
+   initAntrianPage() di js/pages/antrian.js. Pindah antar varian
+   sekarang lewat accordion "Antrian" di sidebar (lihat ROLE_MENUS
+   di js/core/role.js), bukan tab di dalam halaman lagi.
    ============================================================ */
 
 .page-antrian {
@@ -10,10 +11,11 @@
   flex-direction: column;
   gap: var(--space-6);
   /* Beda dari halaman lain (max-width-content 1200px): tabel
-     Antrian punya 10 kolom (2 lebih banyak dari Monitoring, ada
-     Nomor Pengajuan & Koreksi Ke- ekstra), jadi container-nya perlu
-     lebih lebar supaya Status & Aksi tidak kesorong keluar dan
-     butuh scroll horizontal buat keliatan. */
+     Antrian Konsep PL punya 10 kolom (Nomor Pengajuan & Koreksi
+     Ke- ekstra dibanding Monitoring), Antrian Proposal PL 9 kolom
+     (Nomor Pengajuan doang, tanpa Koreksi Ke-) -- keduanya butuh
+     container lebih lebar dari 1200px supaya Status & Aksi tidak
+     kesorong keluar dan butuh scroll horizontal buat keliatan. */
   max-width: 100%;
 }
 
@@ -83,7 +85,7 @@
   white-space: nowrap;
 }
 
-.data-table-card--compact .data-table tbody td:nth-child(7) {
+.data-table-card--compact .data-table__cell--nowrap {
   white-space: nowrap;
 }
 
