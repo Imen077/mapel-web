@@ -9,7 +9,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: var(--max-width-content);
+  /* Beda dari halaman lain (max-width-content 1200px): tabel
+     Antrian punya 10 kolom (2 lebih banyak dari Monitoring, ada
+     Nomor Pengajuan & Koreksi Ke- ekstra), jadi container-nya perlu
+     lebih lebar supaya Status & Aksi tidak kesorong keluar dan
+     butuh scroll horizontal buat keliatan. */
+  max-width: 100%;
 }
 
 .subnav {
@@ -51,4 +56,50 @@
   font-family: var(--font-display);
   font-size: var(--text-2xl);
   color: var(--color-ink-900);
+}
+
+/* ---------- Varian compact khusus tabel Antrian ----------
+   Antrian punya lebih banyak kolom daripada Monitoring (Nomor
+   Pengajuan, Koreksi Ke- extra), jadi butuh padding & font lebih
+   rapat supaya tetap muat rapi tanpa bikin judul konsep pecah
+   jadi berbaris-baris. Judul dipotong + "..." (bukan wrap) kalau
+   memang kepanjangan -- detail lengkapnya tetap bisa dilihat lewat
+   tombol Aksi. */
+.data-table-card--compact .data-table thead th {
+  padding: var(--space-3) var(--space-4);
+  font-size: 11px;
+}
+
+.data-table-card--compact .data-table tbody td {
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+}
+
+.data-table-card--compact .data-table__title {
+  display: block;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-table-card--compact .data-table tbody td:nth-child(7) {
+  white-space: nowrap;
+}
+
+/* Footer pagination NEMPEL jadi satu sama card (bukan lagi
+   elemen terpisah di bawahnya) -- garis pemisah tipis di atas,
+   biar filter+tabel+pagination kelihatan sebagai satu kesatuan
+   utuh (satu background/border/shadow), sesuai referensi desain. */
+.data-table-card__footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-paper-line);
+}
+
+.data-table-card__footer:empty {
+  display: none;
+}
+
+.data-table-card__footer .pagination {
+  justify-content: space-between;
 }

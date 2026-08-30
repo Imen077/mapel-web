@@ -3,11 +3,13 @@
 // Data dummy pengajuan Konsep PL. Dipakai halaman Monitoring &
 // Antrian Konsep PL. Strukturnya identik dengan data/proposal.js
 // (lihat data/status.js & data/submission-service.js buat logic
-// bersama) -- jumlah tiap status di data dummy ini sengaja dibuat
-// sama persis dengan contoh tampilan yang sudah disepakati:
-// Konsep 6, Menunggu Persetujuan 7, Dikirim 3, Koreksi Satker 2,
-// Ditolak Kasatker 0, Proses Reviu 7, Final 3, Koreksi Ortala 4,
-// Pengesahan Satker 5, Legislasi 3, Indeksasi 0.
+// bersama), ditambah 3 field yang cuma dipakai tabel Antrian
+// (nomorPengajuan, koreksiKe, employeeId) -- jumlah tiap status
+// di data dummy ini sengaja dibuat sama persis dengan contoh
+// tampilan yang sudah disepakati: Konsep 6, Menunggu Persetujuan
+// 7, Dikirim 3, Koreksi Satker 2, Ditolak Kasatker 0, Proses
+// Reviu 7, Final 3, Koreksi Ortala 4, Pengesahan Satker 5,
+// Legislasi 3, Indeksasi 0.
 // ============================================================
 
 import { SUBMISSION_STATUS, buildStatusMeta } from './status.js';
@@ -125,6 +127,29 @@ function daysBeforeISO(baseDate, offsetDays) {
   return d.toISOString().slice(0, 10);
 }
 
+const MONTH_ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
+/** Nomor pengajuan resmi (beda dari "id" internal), format birokrasi mis. "032/KL-PL/VII/2026". */
+function buildNomorPengajuan(nomor, dateISO) {
+  const month = MONTH_ROMAN[new Date(dateISO).getMonth()];
+  return `${String(nomor).padStart(3, '0')}/KL-PL/${month}/2026`;
+}
+
+/** ID pegawai pembuat, dipasangkan sama nama (item.employeeId + '-' + item.createdBy) di tabel Antrian. */
+function buildEmployeeId(nameIndex) {
+  return `EMP-${String(nameIndex + 1).padStart(2, '0')}`;
+}
+
+// Jumlah koreksi yang pernah dilalui, dipakai badge "Koreksi Ke-"
+// di tabel Antrian. Item yang statusnya LAGI di tahap koreksi jelas
+// >0; status lain default 0 (belum ada iterasi lain yang dilacak di
+// data dummy ini).
+function buildKoreksiKe(status) {
+  if (status === SUBMISSION_STATUS.KOREKSI_SATKER) return 1;
+  if (status === SUBMISSION_STATUS.KOREKSI_ORTALA) return 2;
+  return 0;
+}
+
 const BASE_DATE = '2026-07-24';
 const BASE_NUMBER = 34;
 
@@ -133,13 +158,18 @@ const BASE_NUMBER = 34;
 // ringkasan "Konsep" -- lihat DRAFT_COUNT di bawah).
 export const SEED_KONSEP = JUDUL_LIST.slice(0, STATUS_SEQUENCE.length).map((title, i) => {
   const nomor = BASE_NUMBER - i;
+  const nameIndex = i % NAMA_LIST.length;
+  const createdAt = daysBeforeISO(BASE_DATE, i * 2);
   return {
     id: `KL-2026-${String(nomor).padStart(3, '0')}`,
     unit: UNIT_LIST[i % UNIT_LIST.length],
     title,
     jenis: JENIS_LIST[i % JENIS_LIST.length],
-    createdBy: NAMA_LIST[i % NAMA_LIST.length],
-    createdAt: daysBeforeISO(BASE_DATE, i * 2),
+    createdBy: NAMA_LIST[nameIndex],
+    employeeId: buildEmployeeId(nameIndex),
+    nomorPengajuan: buildNomorPengajuan(nomor, createdAt),
+    koreksiKe: buildKoreksiKe(STATUS_SEQUENCE[i]),
+    createdAt,
     status: STATUS_SEQUENCE[i]
   };
 });
@@ -147,12 +177,18 @@ export const SEED_KONSEP = JUDUL_LIST.slice(0, STATUS_SEQUENCE.length).map((titl
 const DRAFT_COUNT = 6;
 JUDUL_LIST.slice(STATUS_SEQUENCE.length).forEach((title, i) => {
   if (i >= DRAFT_COUNT) return;
+  const nameIndex = i % NAMA_LIST.length;
   SEED_KONSEP.push({
     id: `KL-2026-DRAFT-${String(i + 1).padStart(2, '0')}`,
     unit: UNIT_LIST[i % UNIT_LIST.length],
     title,
     jenis: JENIS_LIST[i % JENIS_LIST.length],
-    createdBy: NAMA_LIST[i % NAMA_LIST.length],
+    createdBy: NAMA_LIST[nameIndex],
+    employeeId: buildEmployeeId(nameIndex),
+    // Draft belum resmi diajukan, jadi belum ada nomor pengajuan
+    // ataupun riwayat koreksi -- ditampilkan "-" & 0 di tabel Antrian.
+    nomorPengajuan: null,
+    koreksiKe: 0,
     createdAt: daysBeforeISO(BASE_DATE, (STATUS_SEQUENCE.length + i) * 2),
     status: SUBMISSION_STATUS.DRAFT
   });

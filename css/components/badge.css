@@ -61,3 +61,25 @@
   background: var(--color-gold);
   color: var(--color-ink-900);
 }
+
+/* Badge bulat kolom "Koreksi Ke-" di tabel Antrian: hijau kalau
+   belum pernah dikoreksi (0), kuning/gold begitu sudah >0 (perlu
+   perhatian). */
+.koreksi-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.koreksi-badge--attention {
+  background: var(--color-gold-soft);
+  color: #8a641f;
+}

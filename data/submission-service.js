@@ -43,11 +43,22 @@ export function createSubmissionService({ statusMeta, items }) {
    * @param {string} [params.assignedTo] - nama pembuat (item.createdBy), atau '' buat semua -- dipakai toggle "Assign to Me"
    * @param {number} [params.page] - 1-indexed
    * @param {number} [params.pageSize]
+   * @param {boolean} [params.includeDraft] - ikutkan item berstatus draft juga (default false, dipakai Monitoring). Antrian set true karena draft milik sendiri memang harus tampil di situ.
    */
-  function getFiltered({ search = '', status = '', year = '', assignedTo = '', page = 1, pageSize = 7 } = {}) {
+  function getFiltered({
+    search = '',
+    status = '',
+    year = '',
+    assignedTo = '',
+    page = 1,
+    pageSize = 7,
+    includeDraft = false
+  } = {}) {
     const term = search.trim().toLowerCase();
 
-    let rows = items.filter((item) => submittedStatuses.includes(item.status));
+    let rows = includeDraft
+      ? items.slice()
+      : items.filter((item) => submittedStatuses.includes(item.status));
 
     if (term) {
       rows = rows.filter(

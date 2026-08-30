@@ -29,3 +29,31 @@ export function getYear(dateInput) {
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   return date.getFullYear();
 }
+
+/**
+ * Format tanggal + jam ala Indonesia, mis. "24 Juli 2026, 00.00".
+ * Dipakai tabel Antrian yang butuh presisi jam (beda dari
+ * formatDateLongID yang cuma tanggal, tanpa nama hari). Kalau
+ * dateInput cuma tanggal tanpa komponen jam (mis. data dummy
+ * '2026-07-24'), jamnya otomatis tampil 00.00.
+ * @param {string|number|Date} dateInput
+ */
+export function formatDateTimeLongID(dateInput) {
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return '-';
+
+  const datePart = new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(date);
+
+  const timePart = new Intl.DateTimeFormat('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(date);
+
+  const capitalized = datePart.replace(/\b\p{L}/gu, (ch) => ch.toUpperCase());
+  return `${capitalized}, ${timePart.replace(':', '.')}`;
+}
