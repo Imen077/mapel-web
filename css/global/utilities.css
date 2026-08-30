@@ -8,6 +8,13 @@
 .layout {
   display: flex;
   min-height: 100vh;
+  /* Sidebar sekarang position:sticky dengan height:100vh (lihat
+     .sidebar di sidebar-pegawai.css) -- di halaman yang lebih
+     tinggi dari 1 layar, sidebar berhenti "ngisi" begitu sampai
+     ujung bawahnya sendiri. Background gelap di sini nyambungin
+     kolom kiri biar tetap keliatan solid, gak keliatan putih
+     kepotong di bawah sidebar. */
+  background: var(--color-ink-900);
 }
 
 .layout__main {

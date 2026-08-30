@@ -10,6 +10,17 @@
   width: 240px;
   flex-shrink: 0;
   min-height: 100vh;
+  /* Sticky (bukan fixed) supaya tetap ikut alur flex .layout tanpa
+     perlu ngatur margin/width kompensasi di layout__main -- nempel
+     di atas viewport dan otomatis scroll balik begitu sudah sampai
+     ujung bawah sidebar (kalau suatu saat menu lebih panjang dari
+     layar). Berlaku sama buat semua role karena ini satu-satunya
+     definisi .sidebar yang dipakai bersama. */
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
   background: var(--color-ink-900);
   display: flex;
   flex-direction: column;
