@@ -92,13 +92,17 @@ function renderPegawaiDashboard(user) {
 }
 
 /**
- * Dashboard LO Biro TI: sama seperti Pegawai (Top Download/Top
- * View + ajakan Library), ditambah baris kartu ringkas di atas --
- * total perangkat lunak yang diajukan, dan kartu Library versi
- * ringkas (bukan banner penuh) berdampingan.
+ * Varian dashboard "standar" (Pegawai+): sama seperti Pegawai
+ * (Top Download/Top View + ajakan Library), ditambah baris kartu
+ * ringkas di atas -- total perangkat lunak yang diajukan, dan
+ * kartu Library versi ringkas (bukan banner penuh) berdampingan.
+ * Dipakai LO Biro TI & Kepala Satker Biro TI -- spek keduanya
+ * sama persis (lihat ROLE_MENUS di core/role.js), cuma beda folder
+ * halaman Library-nya masing-masing.
  * @param {Session} user
+ * @param {string} libraryPath - path halaman Library milik role ini
  */
-function renderLoDashboard(user) {
+function renderStandardDashboard(user, libraryPath) {
   const totalPerangkatLunak = libraryService.getTotalCount();
   const topDownloads = libraryService.getTopDownloads(5);
   const topViews = libraryService.getTopViews(5);
@@ -138,7 +142,7 @@ function renderLoDashboard(user) {
           <p class="eyebrow card-feature__eyebrow">Library Perangkat Lunak</p>
           <h2 class="card-feature__title">Katalog referensi terpusat</h2>
           <p class="card-feature__desc">Telusuri seluruh perangkat lunak yang telah terdaftar dari satuan kerja pusat maupun perwakilan.</p>
-          <a class="btn btn-gold btn-block" href="#" data-path="/pages/lo-biro-ti/library.html">
+          <a class="btn btn-gold btn-block" href="#" data-path="${libraryPath}">
             Akses library ${ARROW_ICON}
           </a>
         </div>
@@ -179,11 +183,14 @@ export function initDashboardPage(root, user) {
       root.innerHTML = renderPegawaiDashboard(user);
       break;
     case ROLES.LO_BIRO_TI:
-      root.innerHTML = renderLoDashboard(user);
+      root.innerHTML = renderStandardDashboard(user, '/pages/lo-biro-ti/library.html');
+      break;
+    case ROLES.KEPALA_SATKER_BIRO_TI:
+      root.innerHTML = renderStandardDashboard(user, '/pages/kepala-satker-biro-ti/library.html');
       break;
     default:
-      // TODO: varian dashboard role lain (Kasatker, Ortala chain --
-      // "dashboard lengkap" dengan grafik & data PL) -- menyusul.
+      // TODO: varian dashboard role lain (rantai Ortala -- "dashboard
+      // lengkap" dengan grafik & data PL) -- menyusul.
       root.innerHTML = `
         <div class="dashboard">
           <p class="dashboard__subtitle">Dashboard untuk role ini sedang dalam pengembangan.</p>
