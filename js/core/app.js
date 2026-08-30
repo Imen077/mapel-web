@@ -20,7 +20,8 @@ const PAGE_MODULES = {
   'antrian/proposal-pl': () => import('../pages/antrian.js'),
   'antrian/konsep-pl': () => import('../pages/antrian.js'),
   'monitoring/proposal-pl': () => import('../pages/monitoring.js'),
-  'monitoring/konsep-pl': () => import('../pages/monitoring.js')
+  'monitoring/konsep-pl': () => import('../pages/monitoring.js'),
+  'pengajuan/proposal-pl': () => import('../pages/pengajuan-proposal.js')
 };
 
 // Breadcrumb navbar per pageKey. Halaman yang tidak didaftarkan di
@@ -30,7 +31,8 @@ const PAGE_BREADCRUMBS = {
   'antrian/proposal-pl': ['Antrian', 'Antrian Proposal PL'],
   'antrian/konsep-pl': ['Antrian', 'Antrian Konsep PL'],
   'monitoring/proposal-pl': ['Monitoring', 'Monitoring Proposal'],
-  'monitoring/konsep-pl': ['Monitoring', 'Monitoring Konsep']
+  'monitoring/konsep-pl': ['Monitoring', 'Monitoring Konsep'],
+  'pengajuan/proposal-pl': ['Pengajuan Proposal PL']
 };
 
 // Folder yang nama file di dalamnya BUKAN unik (mis. "proposal-pl"

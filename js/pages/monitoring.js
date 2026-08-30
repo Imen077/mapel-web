@@ -99,6 +99,10 @@ const MONITORING_CONFIG = {
   'konsep-pl': {
     service: konsepService,
     statusMeta: KONSEP_STATUS_META,
+    // Disamain sama Monitoring Proposal PL biar tabelnya nggak
+    // "gede" (judul konsep gak pecah jadi 3 baris) -- lihat komentar
+    // compactTable di config 'proposal-pl' di atas.
+    compactTable: true,
     title: 'Monitoring Konsep Perangkat Lunak',
     subtitle: 'Pantau progres seluruh konsep perangkat lunak yang telah diajukan, mulai dari konsep hingga persetujuan akhir.',
     searchPlaceholder: 'Cari konsep ...',
