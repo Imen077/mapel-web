@@ -24,14 +24,16 @@ const ARROW_RIGHT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="
 const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const PLUS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 
-// Proyeksi label+warna badge tabel Monitoring Proposal PL -- status
-// mentah yang sudah "digabung" secara tampilan di PROPOSAL_CARD_GROUPS
-// (final/pengesahan-satker/legislasi/indeksasi -> "Disetujui",
-// koreksi-ortala -> "Proses Reviu") juga perlu tampil dengan label
-// gabungan yang sama di badge status tabel, bukan label aslinya per
-// status. Status yang tidak disebut di sini tetap pakai label/warna
-// asli dari PROPOSAL_STATUS_META (lihat renderTableRows).
-const PROPOSAL_STATUS_LABEL_OVERRIDES = {
+// Proyeksi label+warna badge tabel Monitoring Proposal PL & Konsep PL
+// -- status mentah yang sudah "digabung" secara tampilan di
+// PROPOSAL_CARD_GROUPS (final/pengesahan-satker/legislasi/indeksasi
+// -> "Disetujui", koreksi-ortala -> "Proses Reviu") juga perlu
+// tampil dengan label gabungan yang sama di badge status tabel,
+// bukan label aslinya per status -- dipakai bareng di kedua halaman
+// karena status mentahnya memang sama persis (lihat buildStatusMeta
+// di data/status.js). Status yang tidak disebut di sini tetap pakai
+// label/warna asli dari statusMeta (lihat renderTableRows).
+const STATUS_LABEL_OVERRIDES = {
   [SUBMISSION_STATUS.FINAL]: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' },
   [SUBMISSION_STATUS.PENGESAHAN_SATKER]: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' },
   [SUBMISSION_STATUS.LEGISLASI]: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' },
@@ -133,7 +135,7 @@ const MONITORING_CONFIG = {
       [ROLES.KEPALA_SUBBAGIAN_ORTALA]: ORTALA_CHAIN_CARD_GROUPS,
       [ROLES.PREVIU_BIRO_ORTALA]: ORTALA_CHAIN_CARD_GROUPS
     },
-    statusLabelOverrides: PROPOSAL_STATUS_LABEL_OVERRIDES,
+    statusLabelOverrides: STATUS_LABEL_OVERRIDES,
     // Toggle "Assign to Me"/"Belum ada Konsep PL" berguna buat semua
     // role yang bisa buka halaman ini (LO maupun reviewer Ortala),
     // tapi tombol "Buat Proposal Baru" cuma relevan buat LO Biro TI
@@ -156,6 +158,12 @@ const MONITORING_CONFIG = {
   'konsep-pl': {
     service: konsepService,
     statusMeta: KONSEP_STATUS_META,
+    // Sama seperti di Monitoring Proposal PL: status Final/Pengesahan
+    // Satker/Legislasi/Indeksasi tetap tampil sebagai badge "Disetujui"
+    // di tabel (bukan label aslinya masing-masing), dan Koreksi Ortala
+    // tampil sebagai "Proses Reviu" -- statusnya sama persis dengan
+    // Proposal PL jadi override-nya dipakai bareng.
+    statusLabelOverrides: STATUS_LABEL_OVERRIDES,
     // Disamain sama Monitoring Proposal PL biar tabelnya nggak
     // "gede" (judul konsep gak pecah jadi 3 baris) -- lihat komentar
     // compactTable di config 'proposal-pl' di atas.
