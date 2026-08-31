@@ -70,6 +70,7 @@ const PROPOSAL_CARD_GROUPS = [
   { label: 'Tidak Disetujui', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#C0392B', blob: '#DCF3E7' }
 ];
 
+<<<<<<< HEAD
 // Kartu ringkasan Monitoring Proposal PL versi rantai Ortala (Kepala
 // Biro Ortala, Kepala Bagian, dst) -- beda dari punya LO Biro TI:
 // - Dipecah per tahap disposisi/reviu ("Disposisi" = PROSES_REVIU
@@ -112,6 +113,57 @@ const ORTALA_CHAIN_CARD_GROUPS = [
 const KARO_ORTALA_PROPOSAL_CARD_GROUPS = [
   { label: 'Diterima', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#2B5C89', blob: '#C2D8F0' },
   ...ORTALA_CHAIN_CARD_GROUPS
+=======
+// Revisi kartu ringkasan Monitoring Proposal PL KHUSUS role Kepala
+// Biro Ortala -- kategorinya beda dari role lain (lihat
+// PROPOSAL_CARD_GROUPS di atas) karena dilihat dari sudut pandang
+// alur reviu internal Ortala (diterima dari Kasatker -> didisposisi
+// -> direviu -> selesai/dikoreksi -> disetujui/tidak), bukan dari
+// sudut pandang status mentah proposal itu sendiri.
+//
+// PENTING: angka-angkanya masih HARDCODE dummy (sama seperti kartu
+// KPI di dashboard Kepala Biro Ortala), BUKAN hasil hitungan dari
+// service.getStatusCounts() -- belum ada tahap "Diterima/Disposisi/
+// Direviu/Selesai Reviu/Koreksi" di data/status.js (itu semua bagian
+// dari alur disposisi & reviu Ortala yang belum dimodelkan). TODO:
+// ganti jadi hitungan asli begitu js/workflow/disposisi.js &
+// reviu.js sudah jalan.
+const KARO_PROPOSAL_CARDS = [
+  { label: 'Diterima', value: 1, color: '#2B935B' },
+  { label: 'Disposisi', value: 7, color: '#2F6FED' },
+  { label: 'Direviu', value: 4, color: '#2F6FED' },
+  { label: 'Selesai Reviu', value: 5, color: '#2F6FED' },
+  { label: 'Koreksi', value: 3, color: '#2F6FED' },
+  { label: 'Disetujui', value: 25, color: '#2B935B' },
+  { label: 'Tidak Disetujui', value: 1, color: '#D9534F' }
+];
+
+// Revisi kartu ringkasan Monitoring KONSEP PL khusus role Kepala
+// Biro Ortala -- pasangan dari KARO_PROPOSAL_CARDS di atas, sama-
+// sama dilihat dari sudut pandang alur reviu internal Ortala.
+// Bedanya di sini 11 kartu (bukan 7) karena konsep punya tahap
+// lanjutan setelah disetujui (Pengesahan Satker -> Legislasi ->
+// Indeksasi) yang di kartu Proposal cuma digabung jadi "Disetujui".
+//
+// PENTING: angka & labelnya masih HARDCODE dummy (sama seperti
+// KARO_PROPOSAL_CARDS), BUKAN hasil hitungan dari
+// service.getStatusCounts() -- tahap "Diterima/Disposisi/Direviu/
+// Selesai Reviu/Koreksi/Koreksi dari Ortala/Dicabut" belum
+// dimodelkan di data/status.js. TODO: ganti jadi hitungan asli
+// begitu js/workflow/disposisi.js & reviu.js sudah jalan.
+const KARO_KONSEP_CARDS = [
+  { label: 'Diterima', value: 2, color: '#2B935B' },
+  { label: 'Disposisi', value: 3, color: '#2F6FED' },
+  { label: 'Direviu', value: 0, color: '#2F6FED' },
+  { label: 'Selesai Reviu', value: 1, color: '#2F6FED' },
+  { label: 'Koreksi', value: 1, color: '#2F6FED' },
+  { label: 'Final', value: 5, color: '#2B935B' },
+  { label: 'Koreksi dari Ortala', value: 3, color: '#9F7327' },
+  { label: 'Pengesahan Satker', value: 10, color: '#2F6FED' },
+  { label: 'Legislasi', value: 4, color: '#2F6FED' },
+  { label: 'Indeksasi', value: 0, color: '#2F6FED' },
+  { label: 'Dicabut', value: 0, color: '#9AA0AA' }
+>>>>>>> upstream/main
 ];
 
 // Konfigurasi per tipe monitoring -- cukup tambah entri baru di
@@ -213,6 +265,27 @@ function renderStatCardsGrouped(cardGroups, counts) {
     .join('');
 
   return `<div class="stat-tile-grid">${cards}</div>`;
+}
+
+/**
+ * Varian polos (tanpa blob dekorasi, angka+label sejajar) khusus
+ * revisi Monitoring Proposal PL role Kepala Biro Ortala -- lihat
+ * KARO_PROPOSAL_CARDS.
+ * @param {{label:string, value:number, color:string}[]} cards
+ */
+function renderStatCardsPlain(cards) {
+  const items = cards
+    .map(
+      (c) => `
+        <div class="stat-tile stat-tile--plain">
+          <span class="stat-tile__value stat-tile__value--inline" style="color:${c.color}">${c.value}</span>
+          <span class="stat-tile__label stat-tile__label--inline" style="color:${c.color}">${c.label}</span>
+        </div>
+      `
+    )
+    .join('');
+
+  return `<div class="stat-tile-grid stat-tile-grid--plain">${items}</div>`;
 }
 
 function renderFilterBar({
@@ -383,12 +456,17 @@ function initMonitoringTable(root, config, user) {
     searchPlaceholder,
     titleColumnLabel
   } = config;
+<<<<<<< HEAD
   // Beberapa role (Kepala Biro Ortala, Kepala Bagian Ortala, dst)
   // lihat kartu ringkasan yang beda dari default -- lihat
   // cardGroupsByRole di MONITORING_CONFIG.
   const cardGroups = cardGroupsByRole?.[user?.role] ?? defaultCardGroups;
   const showToggles = Boolean(showFilterToggles);
   const showCreateButton = Boolean(loBiroTiControls) && user?.role === ROLES.LO_BIRO_TI;
+=======
+  const showLoControls = Boolean(loBiroTiControls) && user?.role === ROLES.LO_BIRO_TI;
+  const type = getMonitoringType(router.getCurrentPath());
+>>>>>>> upstream/main
   const state = { search: '', status: '', year: '', page: 1, assignToMe: false, belumAdaKonsep: false };
   const years = service.getAvailableYears();
 
@@ -406,6 +484,19 @@ function initMonitoringTable(root, config, user) {
     const counts = service.getStatusCounts();
     const startIndex = (page - 1) * PAGE_SIZE;
 
+    // Revisi khusus role Kepala Biro Ortala (lihat komentar
+    // KARO_PROPOSAL_CARDS / KARO_KONSEP_CARDS) -- role lain tetap
+    // pakai cardGroups/statusMeta seperti biasa.
+    const isKaroProposal = type === 'proposal-pl' && user?.role === ROLES.KEPALA_BIRO_ORTALA;
+    const isKaroKonsep = type === 'konsep-pl' && user?.role === ROLES.KEPALA_BIRO_ORTALA;
+    const statCardsHtml = isKaroProposal
+      ? renderStatCardsPlain(KARO_PROPOSAL_CARDS)
+      : isKaroKonsep
+        ? renderStatCardsPlain(KARO_KONSEP_CARDS)
+        : cardGroups
+          ? renderStatCardsGrouped(cardGroups, counts)
+          : renderStatCards(statusMeta, counts);
+
     root.innerHTML = `
       <div class="monitoring-page">
         <div class="monitoring-page__intro">
@@ -413,7 +504,7 @@ function initMonitoringTable(root, config, user) {
           <p class="dashboard__subtitle">${subtitle}</p>
         </div>
 
-        ${cardGroups ? renderStatCardsGrouped(cardGroups, counts) : renderStatCards(statusMeta, counts)}
+        ${statCardsHtml}
 
         <div class="card data-table-card${compactTable ? ' data-table-card--compact' : ''}">
           ${renderFilterBar({
