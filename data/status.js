@@ -28,7 +28,11 @@ export const SUBMISSION_STATUS = {
   // Kabiro Ortala (disetujui/tidak). Cuma dipakai di kartu ringkasan
   // Monitoring Proposal PL milik role-role Ortala (Kabiro/Kabag/dst,
   // lihat *_CARD_GROUPS di js/pages/monitoring.js).
-  SELESAI_REVIU: 'selesai-reviu'
+  SELESAI_REVIU: 'selesai-reviu',
+  // Lagi dibolak-balik di REVIU_CHAIN, beda dari KOREKSI_ORTALA
+  // (yang berarti ada revisi diminta) -- ini cuma "lagi direviu",
+  // belum ada revisi/keputusan. Dipakai di kartu "Direviu".
+  DIREVIU: 'direviu'
 };
 
 /**

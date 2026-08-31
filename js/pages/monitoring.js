@@ -88,8 +88,8 @@ const PROPOSAL_CARD_GROUPS = [
 // warna yang sudah dipakai sebelumnya, bukan bikin palet baru.
 const ORTALA_CHAIN_CARD_GROUPS = [
   { label: 'Disposisi', statuses: [SUBMISSION_STATUS.PROSES_REVIU], text: '#6C3FB5', blob: '#D9C6F2' },
-  { label: 'Direviu', statuses: [SUBMISSION_STATUS.KOREKSI_ORTALA], text: '#B03A6E', blob: '#F5B8D3' },
-  { label: 'Selesai Reviu', statuses: [SUBMISSION_STATUS.SELESAI_REVIU], text: '#3B4F9E', blob: '#C2CCF0' },
+  { label: 'Direviu', statuses: [SUBMISSION_STATUS.DIREVIU], text: '#2C7DA0', blob: '#BEE0EE' },
+  { label: 'Selesai Reviu', statuses: [SUBMISSION_STATUS.SELESAI_REVIU], text: '#0F7A6B', blob: '#B8E4DC' },
   { label: 'Koreksi', statuses: [SUBMISSION_STATUS.KOREKSI_SATKER], text: '#B5601E', blob: '#F5C89B' },
   {
     label: 'Disetujui',
@@ -114,6 +114,33 @@ const ORTALA_CHAIN_CARD_GROUPS = [
 const KARO_ORTALA_PROPOSAL_CARD_GROUPS = [
   { label: 'Diterima', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#2B5C89', blob: '#C2D8F0' },
   ...ORTALA_CHAIN_CARD_GROUPS
+];
+
+// Kartu ringkasan Monitoring KONSEP PL versi Kepala Biro Ortala --
+// beda dari punya Proposal PL: di sini Final/Koreksi Ortala/
+// Pengesahan Satker/Legislasi/Indeksasi TETAP dipisah per kartu
+// (nggak digabung jadi satu kartu "Disetujui"), dan nggak ada kartu
+// "Tidak Disetujui" sama sekali. Cuma dummy sesuai desain yang
+// dikasih, warnanya diambil dari palet asli per-status di
+// buildStatusMeta (data/status.js) biar konsisten.
+const KONSEP_ORTALA_CHAIN_CARD_GROUPS = [
+  { label: 'Disposisi', statuses: [SUBMISSION_STATUS.PROSES_REVIU], text: '#6C3FB5', blob: '#D9C6F2' },
+  { label: 'Direviu', statuses: [SUBMISSION_STATUS.DIREVIU], text: '#2C7DA0', blob: '#BEE0EE' },
+  { label: 'Selesai Reviu', statuses: [SUBMISSION_STATUS.SELESAI_REVIU], text: '#0F7A6B', blob: '#B8E4DC' },
+  { label: 'Koreksi', statuses: [SUBMISSION_STATUS.KOREKSI_SATKER], text: '#B5601E', blob: '#F5C89B' },
+  { label: 'Final', statuses: [SUBMISSION_STATUS.FINAL], text: '#3C7A5C', blob: '#B9DDC7' },
+  { label: 'Koreksi dari Ortala', statuses: [SUBMISSION_STATUS.KOREKSI_ORTALA], text: '#B03A6E', blob: '#F5B8D3' },
+  { label: 'Pengesahan Satker', statuses: [SUBMISSION_STATUS.PENGESAHAN_SATKER], text: '#3B4F9E', blob: '#C2CCF0' },
+  { label: 'Legislasi', statuses: [SUBMISSION_STATUS.LEGISLASI], text: '#7A3FA0', blob: '#DFC0EF' },
+  { label: 'Indeksasi', statuses: [SUBMISSION_STATUS.INDEKSASI], text: '#1F8A63', blob: '#A9E8C7' }
+];
+
+// Kepala Biro Ortala ada di paling depan rantai Ortala buat Konsep
+// PL juga (sama seperti di Proposal PL), jadi masih lihat kartu
+// "Diterima" -- role di bawahnya (Kabag/Kasubbag/Previu) enggak.
+const KARO_ORTALA_KONSEP_CARD_GROUPS = [
+  { label: 'Diterima', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#2B5C89', blob: '#C2D8F0' },
+  ...KONSEP_ORTALA_CHAIN_CARD_GROUPS
 ];
 
 // Konfigurasi per tipe monitoring -- cukup tambah entri baru di
@@ -158,6 +185,18 @@ const MONITORING_CONFIG = {
   'konsep-pl': {
     service: konsepService,
     statusMeta: KONSEP_STATUS_META,
+    // Cuma Kepala Biro Ortala yang lihat kartu ringkasan beda (lihat
+    // KARO_ORTALA_KONSEP_CARD_GROUPS di atas) -- role lain (LO,
+    // Kepala Satker, dan role Ortala di bawah Kabiro) belum dikasih
+    // desain kartu khusus, jadi tetap pakai 11 kartu default
+    // (statusMeta) apa adanya.
+    cardGroupsByRole: {
+      [ROLES.KEPALA_BIRO_ORTALA]: KARO_ORTALA_KONSEP_CARD_GROUPS,
+      // 9 kartu, sama kayak Kabiro tapi tanpa "Diterima" -- lihat
+      // KONSEP_ORTALA_CHAIN_CARD_GROUPS di atas.
+      [ROLES.KEPALA_BAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
+      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS
+    },
     // Sama seperti di Monitoring Proposal PL: status Final/Pengesahan
     // Satker/Legislasi/Indeksasi tetap tampil sebagai badge "Disetujui"
     // di tabel (bukan label aslinya masing-masing), dan Koreksi Ortala
