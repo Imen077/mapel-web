@@ -61,6 +61,29 @@
   background: var(--color-paper-dim);
 }
 
+.btn-secondary {
+  background: var(--color-info-soft);
+  color: var(--color-info);
+}
+
+.btn-secondary:hover {
+  background: #dbe6fa;
+}
+
+.btn-danger {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+}
+
+.btn-danger:hover {
+  background: #f0d0ca;
+}
+
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;

@@ -1,1 +1,46 @@
-/* MAPEL - placeholder */
+/* ============================================================
+   MAPEL - pages/pengaturan.css
+   Halaman Pengaturan: kelola akun. Reuse .card/.data-table-card
+   (card.css) & .data-table/.data-table-wrap (table.css) apa
+   adanya -- file ini cuma nambahin bagian yang belum ada:
+   intro judul, toolbar tombol "Tambah Akun", dan tombol
+   Edit/Delete berdampingan di kolom Aksi.
+   ============================================================ */
+
+.pengaturan-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--max-width-content);
+}
+
+.pengaturan-page__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pengaturan-page__title {
+  color: var(--color-ink-900);
+  font-size: var(--text-2xl);
+}
+
+.pengaturan-page__subtitle {
+  color: var(--color-paper-muted);
+  font-size: var(--text-sm);
+}
+
+.pengaturan-page__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-4) var(--space-5) 0;
+}
+
+.pengaturan-page__row-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pengaturan-page__row-actions .btn {
+  white-space: nowrap;
+}
