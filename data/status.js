@@ -22,7 +22,13 @@ export const SUBMISSION_STATUS = {
   // Ditolak final oleh Kepala Biro Ortala di UJUNG rantai reviu --
   // beda dari DITOLAK_KASATKER yang gugur di awal (tahap disposisi,
   // sebelum sempat masuk rantai reviu Ortala sama sekali).
-  TIDAK_DISETUJUI: 'tidak-disetujui'
+  TIDAK_DISETUJUI: 'tidak-disetujui',
+  // Rantai REVIU_CHAIN sudah kelar dibolak-balik (Previu -> Kasubbag
+  // -> Kabag -> balik ke Kabiro), tinggal nunggu keputusan akhir
+  // Kabiro Ortala (disetujui/tidak). Cuma dipakai di kartu ringkasan
+  // Monitoring Proposal PL milik role-role Ortala (Kabiro/Kabag/dst,
+  // lihat *_CARD_GROUPS di js/pages/monitoring.js).
+  SELESAI_REVIU: 'selesai-reviu'
 };
 
 /**

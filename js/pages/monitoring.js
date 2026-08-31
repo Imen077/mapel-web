@@ -70,6 +70,50 @@ const PROPOSAL_CARD_GROUPS = [
   { label: 'Tidak Disetujui', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#C0392B', blob: '#DCF3E7' }
 ];
 
+// Kartu ringkasan Monitoring Proposal PL versi rantai Ortala (Kepala
+// Biro Ortala, Kepala Bagian, dst) -- beda dari punya LO Biro TI:
+// - Dipecah per tahap disposisi/reviu ("Disposisi" = PROSES_REVIU
+//   yaitu lagi jalan MAJU di DISPOSISI_CHAIN, "Direviu" = KOREKSI_ORTALA
+//   yaitu lagi jalan BALIK di REVIU_CHAIN -- dua ini digabung jadi satu
+//   kartu "Proses Reviu" di punya LO, di sini dipisah)
+// - "Selesai Reviu" = status baru SELESAI_REVIU, REVIU_CHAIN sudah
+//   kelar dibolak-balik, tinggal nunggu keputusan akhir Kabiro Ortala
+// - "Koreksi" = KOREKSI_SATKER (namanya dipendekin, sama isinya
+//   dengan "Koreksi Satker" di punya LO)
+// - "Disetujui"/"Tidak Disetujui" sama persis dengan punya LO
+// Warna dasarnya diambil dari palet asli per-status di buildStatusMeta
+// (data/status.js) supaya konsisten sama badge status di tabel &
+// warna yang sudah dipakai sebelumnya, bukan bikin palet baru.
+const ORTALA_CHAIN_CARD_GROUPS = [
+  { label: 'Disposisi', statuses: [SUBMISSION_STATUS.PROSES_REVIU], text: '#6C3FB5', blob: '#D9C6F2' },
+  { label: 'Direviu', statuses: [SUBMISSION_STATUS.KOREKSI_ORTALA], text: '#B03A6E', blob: '#F5B8D3' },
+  { label: 'Selesai Reviu', statuses: [SUBMISSION_STATUS.SELESAI_REVIU], text: '#3B4F9E', blob: '#C2CCF0' },
+  { label: 'Koreksi', statuses: [SUBMISSION_STATUS.KOREKSI_SATKER], text: '#B5601E', blob: '#F5C89B' },
+  {
+    label: 'Disetujui',
+    statuses: [
+      SUBMISSION_STATUS.FINAL,
+      SUBMISSION_STATUS.PENGESAHAN_SATKER,
+      SUBMISSION_STATUS.LEGISLASI,
+      SUBMISSION_STATUS.INDEKSASI
+    ],
+    text: '#888A92',
+    blob: '#EDEEF0'
+  },
+  { label: 'Tidak Disetujui', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#C0392B', blob: '#DCF3E7' }
+];
+
+// Kepala Biro Ortala ada di ujung DEPAN rantai Ortala (langsung
+// sesudah Kepala Satker Biro TI), jadi dia masih lihat kartu
+// "Diterima" (proposal yang baru dikirim/DIKIRIM ke rantai Ortala) --
+// role Ortala di bawahnya (Kabag, Kasubbag, Previu) enggak perlu
+// tahu soal ini, buat mereka rantainya baru mulai kelihatan dari
+// "Disposisi".
+const KARO_ORTALA_PROPOSAL_CARD_GROUPS = [
+  { label: 'Diterima', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#2B5C89', blob: '#C2D8F0' },
+  ...ORTALA_CHAIN_CARD_GROUPS
+];
+
 // Konfigurasi per tipe monitoring -- cukup tambah entri baru di
 // sini kalau nanti ada varian lain, tidak perlu ubah logic render.
 const MONITORING_CONFIG = {
@@ -77,11 +121,24 @@ const MONITORING_CONFIG = {
     service: proposalService,
     statusMeta: PROPOSAL_STATUS_META,
     cardGroups: PROPOSAL_CARD_GROUPS,
+    // Role-role rantai Ortala lihat kartu ringkasan yang beda dari LO
+    // Biro TI (lihat komentar di ORTALA_CHAIN_CARD_GROUPS di atas).
+    // Role yang tidak disebut di sini (LO Biro TI, Kepala Satker Biro
+    // TI) tetap pakai `cardGroups` default di atas.
+    cardGroupsByRole: {
+      [ROLES.KEPALA_BIRO_ORTALA]: KARO_ORTALA_PROPOSAL_CARD_GROUPS,
+      [ROLES.KEPALA_BAGIAN_ORTALA]: ORTALA_CHAIN_CARD_GROUPS,
+      // Sama persis kartunya dengan Kepala Bagian Ortala (6 kartu,
+      // tanpa "Diterima") -- desain yang dikasih emang identik.
+      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: ORTALA_CHAIN_CARD_GROUPS,
+      [ROLES.PREVIU_BIRO_ORTALA]: ORTALA_CHAIN_CARD_GROUPS
+    },
     statusLabelOverrides: PROPOSAL_STATUS_LABEL_OVERRIDES,
-    // Toggle "Assign to Me"/"Belum ada Konsep PL" + tombol "Buat
-    // Proposal Baru" cuma relevan buat LO Biro TI (yang mengajukan),
-    // bukan buat role reviewer lain yang cuma memantau -- dicek lagi
-    // pakai user.role saat render, bukan cuma dari config ini.
+    // Toggle "Assign to Me"/"Belum ada Konsep PL" berguna buat semua
+    // role yang bisa buka halaman ini (LO maupun reviewer Ortala),
+    // tapi tombol "Buat Proposal Baru" cuma relevan buat LO Biro TI
+    // yang mengajukan -- dua-duanya dicek terpisah di initMonitoringTable.
+    showFilterToggles: true,
     loBiroTiControls: true,
     createRoute: '/pages/lo-biro-ti/pengajuan/proposal-pl.html',
     createLabel: 'Buat Proposal Baru',
@@ -165,7 +222,8 @@ function renderFilterBar({
   search,
   selectedStatus,
   searchPlaceholder,
-  showLoControls,
+  showToggles,
+  showCreateButton,
   belumAdaKonsep,
   assignToMe,
   createLabel
@@ -187,8 +245,11 @@ function renderFilterBar({
   // pengecekan role di initMonitoringTable). "Belum ada Konsep PL"
   // untuk sekarang BARU UI-nya saja -- logic filternya nyusul begitu
   // ada relasi proposal<->konsep di data (lihat TODO di bindEvents).
-  const loControls = showLoControls
+  const loControls = (showToggles || showCreateButton)
     ? `
+      ${
+        showToggles
+          ? `
       <div class="filter-bar__toggles">
         <label class="toggle">
           <input type="checkbox" class="toggle__input" id="filter-belum-konsep" ${belumAdaKonsep ? 'checked' : ''}>
@@ -200,9 +261,11 @@ function renderFilterBar({
           <span class="toggle__track"><span class="toggle__thumb"></span></span>
           <span class="toggle__label">Assign to Me</span>
         </label>
-      </div>
+      </div>`
+          : ''
+      }
       <span class="filter-bar__spacer"></span>
-      <button class="btn btn-dark" type="button" id="btn-create-proposal">${PLUS_ICON}${createLabel}</button>
+      ${showCreateButton ? `<button class="btn btn-dark" type="button" id="btn-create-proposal">${PLUS_ICON}${createLabel}</button>` : ''}
     `
     : '';
 
@@ -307,8 +370,10 @@ function initMonitoringTable(root, config, user) {
   const {
     service,
     statusMeta,
-    cardGroups,
+    cardGroups: defaultCardGroups,
+    cardGroupsByRole,
     statusLabelOverrides,
+    showFilterToggles,
     loBiroTiControls,
     createRoute,
     createLabel,
@@ -318,7 +383,12 @@ function initMonitoringTable(root, config, user) {
     searchPlaceholder,
     titleColumnLabel
   } = config;
-  const showLoControls = Boolean(loBiroTiControls) && user?.role === ROLES.LO_BIRO_TI;
+  // Beberapa role (Kepala Biro Ortala, Kepala Bagian Ortala, dst)
+  // lihat kartu ringkasan yang beda dari default -- lihat
+  // cardGroupsByRole di MONITORING_CONFIG.
+  const cardGroups = cardGroupsByRole?.[user?.role] ?? defaultCardGroups;
+  const showToggles = Boolean(showFilterToggles);
+  const showCreateButton = Boolean(loBiroTiControls) && user?.role === ROLES.LO_BIRO_TI;
   const state = { search: '', status: '', year: '', page: 1, assignToMe: false, belumAdaKonsep: false };
   const years = service.getAvailableYears();
 
@@ -353,7 +423,8 @@ function initMonitoringTable(root, config, user) {
             search: state.search,
             selectedStatus: state.status,
             searchPlaceholder,
-            showLoControls,
+            showToggles,
+            showCreateButton,
             belumAdaKonsep: state.belumAdaKonsep,
             assignToMe: state.assignToMe,
             createLabel
