@@ -193,9 +193,11 @@ const MONITORING_CONFIG = {
     cardGroupsByRole: {
       [ROLES.KEPALA_BIRO_ORTALA]: KARO_ORTALA_KONSEP_CARD_GROUPS,
       // 9 kartu, sama kayak Kabiro tapi tanpa "Diterima" -- lihat
-      // KONSEP_ORTALA_CHAIN_CARD_GROUPS di atas.
+      // KONSEP_ORTALA_CHAIN_CARD_GROUPS di atas. Berlaku juga buat
+      // Previu Biro Ortala (rantai Ortala yang sama, di bawah Kabiro).
       [ROLES.KEPALA_BAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
-      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS
+      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
+      [ROLES.PREVIU_BIRO_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS
     },
     // Sama seperti di Monitoring Proposal PL: status Final/Pengesahan
     // Satker/Legislasi/Indeksasi tetap tampil sebagai badge "Disetujui"
