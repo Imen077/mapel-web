@@ -23,12 +23,12 @@ import { KONSEP_STATUS_META } from '../../data/konsep.js';
 import { PROPOSAL_STATUS_META } from '../../data/proposal.js';
 import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateTimeLongID, formatDateTimeFullID } from '../core/format.js';
+import { renderAksiCell, bindAksiDropdowns } from '../components/table.js';
 
 const PAGE_SIZE = 10;
 
 const SEARCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const CHEVRON_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 
 // Status mentah yang tampil DIGABUNG secara label di badge tabel
 // Antrian Proposal PL (bukan label asli PROPOSAL_STATUS_META):
@@ -140,9 +140,7 @@ function renderTableRows(service, rows, startIndex, options = {}) {
           <td>
             <span class="badge badge--tint" style="--tint-bg:${meta.bg};--tint-text:${meta.text}">${meta.label}</span>
           </td>
-          <td>
-            <button class="data-table__aksi" type="button" title="Lihat detail (segera hadir)">${AKSI_ICON}</button>
-          </td>
+          ${renderAksiCell()}
         </tr>
       `;
     })
@@ -285,6 +283,7 @@ function initAntrianKonsepTable(root, user) {
         }
       });
     });
+    bindAksiDropdowns(root);
   }
 
   renderAll();
@@ -409,6 +408,7 @@ function initAntrianProposalTable(root, user) {
         }
       });
     });
+    bindAksiDropdowns(root);
   }
 
   renderAll();
