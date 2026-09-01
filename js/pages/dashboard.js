@@ -75,7 +75,6 @@ function renderPegawaiDashboard(user) {
       <div class="card-feature">
         <p class="eyebrow card-feature__eyebrow">Library Perangkat Lunak</p>
         <h2 class="card-feature__title">Katalog referensi terpusat</h2>
-        <p class="card-feature__desc">Telusuri seluruh perangkat lunak yang telah terdaftar dari satuan kerja pusat maupun perwakilan.</p>
         <a class="btn btn-gold" href="#" data-path="/pages/pegawai/library.html">
           Akses library ${ARROW_ICON}
         </a>
@@ -150,8 +149,7 @@ function renderLoDashboard(user) {
         <div class="card-feature card-feature--compact">
           <p class="eyebrow card-feature__eyebrow">Library Perangkat Lunak</p>
           <h2 class="card-feature__title">Katalog referensi terpusat</h2>
-          <p class="card-feature__desc">Telusuri seluruh perangkat lunak yang telah terdaftar dari satuan kerja pusat maupun perwakilan.</p>
-          <a class="btn btn-gold btn-block" href="#" data-path="/pages/lo-biro-ti/library.html">
+            <a class="btn btn-gold btn-block" href="#" data-path="/pages/lo-biro-ti/library.html">
             Akses library ${ARROW_ICON}
           </a>
         </div>
@@ -494,19 +492,12 @@ function renderFullDashboard(user) {
               Selesai · ${kpi.reviuSelesai}
             </div>
           </div>
-
-          <ul class="review-flow-card__legend">
-            <li><span class="review-flow-legend__dot review-flow-legend__dot--antrian"></span>Antrian reviu — belum ditangani</li>
-            <li><span class="review-flow-legend__dot review-flow-legend__dot--proses"></span>Proses reviu — sedang berjalan</li>
-            <li><span class="review-flow-legend__dot review-flow-legend__dot--selesai"></span>Reviu selesai — siap terbit</li>
-          </ul>
         </section>
 
         <div class="card-feature card-feature--compact">
           <p class="eyebrow card-feature__eyebrow">Library Perangkat Lunak</p>
           <h2 class="card-feature__title">Katalog referensi terpusat</h2>
-          <p class="card-feature__desc">Telusuri seluruh perangkat lunak yang telah terdaftar dari satuan kerja pusat maupun perwakilan.</p>
-          <a class="btn btn-gold btn-block" href="#" data-path="/pages/${user.role}/library.html">
+            <a class="btn btn-gold btn-block" href="#" data-path="/pages/${user.role}/library.html">
             Akses library ${ARROW_ICON}
           </a>
         </div>

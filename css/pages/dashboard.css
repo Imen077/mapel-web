@@ -41,6 +41,7 @@
 .dashboard__top-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: stretch;
   gap: var(--space-5);
 }
 
@@ -49,8 +50,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-7) var(--space-6);
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
   text-align: center;
 }
 
@@ -292,14 +293,14 @@
 .jenis-card {
   display: flex;
   flex-direction: column;
-  padding-bottom: var(--space-5);
+  padding-bottom: var(--space-6);
 }
 
 .jenis-chart {
   position: relative;
   display: flex;
   flex: 1;
-  min-height: 260px;
+  min-height: 300px;
   padding: var(--space-5) var(--space-5) 0;
   gap: var(--space-3);
 }
@@ -309,7 +310,7 @@
   top: var(--space-5);
   left: var(--space-5);
   right: var(--space-5);
-  bottom: 68px;
+  bottom: 108px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -347,7 +348,7 @@
   justify-content: flex-end;
   flex: 1;
   height: 100%;
-  padding-bottom: 68px;
+  padding-bottom: 108px;
   position: relative;
 }
 
@@ -411,23 +412,25 @@
 
 /* Varian card-feature yang lebih ringkas (setengah lebar, rata
    kiri) buat ditaruh berdampingan sama stat-card, alih-alih jadi
-   banner penuh seperti di dashboard Pegawai. */
+   banner penuh seperti di dashboard Pegawai. Rata atas (bukan center)
+   supaya tinggi kartu ngikutin isinya, bukan ke-stretch kosong
+   ngejar tinggi stat-card di sebelahnya. */
 .card-feature--compact {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: left;
-  padding: var(--space-6);
+  padding: var(--space-5) var(--space-6);
 }
 
 .card-feature--compact .card-feature__title {
   font-size: var(--text-xl);
-  margin: var(--space-2) 0 var(--space-3);
+  margin: var(--space-1) 0 var(--space-4);
 }
 
 .card-feature--compact .card-feature__desc {
   max-width: none;
-  margin: 0 0 var(--space-5);
+  margin: 0 0 var(--space-4);
 }
 
 @media (max-width: 880px) {
