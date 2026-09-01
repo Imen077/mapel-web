@@ -143,6 +143,21 @@ const KARO_ORTALA_KONSEP_CARD_GROUPS = [
   ...KONSEP_ORTALA_CHAIN_CARD_GROUPS
 ];
 
+// Sama polanya kayak KONSEP_ORTALA_CHAIN_CARD_GROUPS, khusus buat
+// Monitoring PENGESAHAN PL: kartu "Pengesahan Satker" dibuang
+// (halaman ini sendiri representasi pengesahan, jadi kartu itu
+// jadi berlebihan/menyesatkan), diganti "Dicabut" di ujung (sesuai
+// referensi foto).
+const PENGESAHAN_ORTALA_CARD_GROUPS = [
+  ...KONSEP_ORTALA_CHAIN_CARD_GROUPS.filter((group) => group.label !== 'Pengesahan Satker'),
+  { label: 'Dicabut', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#9AA0AA', blob: '#DCD5C2' }
+];
+
+const KARO_PENGESAHAN_CARD_GROUPS = [
+  { label: 'Diterima', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#2B5C89', blob: '#C2D8F0' },
+  ...PENGESAHAN_ORTALA_CARD_GROUPS
+];
+
 // Konfigurasi per tipe monitoring -- cukup tambah entri baru di
 // sini kalau nanti ada varian lain, tidak perlu ubah logic render.
 const MONITORING_CONFIG = {
@@ -212,6 +227,26 @@ const MONITORING_CONFIG = {
     title: 'Monitoring Konsep Perangkat Lunak',
     subtitle: 'Pantau progres seluruh konsep perangkat lunak yang telah diajukan, mulai dari konsep hingga persetujuan akhir.',
     searchPlaceholder: 'Cari konsep ...',
+    titleColumnLabel: 'Judul Konsep'
+  },
+  'pengesahan-pl': {
+    service: konsepService,
+    statusMeta: KONSEP_STATUS_META,
+    // Sama pola-nya kayak 'konsep-pl' di atas: cuma role rantai
+    // Ortala yang lihat kartu ringkasan khusus (lihat
+    // KARO_PENGESAHAN_CARD_GROUPS/PENGESAHAN_ORTALA_CARD_GROUPS),
+    // role lain (LO, Kepala Satker) tetap pakai 11 kartu default.
+    cardGroupsByRole: {
+      [ROLES.KEPALA_BIRO_ORTALA]: KARO_PENGESAHAN_CARD_GROUPS,
+      [ROLES.KEPALA_BAGIAN_ORTALA]: PENGESAHAN_ORTALA_CARD_GROUPS,
+      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: PENGESAHAN_ORTALA_CARD_GROUPS,
+      [ROLES.PREVIU_BIRO_ORTALA]: PENGESAHAN_ORTALA_CARD_GROUPS
+    },
+    statusLabelOverrides: STATUS_LABEL_OVERRIDES,
+    compactTable: true,
+    title: 'Monitoring Pengesahan Perangkat Lunak',
+    subtitle: 'Pantau progres akhir konsep perangkat lunak yang sudah disetujui hingga resmi diterbitkan.',
+    searchPlaceholder: 'Cari pengesahan ...',
     titleColumnLabel: 'Judul Konsep'
   }
 };

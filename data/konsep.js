@@ -16,7 +16,25 @@ import { SUBMISSION_STATUS, buildStatusMeta } from './status.js';
 import { createSubmissionService } from './submission-service.js';
 
 export const KONSEP_STATUS = SUBMISSION_STATUS;
-export const KONSEP_STATUS_META = buildStatusMeta('Konsep');
+
+// Override 2 kartu status, KHUSUS Konsep PL (Proposal PL tetap
+// pakai buildStatusMeta('Proposal') apa adanya, tidak ikut
+// berubah):
+// - Pengesahan Satker disembunyikan dari kartu ringkasan/filter --
+//   sekarang sudah punya halaman monitoring sendiri (Monitoring
+//   Pengesahan PL, lihat data/pengesahan.js), jadi tidak perlu
+//   dobel ditampilkan di sini juga.
+// - Tidak Disetujui dimunculkan balik (sebelumnya hidden) dengan
+//   nama "Dicabut" + warna netral abu-abu, ganti dari merah.
+export const KONSEP_STATUS_META = buildStatusMeta('Konsep').map((meta) => {
+  if (meta.key === SUBMISSION_STATUS.PENGESAHAN_SATKER) {
+    return { ...meta, hidden: true };
+  }
+  if (meta.key === SUBMISSION_STATUS.TIDAK_DISETUJUI) {
+    return { ...meta, label: 'Dicabut', bg: '#EDEAE0', text: '#9AA0AA', blob: '#DCD5C2', hidden: false };
+  }
+  return meta;
+});
 
 const JENIS_LIST = ['Instruksi Kerja', 'Juknis', 'Standar Pelayanan', 'Pedoman', 'POS'];
 

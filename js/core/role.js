@@ -80,7 +80,8 @@ export const ROLE_MENUS = {
       icon: 'activity',
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/lo-biro-ti/monitoring/proposal-pl.html' },
-        { label: 'Monitoring Konsep PL', path: '/pages/lo-biro-ti/monitoring/konsep-pl.html' }
+        { label: 'Monitoring Konsep PL', path: '/pages/lo-biro-ti/monitoring/konsep-pl.html' },
+        { label: 'Monitoring Pengesahan PL', path: '/pages/lo-biro-ti/monitoring/pengesahan-pl.html' }
       ]
     },
     {
@@ -100,7 +101,8 @@ export const ROLE_MENUS = {
       icon: 'activity',
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/kepala-satker-biro-ti/monitoring/proposal-pl.html' },
-        { label: 'Monitoring Konsep PL', path: '/pages/kepala-satker-biro-ti/monitoring/konsep-pl.html' }
+        { label: 'Monitoring Konsep PL', path: '/pages/kepala-satker-biro-ti/monitoring/konsep-pl.html' },
+        { label: 'Monitoring Pengesahan PL', path: '/pages/kepala-satker-biro-ti/monitoring/pengesahan-pl.html' }
       ]
     },
     {
@@ -119,7 +121,8 @@ export const ROLE_MENUS = {
       icon: 'activity',
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/kepala-biro-ortala/monitoring/proposal-pl.html' },
-        { label: 'Monitoring Konsep PL', path: '/pages/kepala-biro-ortala/monitoring/konsep-pl.html' }
+        { label: 'Monitoring Konsep PL', path: '/pages/kepala-biro-ortala/monitoring/konsep-pl.html' },
+        { label: 'Monitoring Pengesahan PL', path: '/pages/kepala-biro-ortala/monitoring/pengesahan-pl.html' }
       ]
     },
     {
@@ -138,7 +141,8 @@ export const ROLE_MENUS = {
       icon: 'activity',
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/kepala-bagian-ortala/monitoring/proposal-pl.html' },
-        { label: 'Monitoring Konsep PL', path: '/pages/kepala-bagian-ortala/monitoring/konsep-pl.html' }
+        { label: 'Monitoring Konsep PL', path: '/pages/kepala-bagian-ortala/monitoring/konsep-pl.html' },
+        { label: 'Monitoring Pengesahan PL', path: '/pages/kepala-bagian-ortala/monitoring/pengesahan-pl.html' }
       ]
     },
     {
@@ -157,7 +161,8 @@ export const ROLE_MENUS = {
       icon: 'activity',
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/kepala-subbagian-ortala/monitoring/proposal-pl.html' },
-        { label: 'Monitoring Konsep PL', path: '/pages/kepala-subbagian-ortala/monitoring/konsep-pl.html' }
+        { label: 'Monitoring Konsep PL', path: '/pages/kepala-subbagian-ortala/monitoring/konsep-pl.html' },
+        { label: 'Monitoring Pengesahan PL', path: '/pages/kepala-subbagian-ortala/monitoring/pengesahan-pl.html' }
       ]
     },
     {
@@ -176,7 +181,8 @@ export const ROLE_MENUS = {
       icon: 'activity',
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/previu-biro-ortala/monitoring/proposal-pl.html' },
-        { label: 'Monitoring Konsep PL', path: '/pages/previu-biro-ortala/monitoring/konsep-pl.html' }
+        { label: 'Monitoring Konsep PL', path: '/pages/previu-biro-ortala/monitoring/konsep-pl.html' },
+        { label: 'Monitoring Pengesahan PL', path: '/pages/previu-biro-ortala/monitoring/pengesahan-pl.html' }
       ]
     },
     {
