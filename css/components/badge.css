@@ -41,6 +41,23 @@
   color: var(--tint-text);
 }
 
+/* Varian outline + titik warna di kiri teks, dipakai badge Status
+   di halaman Review Proposal (js/pages/review.js) -- warnanya juga
+   diset inline lewat --tint-text. */
+.badge--outline {
+  background: transparent;
+  color: var(--tint-text);
+  border: 1.5px solid var(--tint-text);
+  padding: 3px var(--space-3) 3px var(--space-2);
+}
+
+.badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
 /* Badge angka peringkat (dipakai di list Top Download / Top View) */
 .rank-badge {
   display: inline-flex;

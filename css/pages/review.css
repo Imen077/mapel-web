@@ -1,72 +1,64 @@
 /* ============================================================
    MAPEL - pages/review.css
-   Halaman "Review Proposal" (js/pages/review-proposal.js) --
-   dibuka Kepala Satker Biro TI dari Monitoring Proposal PL.
-   Beberapa bagian SENGAJA reuse class dari file lain alih-alih
-   diduplikasi di sini:
-   - .doc-preview* (kartu pratinjau dokumen) -> pages/pengajuan.css
-   - .detail-actions*, .detail-card__body -> pages/detail.css
+   Halaman "Review Proposal" (js/pages/review.js) -- dibuka role
+   reviewer (Kepala Satker, dst) dari tombol Aksi di Monitoring.
    ============================================================ */
 
-.page-review {
+.review-page {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
   max-width: var(--max-width-content);
 }
 
-.page-review__intro {
+.review-page__intro {
   margin-bottom: var(--space-1);
 }
 
-/* Judul di-emaskan (bukan navy) -- pola yang sama dipakai di
-   .page-pengajuan__title (pages/pengajuan.css), keduanya halaman
-   "aksi/keputusan" yang sengaja ditonjolkan beda dari halaman baca
-   biasa seperti Monitoring/Dashboard. */
-.page-review__title {
+.review-page__title {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
   color: var(--color-gold);
+  margin: 0 0 var(--space-1);
 }
 
-.page-review__subtitle {
-  margin-top: var(--space-1);
-  color: var(--color-ink-700);
+.review-page__subtitle {
+  color: var(--color-gold);
+  opacity: 0.85;
   font-size: var(--text-sm);
+  margin: 0;
 }
 
-/* ---------- Header kartu "Detail Proposal" (ikon + judul + subjudul) ---------- */
-
-.card__header-icon-title {
+.review-card__header {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--color-paper-line);
 }
 
-.card__header-icon {
+.review-card__header-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
   border-radius: var(--radius-md);
   background: var(--color-gold-soft);
-  color: var(--color-gold);
-  flex-shrink: 0;
+  color: #8a641f;
 }
 
-.card__header-subtitle {
-  margin-top: 2px;
-  font-size: var(--text-xs);
+.review-card__header-subtitle {
+  margin: 2px 0 0;
+  font-size: var(--text-sm);
   color: var(--color-paper-muted);
 }
-
-/* ---------- Grid detail (2 kolom, tiap item punya ikon kecil) ---------- */
 
 .review-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-5) var(--space-7);
+  gap: var(--space-5) var(--space-6);
   padding: var(--space-5);
 }
 
@@ -86,71 +78,38 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-md);
-  background: var(--color-paper-dim);
-  color: var(--color-paper-muted);
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
-}
-
-.review-grid__body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-dim);
+  color: var(--color-ink-700);
 }
 
 .review-grid__label {
-  font-size: 11px;
+  margin: 0 0 2px;
+  font-size: var(--text-xs);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--color-paper-muted);
 }
 
 .review-grid__value {
+  margin: 0;
   font-weight: 700;
   color: var(--color-ink-900);
   font-size: var(--text-sm);
 }
 
-.review-grid__link {
-  font-weight: 700;
+.review-grid__value a {
   color: var(--color-ink-700);
-  font-size: var(--text-sm);
   text-decoration: none;
 }
 
-.review-grid__link:hover {
+.review-grid__value a:hover {
   text-decoration: underline;
 }
-
-/* Badge status berbentuk pil beroutline + titik (beda dari
-   .badge--tint yang solid, dipakai KHUSUS di halaman ini sesuai
-   desain -- warnanya pakai token --color-info yang sudah ada). */
-.status-dot-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 3px var(--space-3);
-  border: 1.5px solid var(--color-info);
-  border-radius: var(--radius-full);
-  color: var(--color-info);
-  font-size: var(--text-sm);
-  font-weight: 700;
-}
-
-.status-dot-badge::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-
-/* ---------- Pratinjau dokumen (2 kolom) ---------- */
 
 .review-preview-grid {
   display: grid;
@@ -158,43 +117,66 @@
   gap: var(--space-5);
 }
 
-/* ---------- Catatan Revisi ---------- */
+.review-notes__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--color-paper-line);
+}
 
-.review-catatan-hint {
-  font-family: var(--font-body);
+.review-notes__required {
   font-size: var(--text-xs);
-  font-weight: 600;
   color: var(--color-error);
 }
 
-.review-textarea {
+.review-notes__body {
+  padding: var(--space-5);
+}
+
+.review-notes__textarea {
   width: 100%;
-  min-height: 110px;
   padding: var(--space-4);
-  background: #ffffff;
   border: 1px solid var(--color-paper-line);
   border-radius: var(--radius-md);
-  font-family: var(--font-body);
+  background: var(--color-paper-dim);
+  font-family: inherit;
   font-size: var(--text-sm);
-  color: var(--color-ink-800);
+  color: var(--color-ink-900);
   resize: vertical;
 }
 
-.review-textarea:focus {
-  outline: none;
-  border-color: var(--color-stamp);
+.review-notes__textarea:focus {
+  outline: 2px solid var(--color-ink-700);
+  outline-offset: 1px;
 }
 
-.review-textarea::placeholder {
-  color: var(--color-paper-muted);
+.review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.review-actions__right {
+  display: flex;
+  gap: var(--space-3);
 }
 
 @media (max-width: 880px) {
-  .review-grid {
+  .review-grid,
+  .review-preview-grid {
     grid-template-columns: 1fr;
   }
 
-  .review-preview-grid {
-    grid-template-columns: 1fr;
+  .review-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-actions__right {
+    justify-content: flex-end;
   }
 }

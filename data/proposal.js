@@ -15,7 +15,7 @@ export const PROPOSAL_STATUS_META = buildStatusMeta('Proposal');
 
 const JENIS_LIST = ['Instruksi Kerja', 'Juknis', 'Standar Pelayanan', 'Pedoman', 'POS'];
 
-export const UNIT_LIST = [
+const UNIT_LIST = [
   'Biro Teknologi Informasi',
   'Biro Sumber Daya Manusia',
   'Biro Umum',
@@ -175,6 +175,22 @@ export const SEED_PROPOSALS = JUDUL_LIST.slice(0, STATUS_SEQUENCE.length).map((t
     createdAt: `${daysBeforeISO(BASE_DATE, i * 2)}T${buildTimeOfDay(i)}`,
     status: STATUS_SEQUENCE[i]
   };
+});
+
+// Satu item tambahan di paling atas (tanggal paling baru), status
+// Menunggu Persetujuan -- sengaja ditaruh di sini (bukan di
+// STATUS_SEQUENCE) biar gampang dites: selalu jadi baris pertama di
+// Monitoring/Antrian Proposal PL, jadi gampang di-klik buat nyoba
+// halaman "Review Proposal" (lihat js/pages/review.js).
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-042',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Pendukung Implementasi Sistem Manajemen Keamanan TI (SMKI) Lingkup Data Center',
+  jenis: 'Pedoman',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  createdAt: `${BASE_DATE}T08:37:00`,
+  status: SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN
 });
 
 const DRAFT_COUNT = 2;

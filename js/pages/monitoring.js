@@ -14,8 +14,6 @@ import { proposalService, PROPOSAL_STATUS_META } from '../../data/proposal.js';
 import { konsepService, KONSEP_STATUS_META } from '../../data/konsep.js';
 import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateLongID } from '../core/format.js';
-import { renderAksiCell, bindAksiDropdowns } from '../components/table.js';
-import { saveReviewHandoff } from './review-proposal.js';
 
 const PAGE_SIZE = 7;
 
@@ -23,6 +21,20 @@ const SEARCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 const CHEVRON_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ARROW_LEFT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m14.5 5-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ARROW_RIGHT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9.5 5 7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+// Kapan tombol Aksi di tabel ngarah ke halaman lain (bukan cuma
+// tooltip "segera hadir"). Cuma satu kombinasi yang sudah jadi
+// sekarang: Kepala Satker Biro TI review proposal yang masih
+// Menunggu Persetujuan (lihat js/pages/review.js). Tambah entri
+// baru di sini kalau nanti ada kombinasi role+status+type lain yang
+// juga sudah punya halamannya.
+function resolveRowActionRoute({ type, role, status, itemId }) {
+  if (type === 'proposal-pl' && role === ROLES.KEPALA_SATKER_BIRO_TI && status === SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN) {
+    return `/pages/kepala-satker-biro-ti/antrian/review.html?id=${encodeURIComponent(itemId)}`;
+  }
+  return null;
+}
 const PLUS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 
 // Proyeksi label+warna badge tabel Monitoring Proposal PL & Konsep PL
@@ -144,21 +156,6 @@ const KARO_ORTALA_KONSEP_CARD_GROUPS = [
   ...KONSEP_ORTALA_CHAIN_CARD_GROUPS
 ];
 
-// Sama polanya kayak KONSEP_ORTALA_CHAIN_CARD_GROUPS, khusus buat
-// Monitoring PENGESAHAN PL: kartu "Pengesahan Satker" dibuang
-// (halaman ini sendiri representasi pengesahan, jadi kartu itu
-// jadi berlebihan/menyesatkan), diganti "Dicabut" di ujung (sesuai
-// referensi foto).
-const PENGESAHAN_ORTALA_CARD_GROUPS = [
-  ...KONSEP_ORTALA_CHAIN_CARD_GROUPS.filter((group) => group.label !== 'Pengesahan Satker'),
-  { label: 'Dicabut', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#9AA0AA', blob: '#DCD5C2' }
-];
-
-const KARO_PENGESAHAN_CARD_GROUPS = [
-  { label: 'Diterima', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#2B5C89', blob: '#C2D8F0' },
-  ...PENGESAHAN_ORTALA_CARD_GROUPS
-];
-
 // Konfigurasi per tipe monitoring -- cukup tambah entri baru di
 // sini kalau nanti ada varian lain, tidak perlu ubah logic render.
 const MONITORING_CONFIG = {
@@ -209,8 +206,7 @@ const MONITORING_CONFIG = {
     cardGroupsByRole: {
       [ROLES.KEPALA_BIRO_ORTALA]: KARO_ORTALA_KONSEP_CARD_GROUPS,
       // 9 kartu, sama kayak Kabiro tapi tanpa "Diterima" -- lihat
-      // KONSEP_ORTALA_CHAIN_CARD_GROUPS di atas. Berlaku juga buat
-      // Previu Biro Ortala (rantai Ortala yang sama, di bawah Kabiro).
+      // KONSEP_ORTALA_CHAIN_CARD_GROUPS di atas.
       [ROLES.KEPALA_BAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
       [ROLES.KEPALA_SUBBAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
       [ROLES.PREVIU_BIRO_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS
@@ -228,26 +224,6 @@ const MONITORING_CONFIG = {
     title: 'Monitoring Konsep Perangkat Lunak',
     subtitle: 'Pantau progres seluruh konsep perangkat lunak yang telah diajukan, mulai dari konsep hingga persetujuan akhir.',
     searchPlaceholder: 'Cari konsep ...',
-    titleColumnLabel: 'Judul Konsep'
-  },
-  'pengesahan-pl': {
-    service: konsepService,
-    statusMeta: KONSEP_STATUS_META,
-    // Sama pola-nya kayak 'konsep-pl' di atas: cuma role rantai
-    // Ortala yang lihat kartu ringkasan khusus (lihat
-    // KARO_PENGESAHAN_CARD_GROUPS/PENGESAHAN_ORTALA_CARD_GROUPS),
-    // role lain (LO, Kepala Satker) tetap pakai 11 kartu default.
-    cardGroupsByRole: {
-      [ROLES.KEPALA_BIRO_ORTALA]: KARO_PENGESAHAN_CARD_GROUPS,
-      [ROLES.KEPALA_BAGIAN_ORTALA]: PENGESAHAN_ORTALA_CARD_GROUPS,
-      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: PENGESAHAN_ORTALA_CARD_GROUPS,
-      [ROLES.PREVIU_BIRO_ORTALA]: PENGESAHAN_ORTALA_CARD_GROUPS
-    },
-    statusLabelOverrides: STATUS_LABEL_OVERRIDES,
-    compactTable: true,
-    title: 'Monitoring Pengesahan Perangkat Lunak',
-    subtitle: 'Pantau progres akhir konsep perangkat lunak yang sudah disetujui hingga resmi diterbitkan.',
-    searchPlaceholder: 'Cari pengesahan ...',
     titleColumnLabel: 'Judul Konsep'
   }
 };
@@ -382,7 +358,7 @@ function renderFilterBar({
   `;
 }
 
-function renderTableRows(service, rows, startIndex, labelOverrides) {
+function renderTableRows(service, rows, startIndex, labelOverrides, rowActionCtx) {
   if (!rows.length) {
     return `
       <tr>
@@ -395,12 +371,18 @@ function renderTableRows(service, rows, startIndex, labelOverrides) {
     .map((item, i) => {
       const baseMeta = service.getStatusMeta(item.status);
       const meta = { ...baseMeta, ...(labelOverrides?.[item.status] || {}) };
+      const actionRoute = resolveRowActionRoute({
+        type: rowActionCtx?.type,
+        role: rowActionCtx?.role,
+        status: item.status,
+        itemId: item.id
+      });
       return `
         <tr>
           <td>${startIndex + i + 1}.</td>
           <td>${item.unit}</td>
           <td>
-            <span class="data-table__title">${item.title}</span>
+            <span class="data-table__title${actionRoute ? ' data-table__title--clickable' : ''}"${actionRoute ? ` data-aksi-route="${actionRoute}" role="button" tabindex="0"` : ''}>${item.title}</span>
             <span class="data-table__code">${item.id}</span>
           </td>
           <td>${item.jenis}</td>
@@ -409,7 +391,9 @@ function renderTableRows(service, rows, startIndex, labelOverrides) {
           <td>
             <span class="badge badge--tint" style="--tint-bg:${meta.bg};--tint-text:${meta.text}">${meta.label}</span>
           </td>
-          ${renderAksiCell(item.id)}
+          <td>
+            <button class="data-table__aksi" type="button" title="${actionRoute ? 'Lihat detail' : 'Lihat detail (segera hadir)'}">${AKSI_ICON}</button>
+          </td>
         </tr>
       `;
     })
@@ -448,7 +432,6 @@ function renderPagination(page, totalPages) {
  * @param {HTMLElement} root
  * @param {{service:Object, statusMeta:Array, title:string, subtitle:string, searchPlaceholder:string}} config
  * @param {Session} user
- * @param {string} type - 'proposal-pl' | 'konsep-pl' (dari getMonitoringType), dipakai buat nge-scope aksi "Lihat" yang berbeda per tipe (lihat handleLihat di bindEvents).
  */
 function initMonitoringTable(root, config, user, type) {
   const {
@@ -528,7 +511,7 @@ function initMonitoringTable(root, config, user, type) {
                 </tr>
               </thead>
               <tbody>
-                ${renderTableRows(service, rows, startIndex, statusLabelOverrides)}
+                ${renderTableRows(service, rows, startIndex, statusLabelOverrides, { type, role: user?.role })}
               </tbody>
             </table>
           </div>
@@ -548,6 +531,17 @@ function initMonitoringTable(root, config, user, type) {
     const assignMeToggle = root.querySelector('#filter-assign-me');
     const belumKonsepToggle = root.querySelector('#filter-belum-konsep');
     const createBtn = root.querySelector('#btn-create-proposal');
+
+    root.querySelectorAll('[data-aksi-route]').forEach((el) => {
+      const go = () => router.navigate(el.getAttribute('data-aksi-route'));
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          go();
+        }
+      });
+    });
 
     let debounceTimer;
     searchInput?.addEventListener('input', (event) => {
@@ -604,22 +598,6 @@ function initMonitoringTable(root, config, user, type) {
         }
       });
     });
-
-    // "Lihat" cuma diarahkan ke halaman Review Proposal buat Kepala
-    // Satker Biro TI, di Monitoring Proposal PL, dan CUMA kalau
-    // statusnya "Menunggu Persetujuan" (itu tahap yang butuh
-    // keputusan dia -- lihat js/pages/review-proposal.js). Kombinasi
-    // role/tipe/status lain belum punya halaman tujuan, jadi "Lihat"
-    // di situ masih belum diarahkan ke mana pun (cuma nutup menu).
-    function handleLihat(id) {
-      if (type !== 'proposal-pl' || user?.role !== ROLES.KEPALA_SATKER_BIRO_TI) return;
-      const item = service.getById(id);
-      if (!item || item.status !== SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN) return;
-      saveReviewHandoff(item);
-      router.navigate('/pages/kepala-satker-biro-ti/antrian/review-proposal.html');
-    }
-
-    bindAksiDropdowns(root, { onLihat: handleLihat });
   }
 
   renderAll();

@@ -22,9 +22,8 @@ const PAGE_MODULES = {
   'monitoring/proposal-pl': () => import('../pages/monitoring.js'),
   'monitoring/konsep-pl': () => import('../pages/monitoring.js'),
   'pengajuan/proposal-pl': () => import('../pages/pengajuan-proposal.js'),
-  'pengajuan/ubah-proposal-pl': () => import('../pages/ubah-proposal.js'),
   'antrian/detail': () => import('../pages/detail.js'),
-  'antrian/review-proposal': () => import('../pages/review-proposal.js')
+  'antrian/review': () => import('../pages/review.js')
 };
 
 // Breadcrumb navbar per pageKey. Halaman yang tidak didaftarkan di
@@ -36,9 +35,8 @@ const PAGE_BREADCRUMBS = {
   'monitoring/proposal-pl': ['Monitoring', 'Monitoring Proposal'],
   'monitoring/konsep-pl': ['Monitoring', 'Monitoring Konsep'],
   'pengajuan/proposal-pl': ['Pengajuan Proposal PL'],
-  'pengajuan/ubah-proposal-pl': ['Antrian', 'Ubah Proposal'],
   'antrian/detail': ['Antrian', 'Detail Proposal'],
-  'antrian/review-proposal': ['Antrian', 'Review Proposal']
+  'antrian/review': ['Antrian', 'Review Proposal']
 };
 
 // Folder yang nama file di dalamnya BUKAN unik (mis. "proposal-pl"
