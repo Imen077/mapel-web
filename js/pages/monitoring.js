@@ -15,6 +15,7 @@ import { konsepService, KONSEP_STATUS_META } from '../../data/konsep.js';
 import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateLongID } from '../core/format.js';
 import { renderAksiCell, bindAksiDropdowns } from '../components/table.js';
+import { saveReviewHandoff } from './review-proposal.js';
 
 const PAGE_SIZE = 7;
 
@@ -408,7 +409,7 @@ function renderTableRows(service, rows, startIndex, labelOverrides) {
           <td>
             <span class="badge badge--tint" style="--tint-bg:${meta.bg};--tint-text:${meta.text}">${meta.label}</span>
           </td>
-          ${renderAksiCell()}
+          ${renderAksiCell(item.id)}
         </tr>
       `;
     })
@@ -447,8 +448,9 @@ function renderPagination(page, totalPages) {
  * @param {HTMLElement} root
  * @param {{service:Object, statusMeta:Array, title:string, subtitle:string, searchPlaceholder:string}} config
  * @param {Session} user
+ * @param {string} type - 'proposal-pl' | 'konsep-pl' (dari getMonitoringType), dipakai buat nge-scope aksi "Lihat" yang berbeda per tipe (lihat handleLihat di bindEvents).
  */
-function initMonitoringTable(root, config, user) {
+function initMonitoringTable(root, config, user, type) {
   const {
     service,
     statusMeta,
@@ -603,7 +605,21 @@ function initMonitoringTable(root, config, user) {
       });
     });
 
-    bindAksiDropdowns(root);
+    // "Lihat" cuma diarahkan ke halaman Review Proposal buat Kepala
+    // Satker Biro TI, di Monitoring Proposal PL, dan CUMA kalau
+    // statusnya "Menunggu Persetujuan" (itu tahap yang butuh
+    // keputusan dia -- lihat js/pages/review-proposal.js). Kombinasi
+    // role/tipe/status lain belum punya halaman tujuan, jadi "Lihat"
+    // di situ masih belum diarahkan ke mana pun (cuma nutup menu).
+    function handleLihat(id) {
+      if (type !== 'proposal-pl' || user?.role !== ROLES.KEPALA_SATKER_BIRO_TI) return;
+      const item = service.getById(id);
+      if (!item || item.status !== SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN) return;
+      saveReviewHandoff(item);
+      router.navigate('/pages/kepala-satker-biro-ti/antrian/review-proposal.html');
+    }
+
+    bindAksiDropdowns(root, { onLihat: handleLihat });
   }
 
   renderAll();
@@ -624,5 +640,5 @@ export function initMonitoringPage(root, user) {
     return;
   }
 
-  initMonitoringTable(root, config, user);
+  initMonitoringTable(root, config, user, type);
 }

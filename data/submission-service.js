@@ -84,11 +84,16 @@ export function createSubmissionService({ statusMeta, items }) {
     return { rows: pageRows, total, totalPages, page: safePage };
   }
 
+  /** @param {string} id @returns {Object|undefined} */
+  function getById(id) {
+    return items.find((item) => item.id === id);
+  }
+
   /** @returns {number[]} daftar tahun unik yang ada di data, terbaru dulu */
   function getAvailableYears() {
     const years = new Set(items.map((item) => Number(item.createdAt.slice(0, 4))));
     return [...years].sort((a, b) => b - a);
   }
 
-  return { getStatusMeta, getStatusCounts, getFiltered, getAvailableYears };
+  return { getStatusMeta, getStatusCounts, getFiltered, getAvailableYears, getById };
 }

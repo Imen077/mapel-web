@@ -1,10 +1,10 @@
 // ============================================================
 // MAPEL - components/table.js
 // Menu aksi ("Lihat" / "Riwayat") untuk kolom Aksi di semua tabel
-// data (Monitoring & Antrian). Dummy dulu -- item menunya belum
-// di-link ke halaman detail/riwayat manapun (belum ada
-// js/pages/detail.js & konsep riwayat), cuma buka/tutup menunya
-// saja. Sambungkan ke router begitu halaman-halaman itu sudah ada.
+// data (Monitoring & Antrian). "Riwayat" masih dummy (belum ada
+// halaman riwayat). "Lihat" bisa disambungkan ke halaman lain lewat
+// callback onLihat di bindAksiDropdowns() -- kalau tidak dioper,
+// perilakunya tetap dummy (cuma nutup menu) seperti sebelumnya.
 // ============================================================
 
 const AKSI_ICON =
@@ -51,12 +51,16 @@ function ensureOutsideHandlers() {
  * Markup satu sel "Aksi" (tombol + dropdown Lihat/Riwayat). Dipakai
  * langsung sebagai isi `<td>` di renderTableRows tabel Monitoring &
  * Antrian.
+ * @param {string} [id] - id item baris ini (mis. item.id), dipakai
+ *   bindAksiDropdowns() buat tahu baris mana yang diklik pas
+ *   callback onLihat/onRiwayat dipanggil. Opsional -- kalau tidak
+ *   dioper, callback tetap jalan tapi dengan id `undefined`.
  */
-export function renderAksiCell() {
+export function renderAksiCell(id) {
   const menuId = `aksi-menu-${++seq}`;
   return `
     <td class="data-table__aksi-cell">
-      <div class="aksi-menu" data-aksi-menu>
+      <div class="aksi-menu" data-aksi-menu ${id ? `data-aksi-id="${id}"` : ''}>
         <button
           class="data-table__aksi"
           type="button"
@@ -85,13 +89,18 @@ export function renderAksiCell() {
  * Pasang event listener untuk semua sel Aksi di dalam `root`. Panggil
  * di akhir bindEvents() setiap halaman tabel, tiap kali tabelnya
  * selesai di-render ulang.
+ * @param {HTMLElement} root
+ * @param {Object} [options]
+ * @param {(id: string|undefined) => void} [options.onLihat] - dipanggil pas item "Lihat" diklik, dioper id baris (dari renderAksiCell). Kalau tidak dioper, "Lihat" cuma nutup menu (perilaku lama).
+ * @param {(id: string|undefined) => void} [options.onRiwayat] - sama seperti onLihat, buat item "Riwayat".
  */
-export function bindAksiDropdowns(root) {
+export function bindAksiDropdowns(root, { onLihat, onRiwayat } = {}) {
   ensureOutsideHandlers();
 
   root.querySelectorAll('[data-aksi-menu]').forEach((menu) => {
     const toggle = menu.querySelector('[data-aksi-toggle]');
     const dropdown = menu.querySelector('[data-aksi-dropdown]');
+    const id = menu.getAttribute('data-aksi-id') || undefined;
 
     toggle?.addEventListener('click', (event) => {
       event.stopPropagation();
@@ -103,12 +112,13 @@ export function bindAksiDropdowns(root) {
       }
     });
 
-    // Item menu masih dummy -- web ini belum ngelink ke halaman
-    // detail/riwayat manapun, jadi cuma nutup menunya waktu diklik.
     menu.querySelectorAll('[data-aksi-action]').forEach((item) => {
       item.addEventListener('click', (event) => {
         event.stopPropagation();
         closeMenu(menu);
+        const action = item.getAttribute('data-aksi-action');
+        if (action === 'lihat') onLihat?.(id);
+        if (action === 'riwayat') onRiwayat?.(id);
       });
     });
   });
