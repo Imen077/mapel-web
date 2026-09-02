@@ -75,4 +75,82 @@ export function showSuccessModal({ title = 'Sukses!', message = 'Data berhasil d
 /** Shortcut buat popup gagal/error dengan gaya yang senada. */
 export function showErrorModal({ title = 'Gagal', message = '', okLabel, onOk } = {}) {
   return showModal({ icon: ALERT_ICON, variant: 'error', title, message, okLabel, onOk });
-}// MAPEL - placeholder
+}
+
+/**
+ * Modal konfirmasi 2 tombol (Batal / aksi konfirmasi) -- dipakai buat
+ * aksi yang butuh persetujuan eksplisit dulu sebelum jalan, misalnya
+ * tombol "Hapus" di halaman Detail Proposal. Menggantikan
+ * window.confirm() bawaan browser.
+ * @param {Object} options
+ * @param {string} [options.icon] - Default ikon "!" (sama kayak ALERT_ICON).
+ * @param {'warning'|'error'} [options.variant='warning']
+ * @param {string} options.title - Judul, mis. "Hapus Proposal".
+ * @param {string} [options.subject] - Nama item yang kena aksi, ditebalkan (mis. judul proposal).
+ * @param {string} [options.message='Apakah anda yakin?']
+ * @param {string} [options.cancelLabel='Batal']
+ * @param {string} [options.confirmLabel='Ya, hapus']
+ * @param {() => void} [options.onConfirm] - Dipanggil setelah tombol konfirmasi ditekan (modal sudah ditutup).
+ * @param {() => void} [options.onCancel] - Dipanggil kalau dibatalkan (tombol Batal, klik luar, atau Escape).
+ * @returns {() => void} Fungsi buat nutup modal secara manual.
+ */
+export function showConfirmModal({
+  icon = ALERT_ICON,
+  variant = 'warning',
+  title,
+  subject = '',
+  message = 'Apakah anda yakin?',
+  cancelLabel = 'Batal',
+  confirmLabel = 'Ya, hapus',
+  onConfirm,
+  onCancel
+} = {}) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-dialog" role="alertdialog" aria-modal="true" aria-labelledby="modal-confirm-title">
+      <div class="modal-dialog__icon modal-dialog__icon--${variant}">${icon}</div>
+      <h2 class="modal-dialog__title" id="modal-confirm-title">${title}</h2>
+      ${subject ? `<p class="modal-dialog__subject">${subject}</p>` : ''}
+      <p class="modal-dialog__message modal-dialog__message--tight">${message}</p>
+      <div class="modal-dialog__actions modal-dialog__actions--split">
+        <button type="button" class="btn btn-muted" data-modal-cancel>${cancelLabel}</button>
+        <button type="button" class="btn btn-dark" data-modal-confirm>${confirmLabel}</button>
+      </div>
+    </div>
+  `;
+
+  function close() {
+    document.removeEventListener('keydown', onKeydown);
+    overlay.remove();
+  }
+
+  function onKeydown(event) {
+    if (event.key === 'Escape') {
+      close();
+      onCancel?.();
+    }
+  }
+
+  overlay.querySelector('[data-modal-cancel]').addEventListener('click', () => {
+    close();
+    onCancel?.();
+  });
+  overlay.querySelector('[data-modal-confirm]').addEventListener('click', () => {
+    close();
+    onConfirm?.();
+  });
+  // Klik area gelap di luar dialog = batal juga.
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+      close();
+      onCancel?.();
+    }
+  });
+  document.addEventListener('keydown', onKeydown);
+
+  document.body.appendChild(overlay);
+  overlay.querySelector('[data-modal-cancel]').focus();
+
+  return close;
+}

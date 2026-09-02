@@ -44,11 +44,23 @@
   color: #C0392B;
 }
 
+.modal-dialog__icon--warning {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
 .modal-dialog__title {
   font-size: var(--text-xl, 1.25rem);
   font-weight: 700;
   color: var(--color-ink-800);
   margin: 0 0 var(--space-2);
+}
+
+.modal-dialog__subject {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-ink-800);
+  margin: 0 0 var(--space-1);
 }
 
 .modal-dialog__message {
@@ -57,9 +69,17 @@
   margin: 0 0 var(--space-6);
 }
 
+.modal-dialog__message--tight {
+  margin-top: 0;
+}
+
 .modal-dialog__actions {
   display: flex;
   justify-content: center;
+}
+
+.modal-dialog__actions--split {
+  gap: var(--space-4);
 }
 
 .modal-dialog__actions .btn {

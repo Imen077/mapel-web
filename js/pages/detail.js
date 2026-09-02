@@ -16,7 +16,7 @@
 
 import { router } from '../core/router.js';
 import { proposalService } from '../../data/proposal.js';
-import { showSuccessModal } from '../components/modal.js';
+import { showSuccessModal, showConfirmModal } from '../components/modal.js';
 
 // Sengaja BUKAN lewat storage.js (yang scope-nya data entitas app
 // beneran seperti daftar proposal) -- ini cuma "titipan" sesaat
@@ -35,7 +35,7 @@ export function saveDraftHandoff(data) {
   }
 }
 
-function readDraftHandoff() {
+export function readDraftHandoff() {
   try {
     const raw = sessionStorage.getItem(DRAFT_HANDOFF_KEY);
     return raw ? JSON.parse(raw) : null;
@@ -120,10 +120,10 @@ export function initDetailPage(root, user) {
     </div>
   `;
 
-  bindActions(root);
+  bindActions(root, draft);
 }
 
-function bindActions(root) {
+function bindActions(root, draft) {
   // File belum benar-benar di-upload ke mana pun (lihat TODO di
   // pengajuan-proposal.js), jadi link-nya sengaja tidak diarahkan
   // ke mana pun dulu.
@@ -136,12 +136,17 @@ function bindActions(root) {
   });
 
   root.querySelector('#btn-hapus')?.addEventListener('click', () => {
-    const confirmed = window.confirm('Hapus proposal konsep ini? Tindakan ini tidak bisa dibatalkan.');
-    if (confirmed) router.navigate('/pages/lo-biro-ti/antrian/proposal-pl.html');
+    showConfirmModal({
+      title: 'Hapus Proposal',
+      subject: draft.judul,
+      message: 'Apakah anda yakin?',
+      confirmLabel: 'Ya, hapus',
+      onConfirm: () => router.navigate('/pages/lo-biro-ti/antrian/proposal-pl.html')
+    });
   });
 
   root.querySelector('#btn-ubah')?.addEventListener('click', () => {
-    router.navigate('/pages/lo-biro-ti/pengajuan/proposal-pl.html');
+    router.navigate('/pages/lo-biro-ti/pengajuan/ubah-proposal-pl.html');
   });
 
   root.querySelector('#btn-kirim')?.addEventListener('click', () => {
@@ -150,4 +155,4 @@ function bindActions(root) {
       onOk: () => router.navigate('/pages/lo-biro-ti/monitoring/proposal-pl.html')
     });
   });
-}// MAPEL - placeholder
+}

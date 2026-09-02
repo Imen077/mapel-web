@@ -60,6 +60,15 @@
   background: #a4301f;
 }
 
+.btn-muted {
+  background: var(--color-paper-muted);
+  color: #ffffff;
+}
+
+.btn-muted:hover {
+  background: #5a5548;
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--color-ink-800);

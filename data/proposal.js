@@ -15,7 +15,7 @@ export const PROPOSAL_STATUS_META = buildStatusMeta('Proposal');
 
 const JENIS_LIST = ['Instruksi Kerja', 'Juknis', 'Standar Pelayanan', 'Pedoman', 'POS'];
 
-const UNIT_LIST = [
+export const UNIT_LIST = [
   'Biro Teknologi Informasi',
   'Biro Sumber Daya Manusia',
   'Biro Umum',
