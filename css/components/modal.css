@@ -1,1 +1,77 @@
-/* MAPEL - placeholder */
+/* ============================================================
+   MAPEL - components/modal.css
+   Modal generik (overlay + dialog di tengah). Dipakai lewat
+   js/components/modal.js -- showModal()/showSuccessModal().
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: rgba(20, 32, 43, 0.45);
+  animation: modal-fade-in var(--transition-base);
+}
+
+.modal-dialog {
+  width: 100%;
+  max-width: 360px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+  animation: modal-pop-in var(--transition-base);
+}
+
+.modal-dialog__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--space-4);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-success);
+  color: var(--color-success);
+}
+
+.modal-dialog__icon--error {
+  border-color: #C0392B;
+  color: #C0392B;
+}
+
+.modal-dialog__title {
+  font-size: var(--text-xl, 1.25rem);
+  font-weight: 700;
+  color: var(--color-ink-800);
+  margin: 0 0 var(--space-2);
+}
+
+.modal-dialog__message {
+  font-size: var(--text-sm);
+  color: var(--color-paper-muted);
+  margin: 0 0 var(--space-6);
+}
+
+.modal-dialog__actions {
+  display: flex;
+  justify-content: center;
+}
+
+.modal-dialog__actions .btn {
+  min-width: 120px;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}/* MAPEL - placeholder */

@@ -14,7 +14,16 @@
 // Elemen pesan error (.field__error) sudah disiapkan di markup
 // tapi disembunyikan (hidden) secara default -- tinggal di-toggle
 // nanti kalau validasi beneran mau dikerjakan.
+//
+// Tombol "Simpan" dan "Simpan & Kirim" SUDAH nampilin popup sukses
+// (lihat bindFormActions di bawah) walau belum benar-benar nyimpen/
+// ngirim data -- itu memang scope-nya baru sebatas popup dulu sesuai
+// permintaan.
 // ============================================================
+
+import { router } from '../core/router.js';
+import { showSuccessModal } from '../components/modal.js';
+import { saveDraftHandoff } from './detail.js';
 
 const FILE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 3.5H7a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8.5L13 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 3.5V8h4.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 const BUILDING_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 20.5V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v15.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 10.5h5a1 1 0 0 1 1 1v9" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 7.5h0M8 11h0M8 14.5h0M8 18h0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 20.5h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
@@ -192,13 +201,50 @@ export function initPengajuanProposalPage(root, user) {
   if (satuanKerjaInput) satuanKerjaInput.value = SATUAN_KERJA_PENGUSUL;
 
   bindFileInputs(root);
+  bindFormActions(root, user);
 
   // TODO (tahap selanjutnya, belum dikerjakan sesuai arahan):
   // - Validasi on-submit yang beneran nge-toggle .field__error
   // - Tombol "Batal" -> konfirmasi lalu router.navigate balik ke Monitoring
-  // - Tombol "Simpan" -> simpan sebagai draft (status DRAFT) ke data/proposal.js
-  // - Tombol "Simpan & Kirim" -> submit + mulai alur disposisi (workflow.js)
+  // - Tombol "Simpan" -> beneran nyimpen sebagai draft (status DRAFT) ke
+  //   data/proposal.js sebelum nampilin popup sukses -- sekarang popupnya
+  //   sudah jalan (bindFormActions), tinggal disambung ke logic simpannya
+  // - Tombol "Simpan & Kirim" -> beneran nyimpen + mulai alur disposisi
+  //   (workflow.js) sebelum nampilin popup sukses -- sekarang popupnya
+  //   sudah jalan (bindFormActions), tinggal disambung ke logic simpannya
   // - Kartu pratinjau -> render isi file beneran (bukan skeleton statis)
+}
+
+/** Tombol "Simpan"/"Simpan & Kirim" nampilin popup sukses, lalu balik ke Monitoring Proposal PL. */
+function bindFormActions(root, user) {
+  const simpanBtn = root.querySelector('[data-action="simpan"]');
+  simpanBtn?.addEventListener('click', () => {
+    // Dioper ke halaman Detail Proposal lewat sessionStorage (lihat
+    // saveDraftHandoff di detail.js) -- belum data beneran dari
+    // data/proposal.js, cuma apa yang barusan diketik/dipilih di form ini.
+    const judul = root.querySelector('#judul-proposal')?.value.trim();
+    const fileProposalName = root.querySelector('#file-proposal-name')?.textContent.trim();
+    const fileNotaDinasName = root.querySelector('#file-nota-dinas-name')?.textContent.trim();
+    saveDraftHandoff({
+      judul: judul || 'Proposal Tanpa Judul',
+      satuanKerja: root.querySelector('#satuan-kerja')?.value || SATUAN_KERJA_PENGUSUL,
+      pejabatPengusul: user?.name || '-',
+      fileProposal: fileProposalName && fileProposalName !== 'Tidak ada file yang dipilih' ? fileProposalName : 'proposal.pdf',
+      fileNotaDinas: fileNotaDinasName && fileNotaDinasName !== 'Tidak ada file yang dipilih' ? fileNotaDinasName : 'nota dinas.pdf'
+    });
+    showSuccessModal({
+      message: 'Data berhasil disimpan.',
+      onOk: () => router.navigate('/pages/lo-biro-ti/antrian/detail.html')
+    });
+  });
+
+  const submitBtn = root.querySelector('[data-action="simpan-kirim"]');
+  submitBtn?.addEventListener('click', () => {
+    showSuccessModal({
+      message: 'Data berhasil dikirim.',
+      onOk: () => router.navigate('/pages/lo-biro-ti/monitoring/proposal-pl.html')
+    });
+  });
 }
 
 /** Tombol "Pilih File" buka native file picker; nama file dipilih ditampilkan di sebelahnya. */
