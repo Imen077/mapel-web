@@ -17,7 +17,7 @@
 import { router } from '../core/router.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
-import { showSuccessModal, showErrorModal } from '../components/modal.js';
+import { showSuccessModal, showConfirmModal } from '../components/modal.js';
 
 const DOC_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 3.5H7a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8.5L13 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 3.5V8h4.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 const FOLDER_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3.5 6.5a1 1 0 0 1 1-1H9l2 2h8.5a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
@@ -204,26 +204,47 @@ function bindActions(root) {
 
   root.querySelector('#btn-tolak')?.addEventListener('click', () => {
     if (!requireCatatan()) return;
-    showErrorModal({
-      title: 'Proposal Ditolak',
-      message: 'Keputusan penolakan sudah dikirim ke LO Biro TI.',
-      onOk: () => router.navigate(backTarget)
+    showConfirmModal({
+      title: 'Apakah anda yakin akan menolak pengajuan Proposal ini? Seluruh proses pengajuan pada proposal ini akan dihentikan.',
+      message: 'Data yang dikirim tidak dapat dikembalikan.',
+      cancelLabel: 'Batal',
+      confirmLabel: 'Ya',
+      onConfirm: () => {
+        showSuccessModal({
+          message: 'Data berhasil ditolak.',
+          onOk: () => router.navigate(backTarget)
+        });
+      }
     });
   });
 
   root.querySelector('#btn-revisi')?.addEventListener('click', () => {
     if (!requireCatatan()) return;
-    showSuccessModal({
-      title: 'Revisi Diminta',
-      message: 'Catatan revisi sudah dikirim ke LO Biro TI.',
-      onOk: () => router.navigate(backTarget)
+    showConfirmModal({
+      title: 'Apakah anda yakin akan mengembalikan pengajuan Proposal ini?',
+      message: 'Data akan dikembalikan ke LO satker.',
+      cancelLabel: 'Batal',
+      confirmLabel: 'Ya',
+      onConfirm: () => {
+        showSuccessModal({
+          message: 'Data berhasil dikembalikan ke LO Satker.',
+          onOk: () => router.navigate(backTarget)
+        });
+      }
     });
   });
 
   root.querySelector('#btn-setuju')?.addEventListener('click', () => {
-    showSuccessModal({
-      message: 'Proposal berhasil disetujui.',
-      onOk: () => router.navigate(backTarget)
+    showConfirmModal({
+      title: 'Apakah anda yakin akan mengirim Proposal?',
+      message: 'Data yang dikirim tidak dapat dikembalikan.',
+      cancelLabel: 'Batal',
+      confirmLabel: 'Ya',
+      onConfirm: () => {
+        showSuccessModal({
+          onOk: () => router.navigate(backTarget)
+        });
+      }
     });
   });
 }
