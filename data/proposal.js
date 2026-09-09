@@ -195,31 +195,9 @@ SEED_PROPOSALS.unshift({
 });
 
 // Satu lagi DI ATAS item PO-2026-042 (unshift menaruhnya paling
-// depan) -- status Selesai Reviu, buat testing role Kepala Biro
-// Ortala (item yang REVIU_CHAIN-nya udah kelar dibolak-balik,
-// tinggal nunggu keputusan akhir Kabiro Ortala). Sama motivasinya
-// kayak PO-2026-042 di atas: biar gampang dites, selalu ada & gampang
-// ketemu (baris pertama) di Monitoring Proposal PL milik Kabiro Ortala.
-SEED_PROPOSALS.unshift({
-  id: 'PO-2026-043',
-  unit: 'Biro Organisasi dan Tatalaksana',
-  title: 'Penataan Ulang Struktur Basis Data Kepegawaian Terpusat',
-  jenis: 'Standar Pelayanan',
-  createdBy: 'Siti Nurhaliza',
-  employeeId: '240021847',
-  createdAt: `${BASE_DATE}T10:15:00`,
-  status: SUBMISSION_STATUS.SELESAI_REVIU,
-  // Cuma boleh kelihatan (tabel & kartu ringkasan) buat role ini --
-  // role lain (LO, Kepala Satker, dst) sama sekali nggak lihat item
-  // ini, beda dari PO-2026-042 di atas yang emang kelihatan di semua
-  // role (lihat visibleToRole di data/submission-service.js).
-  testOnlyFor: ROLES.KEPALA_BIRO_ORTALA
-});
-
-// Satu lagi DI ATAS PO-2026-043 -- status Dikirim (masuk ke kartu
-// "Diterima" di KARO_ORTALA_PROPOSAL_CARD_GROUPS, proposal yang baru
-// dikirim/diterima ke rantai Ortala). Sama-sama testOnlyFor Kabiro
-// Ortala kayak PO-2026-043.
+// depan) -- status Dikirim (masuk ke kartu "Diterima" di
+// KARO_ORTALA_PROPOSAL_CARD_GROUPS, proposal yang baru dikirim/
+// diterima ke rantai Ortala), buat testing role Kepala Biro Ortala.
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-044',
   unit: 'BPK Perwakilan Provinsi Jawa Barat',
@@ -229,7 +207,27 @@ SEED_PROPOSALS.unshift({
   employeeId: '240040567',
   createdAt: `${BASE_DATE}T13:05:00`,
   status: SUBMISSION_STATUS.DIKIRIM,
+  // Cuma boleh kelihatan (tabel & kartu ringkasan) buat role ini --
+  // role lain (LO, Kepala Satker, dst) sama sekali nggak lihat item
+  // ini, beda dari PO-2026-042 di atas yang emang kelihatan di semua
+  // role (lihat visibleToRole di data/submission-service.js).
   testOnlyFor: ROLES.KEPALA_BIRO_ORTALA
+});
+
+// Satu lagi DI ATAS PO-2026-044 -- status Proses Reviu (masuk ke
+// kartu "Disposisi" di ORTALA_CHAIN_CARD_GROUPS, proposal yang baru
+// didisposisikan ke Kepala Bagian Ortala), buat testing role Kepala
+// Bagian Ortala. Sama pola-nya kayak PO-2026-044 di atas.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-045',
+  unit: 'Biro Sumber Daya Manusia',
+  title: 'Pembaruan Sistem Informasi Kepegawaian Terintegrasi',
+  jenis: 'Instruksi Kerja',
+  createdBy: 'Rian Hidayat',
+  employeeId: '240015739',
+  createdAt: `${BASE_DATE}T15:20:00`,
+  status: SUBMISSION_STATUS.PROSES_REVIU,
+  testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA
 });
 
 const DRAFT_COUNT = 2;

@@ -16,7 +16,7 @@
 import { router } from '../core/router.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
-import { showSuccessModal } from '../components/modal.js';
+import { showSuccessModal, showConfirmModal } from '../components/modal.js';
 
 const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m0 0 6-6m-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
@@ -138,14 +138,29 @@ export function initDisposisiTujuanPage(root, user) {
 function bindActions(root, item, backTarget) {
   root.querySelectorAll('[data-pilih-index]').forEach((btn) => {
     btn.addEventListener('click', () => {
+      // index/pejabat/catatan disiapkan buat dipakai begitu tombol
+      // "Pilih" ini beneran nyimpen disposisi ke data/proposal.js
+      // (belum, lihat catatan TAHAP INI di kepala file) -- sekarang
+      // popup sukses-nya masih pesan generik, belum nyebut nama
+      // proposal/pejabat tujuannya.
       const index = Number(btn.getAttribute('data-pilih-index'));
       const pejabat = DUMMY_PEJABAT_TUJUAN[index];
       const catatanInput = root.querySelector(`[data-catatan-index="${index}"]`);
       const catatan = catatanInput?.value.trim();
+      void pejabat;
+      void catatan;
 
-      showSuccessModal({
-        message: `Proposal "${item.title}" berhasil didisposisikan ke ${pejabat.nama} (${pejabat.jabatan})${catatan ? ` dengan catatan: "${catatan}"` : ''}.`,
-        onOk: () => router.navigate(backTarget)
+      showConfirmModal({
+        title: 'Apakah anda yakin ingin melakukan disposisi kepada yang bersangkutan?',
+        message: 'Data yang didisposisi tidak dapat dikembalikan.',
+        cancelLabel: 'Batal',
+        confirmLabel: 'Ya',
+        onConfirm: () => {
+          showSuccessModal({
+            message: 'Data berhasil didisposisi.',
+            onOk: () => router.navigate(backTarget)
+          });
+        }
       });
     });
   });

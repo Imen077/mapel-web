@@ -47,6 +47,13 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
   if (role === ROLES.KEPALA_BIRO_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
     return `/pages/kepala-biro-ortala/antrian/review.html?id=${encodeURIComponent(itemId)}`;
   }
+  // Kepala Bagian Ortala (berikutnya di DISPOSISI_CHAIN sesudah
+  // Kepala Biro Ortala) -- "Proses Reviu" = kartu "Disposisi"
+  // (proposal yang baru didisposisikan ke dia), pakai halaman
+  // Detail Proposal ringkas yang sama (js/pages/disposisi.js).
+  if (role === ROLES.KEPALA_BAGIAN_ORTALA && status === SUBMISSION_STATUS.PROSES_REVIU) {
+    return `/pages/kepala-bagian-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
+  }
   return null;
 }
 const PLUS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
