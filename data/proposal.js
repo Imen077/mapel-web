@@ -9,6 +9,7 @@
 
 import { SUBMISSION_STATUS, buildStatusMeta } from './status.js';
 import { createSubmissionService } from './submission-service.js';
+import { ROLES } from '../js/core/role.js';
 
 export const PROPOSAL_STATUS = SUBMISSION_STATUS;
 export const PROPOSAL_STATUS_META = buildStatusMeta('Proposal');
@@ -191,6 +192,44 @@ SEED_PROPOSALS.unshift({
   employeeId: '240004492',
   createdAt: `${BASE_DATE}T08:37:00`,
   status: SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN
+});
+
+// Satu lagi DI ATAS item PO-2026-042 (unshift menaruhnya paling
+// depan) -- status Selesai Reviu, buat testing role Kepala Biro
+// Ortala (item yang REVIU_CHAIN-nya udah kelar dibolak-balik,
+// tinggal nunggu keputusan akhir Kabiro Ortala). Sama motivasinya
+// kayak PO-2026-042 di atas: biar gampang dites, selalu ada & gampang
+// ketemu (baris pertama) di Monitoring Proposal PL milik Kabiro Ortala.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-043',
+  unit: 'Biro Organisasi dan Tatalaksana',
+  title: 'Penataan Ulang Struktur Basis Data Kepegawaian Terpusat',
+  jenis: 'Standar Pelayanan',
+  createdBy: 'Siti Nurhaliza',
+  employeeId: '240021847',
+  createdAt: `${BASE_DATE}T10:15:00`,
+  status: SUBMISSION_STATUS.SELESAI_REVIU,
+  // Cuma boleh kelihatan (tabel & kartu ringkasan) buat role ini --
+  // role lain (LO, Kepala Satker, dst) sama sekali nggak lihat item
+  // ini, beda dari PO-2026-042 di atas yang emang kelihatan di semua
+  // role (lihat visibleToRole di data/submission-service.js).
+  testOnlyFor: ROLES.KEPALA_BIRO_ORTALA
+});
+
+// Satu lagi DI ATAS PO-2026-043 -- status Dikirim (masuk ke kartu
+// "Diterima" di KARO_ORTALA_PROPOSAL_CARD_GROUPS, proposal yang baru
+// dikirim/diterima ke rantai Ortala). Sama-sama testOnlyFor Kabiro
+// Ortala kayak PO-2026-043.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-044',
+  unit: 'BPK Perwakilan Provinsi Jawa Barat',
+  title: 'Digitalisasi Arsip Persuratan Perwakilan',
+  jenis: 'Juknis',
+  createdBy: 'Wulan Permatasari',
+  employeeId: '240040567',
+  createdAt: `${BASE_DATE}T13:05:00`,
+  status: SUBMISSION_STATUS.DIKIRIM,
+  testOnlyFor: ROLES.KEPALA_BIRO_ORTALA
 });
 
 const DRAFT_COUNT = 2;

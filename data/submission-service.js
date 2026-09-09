@@ -19,19 +19,34 @@ export function createSubmissionService({ statusMeta, items }) {
     .filter((s) => s.key !== SUBMISSION_STATUS.DRAFT)
     .map((s) => s.key);
 
+  // Beberapa item dummy sengaja cuma buat testing 1 role tertentu
+  // (lihat field `testOnlyFor` di data/proposal.js, mis. dummy
+  // "Selesai Reviu" yang cuma buat Kepala Biro Ortala) -- item kayak
+  // gini disembunyikan dari role lain, baik di tabel (getFiltered)
+  // maupun kartu ringkasan (getStatusCounts).
+  function visibleToRole(item, role) {
+    return !item.testOnlyFor || item.testOnlyFor === role;
+  }
+
   function getStatusMeta(key) {
     return findStatusMeta(statusMeta, key);
   }
 
-  /** @returns {Record<string, number>} jumlah item per status */
-  function getStatusCounts() {
+  /**
+   * @param {string} [viewerRole] - kalau diisi, item yang `testOnlyFor`-nya
+   *   role lain tidak ikut dihitung.
+   * @returns {Record<string, number>} jumlah item per status
+   */
+  function getStatusCounts(viewerRole) {
     const counts = {};
     statusMeta.forEach((meta) => {
       counts[meta.key] = 0;
     });
-    items.forEach((item) => {
-      counts[item.status] = (counts[item.status] || 0) + 1;
-    });
+    items
+      .filter((item) => visibleToRole(item, viewerRole))
+      .forEach((item) => {
+        counts[item.status] = (counts[item.status] || 0) + 1;
+      });
     return counts;
   }
 
@@ -41,6 +56,7 @@ export function createSubmissionService({ statusMeta, items }) {
    * @param {string} [params.status] - key status, atau '' buat semua
    * @param {string|number} [params.year] - atau '' buat semua tahun
    * @param {string} [params.assignedTo] - nama pembuat (item.createdBy), atau '' buat semua -- dipakai toggle "Assign to Me"
+   * @param {string} [params.viewerRole] - role yang lagi lihat, buat nyaring item `testOnlyFor` (lihat visibleToRole di atas)
    * @param {number} [params.page] - 1-indexed
    * @param {number} [params.pageSize]
    * @param {boolean} [params.includeDraft] - ikutkan item berstatus draft juga (default false, dipakai Monitoring). Antrian set true karena draft milik sendiri memang harus tampil di situ.
@@ -50,6 +66,7 @@ export function createSubmissionService({ statusMeta, items }) {
     status = '',
     year = '',
     assignedTo = '',
+    viewerRole,
     page = 1,
     pageSize = 7,
     includeDraft = false
@@ -59,6 +76,8 @@ export function createSubmissionService({ statusMeta, items }) {
     let rows = includeDraft
       ? items.slice()
       : items.filter((item) => submittedStatuses.includes(item.status));
+
+    rows = rows.filter((item) => visibleToRole(item, viewerRole));
 
     if (term) {
       rows = rows.filter(

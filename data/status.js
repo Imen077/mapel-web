@@ -59,7 +59,17 @@ export function buildStatusMeta(draftLabel) {
     // PROPOSAL_CARD_GROUPS di js/pages/monitoring.js), jadi tidak
     // ikut nongol di daftar kartu/filter default (dipakai apa
     // adanya oleh Monitoring Konsep PL).
-    { key: SUBMISSION_STATUS.TIDAK_DISETUJUI, label: 'Tidak Disetujui', bg: '#F8DCD6', text: '#A93226', blob: '#EFAFA1', hidden: true }
+    { key: SUBMISSION_STATUS.TIDAK_DISETUJUI, label: 'Tidak Disetujui', bg: '#F8DCD6', text: '#A93226', blob: '#EFAFA1', hidden: true },
+    // hidden: true juga -- dua ini cuma dipakai lewat kartu ringkasan
+    // khusus role Ortala (ORTALA_CHAIN_CARD_GROUPS dkk di
+    // js/pages/monitoring.js). WAJIB tetap didaftarkan di sini (bukan
+    // cuma di SUBMISSION_STATUS) meskipun hidden, soalnya
+    // submittedStatuses di submission-service.js diturunkan dari
+    // daftar ini -- kalau tidak didaftarkan, item yang statusnya
+    // SELESAI_REVIU/DIREVIU bakal hilang dari tabel (ke-filter keluar
+    // begitu saja) walau tetap kehitung di kartu ringkasan.
+    { key: SUBMISSION_STATUS.DIREVIU, label: 'Direviu', bg: '#DCEEF7', text: '#2C7DA0', blob: '#BEE0EE', hidden: true },
+    { key: SUBMISSION_STATUS.SELESAI_REVIU, label: 'Selesai Reviu', bg: '#DCF3ED', text: '#0F7A6B', blob: '#B8E4DC', hidden: true }
   ];
 }
 

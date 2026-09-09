@@ -88,6 +88,12 @@ function renderDocPreview({ headerTitle, headerSubtitle, docTitle }) {
 export function initReviewProposalPage(root, user) {
   if (!root) return;
 
+  // Halaman ini dipakai bareng lintas role reviewer (Kepala Satker,
+  // Kepala Biro Ortala, dst -- lihat resolveRowActionRoute di
+  // monitoring.js buat daftar kombinasi role+status yang ngarah ke
+  // sini), jadi "kembali"-nya harus ngikutin folder role yang lagi
+  // login, bukan di-hardcode ke satu role tertentu.
+  const backTarget = `/pages/${user?.role}/monitoring/proposal-pl.html`;
   const item = proposalService.getById(getIdFromQuery());
 
   if (!item) {
@@ -98,7 +104,7 @@ export function initReviewProposalPage(root, user) {
       </div>
     `;
     root.querySelector('#btn-kembali')?.addEventListener('click', () => {
-      router.navigate('/pages/kepala-satker-biro-ti/monitoring/proposal-pl.html');
+      router.navigate(backTarget);
     });
     return;
   }
@@ -180,11 +186,10 @@ export function initReviewProposalPage(root, user) {
     </div>
   `;
 
-  bindActions(root);
+  bindActions(root, backTarget);
 }
 
-function bindActions(root) {
-  const backTarget = '/pages/kepala-satker-biro-ti/monitoring/proposal-pl.html';
+function bindActions(root, backTarget) {
 
   root.querySelectorAll('[data-file-link]').forEach((link) => {
     link.addEventListener('click', (e) => e.preventDefault());

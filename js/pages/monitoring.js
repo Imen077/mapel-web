@@ -30,8 +30,22 @@ const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><
 // baru di sini kalau nanti ada kombinasi role+status+type lain yang
 // juga sudah punya halamannya.
 function resolveRowActionRoute({ type, role, status, itemId }) {
-  if (type === 'proposal-pl' && role === ROLES.KEPALA_SATKER_BIRO_TI && status === SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN) {
+  if (type !== 'proposal-pl') return null;
+
+  if (role === ROLES.KEPALA_SATKER_BIRO_TI && status === SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN) {
     return `/pages/kepala-satker-biro-ti/antrian/review.html?id=${encodeURIComponent(itemId)}`;
+  }
+  // Dua status ini di role Kepala Biro Ortala cuma dipakai buat 2
+  // item dummy testing (lihat testOnlyFor di data/proposal.js).
+  // "Dikirim" (kartu "Diterima") -> halaman Detail Proposal ringkas,
+  // cuma tombol "Disposisi" (belum ada keputusan setuju/tolak/revisi
+  // di tahap ini). "Selesai Reviu" -> halaman Review Proposal penuh
+  // (Tolak/Revisi/Setuju), sama kayak dipakai Kepala Satker.
+  if (role === ROLES.KEPALA_BIRO_ORTALA && status === SUBMISSION_STATUS.DIKIRIM) {
+    return `/pages/kepala-biro-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
+  }
+  if (role === ROLES.KEPALA_BIRO_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
+    return `/pages/kepala-biro-ortala/antrian/review.html?id=${encodeURIComponent(itemId)}`;
   }
   return null;
 }
@@ -537,12 +551,13 @@ function initMonitoringTable(root, config, user, type) {
       status: state.status,
       year: state.year,
       assignedTo: state.assignToMe ? user?.name : '',
+      viewerRole: user?.role,
       page: state.page,
       pageSize: PAGE_SIZE
     });
     state.page = page;
 
-    const counts = service.getStatusCounts();
+    const counts = service.getStatusCounts(user?.role);
     const startIndex = (page - 1) * PAGE_SIZE;
 
     root.innerHTML = `
