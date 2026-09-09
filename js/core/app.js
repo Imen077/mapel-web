@@ -25,7 +25,8 @@ const PAGE_MODULES = {
   'pengajuan/ubah-proposal-pl': () => import('../pages/ubah-proposal.js'),
   'antrian/detail': () => import('../pages/detail.js'),
   'antrian/review': () => import('../pages/review.js'),
-  'monitoring/detail': () => import('../pages/disposisi.js')
+  'monitoring/detail': () => import('../pages/disposisi.js'),
+  'monitoring/disposisi-tujuan': () => import('../pages/disposisi-tujuan.js')
 };
 
 // Breadcrumb navbar per pageKey. Halaman yang tidak didaftarkan di
@@ -43,7 +44,8 @@ const PAGE_BREADCRUMBS = {
   // Sengaja dibikin sama persis kayak breadcrumb Monitoring Proposal
   // PL (bukan "Detail Proposal") -- ngikutin desain, dianggap
   // sub-halaman dari situ, bukan bagian dari alur Antrian.
-  'monitoring/detail': ['Monitoring', 'Monitoring Proposal']
+  'monitoring/detail': ['Monitoring', 'Monitoring Proposal'],
+  'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal']
 };
 
 // Folder yang nama file di dalamnya BUKAN unik (mis. "proposal-pl"

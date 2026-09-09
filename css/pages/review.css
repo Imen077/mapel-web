@@ -180,3 +180,93 @@
     justify-content: flex-end;
   }
 }
+
+/* ---------- Halaman Disposisi (js/pages/disposisi.js) ---------- */
+/* Detail Proposal Kepala Biro Ortala dari Monitoring Proposal PL --
+   reuse layout & komponen .review-page/.review-card/.review-grid
+   punya review.js, tapi teks yang biasanya biru (--color-ink-900/700)
+   diganti emas KHUSUS di halaman ini saja. Di-scope pakai
+   .disposisi-page (bukan ubah variabel global) biar halaman lain
+   yang reuse class yang sama (review.js) tidak ikut berubah. */
+.disposisi-page .card__title,
+.disposisi-page .review-grid__value,
+.disposisi-page .review-grid__value a {
+  color: #D9A441;
+}
+
+/* ---------- Halaman Disposisi Proposal PL (js/pages/disposisi-tujuan.js) ---------- */
+/* Kartu ringkasan proposal + tabel pejabat tujuan, dibuka dari
+   tombol "Disposisi" di halaman Detail Proposal (disposisi.js). */
+
+.disposisi-tujuan-card {
+  padding: 0;
+}
+
+.disposisi-tujuan__subheader {
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-ink-900);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+
+.disposisi-tujuan__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-6);
+  padding: var(--space-5);
+}
+
+.disposisi-tujuan__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.disposisi-tujuan__item {
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.disposisi-tujuan__label {
+  min-width: 140px;
+  color: var(--color-paper-muted);
+}
+
+.disposisi-tujuan__sep {
+  color: var(--color-paper-muted);
+}
+
+.disposisi-tujuan__value {
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+.disposisi-tujuan__input {
+  width: 100%;
+  min-width: 200px;
+  height: 38px;
+  padding: 0 var(--space-3);
+  background: #ffffff;
+  border: 1px solid var(--color-paper-line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-ink-800);
+}
+
+.disposisi-tujuan__input:focus {
+  outline: none;
+  border-color: var(--color-stamp);
+}
+
+.disposisi-tujuan__input::placeholder {
+  color: var(--color-paper-muted);
+}
+
+@media (max-width: 880px) {
+  .disposisi-tujuan__grid {
+    grid-template-columns: 1fr;
+  }
+}
