@@ -57,6 +57,13 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
   if (role === ROLES.KEPALA_BAGIAN_ORTALA && status === SUBMISSION_STATUS.PROSES_REVIU) {
     return `/pages/kepala-bagian-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
   }
+  // Previu Biro Ortala -- tujuan akhir rantai disposisi. Halaman
+  // review-nya (pakai form template Previu) SENGAJA MASIH KOSONG
+  // (placeholder standar, belum didaftarkan ke PAGE_MODULES),
+  // nyusul begitu form-nya digarap.
+  if (role === ROLES.PREVIU_BIRO_ORTALA && status === SUBMISSION_STATUS.PROSES_REVIU) {
+    return `/pages/previu-biro-ortala/monitoring/review.html?id=${encodeURIComponent(itemId)}`;
+  }
   return null;
 }
 const PLUS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';

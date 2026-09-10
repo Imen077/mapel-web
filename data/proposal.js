@@ -248,6 +248,24 @@ SEED_PROPOSALS.unshift({
   testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA
 });
 
+// Satu lagi DI ATAS PO-2026-043 -- status Proses Reviu (masuk ke
+// kartu "Disposisi" di ORTALA_CHAIN_CARD_GROUPS, proposal yang baru
+// didisposisikan sampai ke Previu Ortala, tujuan akhir rantai
+// disposisi), buat testing role Previu Biro Ortala. Klik "Lihat"
+// ngarah ke halaman review pakai form template Previu -- HALAMAN
+// INI SENGAJA MASIH KOSONG (placeholder standar), isinya nyusul.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-046',
+  unit: 'BPK Perwakilan Provinsi Bali',
+  title: 'Sistem Pemantauan Aset Perwakilan Terpadu',
+  jenis: 'POS',
+  createdBy: 'Rian Hidayat',
+  employeeId: '240015739',
+  createdAt: `${BASE_DATE}T09:40:00`,
+  status: SUBMISSION_STATUS.PROSES_REVIU,
+  testOnlyFor: ROLES.PREVIU_BIRO_ORTALA
+});
+
 const DRAFT_COUNT = 2;
 JUDUL_LIST.slice(STATUS_SEQUENCE.length).forEach((title, i) => {
   if (i >= DRAFT_COUNT) return;
