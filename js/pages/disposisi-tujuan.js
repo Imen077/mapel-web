@@ -14,18 +14,29 @@
 // ============================================================
 
 import { router } from '../core/router.js';
+import { ROLES } from '../core/role.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
 import { showSuccessModal, showConfirmModal } from '../components/modal.js';
 
 const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m0 0 6-6m-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-// Daftar pejabat tujuan disposisi -- next di DISPOSISI_CHAIN sesudah
-// Kepala Biro Ortala adalah Kepala Bagian, jadi daftarnya orang-orang
-// di posisi itu (dummy 1 orang dulu, sesuai desain yang ada).
-const DUMMY_PEJABAT_TUJUAN = [
-  { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }
-];
+// Daftar pejabat tujuan disposisi -- beda-beda tergantung siapa yang
+// lagi login, soalnya tujuannya harus pejabat di LANGKAH BERIKUTNYA
+// di DISPOSISI_CHAIN (js/core/role.js), bukan diri sendiri. Masih
+// dummy (1 orang per role, belum baca data pejabat beneran).
+const DUMMY_PEJABAT_TUJUAN_BY_ROLE = {
+  [ROLES.KEPALA_BIRO_ORTALA]: [
+    { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }
+  ],
+  [ROLES.KEPALA_BAGIAN_ORTALA]: [
+    { nama: 'Dimas Prasetyo', nip: '240008842', jabatan: 'Kepala Subbagian - Biro Organisasi dan Tata Laksana' }
+  ],
+  [ROLES.KEPALA_SUBBAGIAN_ORTALA]: [
+    { nama: 'Mochammad Taufik', nip: '240012905', jabatan: 'Previu - Biro Organisasi dan Tata Laksana' }
+  ]
+};
+const DEFAULT_PEJABAT_TUJUAN = DUMMY_PEJABAT_TUJUAN_BY_ROLE[ROLES.KEPALA_BIRO_ORTALA];
 
 function getIdFromQuery() {
   return new URLSearchParams(window.location.search).get('id') || '';
@@ -86,7 +97,8 @@ export function initDisposisiTujuanPage(root, user) {
   // isinya & formatnya konsisten sama contoh desain.
   const nomorNotaDinas = `778/ND/VI.2/${new Date(item.createdAt).getMonth() + 1}/${new Date(item.createdAt).getFullYear()}`;
 
-  const rows = DUMMY_PEJABAT_TUJUAN.map(renderPejabatRow).join('');
+  const pejabatTujuan = DUMMY_PEJABAT_TUJUAN_BY_ROLE[user?.role] ?? DEFAULT_PEJABAT_TUJUAN;
+  const rows = pejabatTujuan.map(renderPejabatRow).join('');
 
   root.innerHTML = `
     <div class="review-page">
@@ -132,10 +144,10 @@ export function initDisposisiTujuanPage(root, user) {
     </div>
   `;
 
-  bindActions(root, item, backTarget);
+  bindActions(root, pejabatTujuan, backTarget);
 }
 
-function bindActions(root, item, backTarget) {
+function bindActions(root, pejabatTujuan, backTarget) {
   root.querySelectorAll('[data-pilih-index]').forEach((btn) => {
     btn.addEventListener('click', () => {
       // index/pejabat/catatan disiapkan buat dipakai begitu tombol
@@ -144,7 +156,7 @@ function bindActions(root, item, backTarget) {
       // popup sukses-nya masih pesan generik, belum nyebut nama
       // proposal/pejabat tujuannya.
       const index = Number(btn.getAttribute('data-pilih-index'));
-      const pejabat = DUMMY_PEJABAT_TUJUAN[index];
+      const pejabat = pejabatTujuan[index];
       const catatanInput = root.querySelector(`[data-catatan-index="${index}"]`);
       const catatan = catatanInput?.value.trim();
       void pejabat;

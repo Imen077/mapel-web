@@ -47,6 +47,9 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
   if (role === ROLES.KEPALA_BIRO_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
     return `/pages/kepala-biro-ortala/antrian/review.html?id=${encodeURIComponent(itemId)}`;
   }
+  if (role === ROLES.KEPALA_SUBBAGIAN_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
+    return `/pages/kepala-subbagian-ortala/antrian/review.html?id=${encodeURIComponent(itemId)}`;
+  }
   // Kepala Bagian Ortala (berikutnya di DISPOSISI_CHAIN sesudah
   // Kepala Biro Ortala) -- "Proses Reviu" = kartu "Disposisi"
   // (proposal yang baru didisposisikan ke dia), pakai halaman

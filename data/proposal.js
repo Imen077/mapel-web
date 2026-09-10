@@ -230,6 +230,24 @@ SEED_PROPOSALS.unshift({
   testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA
 });
 
+// Satu lagi DI ATAS PO-2026-045 -- status Selesai Reviu (REVIU_CHAIN
+// udah kelar dibolak-balik sampai Previu, balik lagi ke Kepala
+// Subbagian Ortala buat lanjut diteruskan), buat testing role Kepala
+// Subbagian Ortala. Klik "Lihat" ngarah ke halaman Review Proposal
+// penuh (Tolak/Revisi/Setuju), beda dari PO-2026-044 yang cuma
+// tombol Disposisi.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-043',
+  unit: 'Biro Organisasi dan Tatalaksana',
+  title: 'Penataan Ulang Struktur Basis Data Kepegawaian Terpusat',
+  jenis: 'Standar Pelayanan',
+  createdBy: 'Siti Nurhaliza',
+  employeeId: '240021847',
+  createdAt: `${BASE_DATE}T10:15:00`,
+  status: SUBMISSION_STATUS.SELESAI_REVIU,
+  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA
+});
+
 const DRAFT_COUNT = 2;
 JUDUL_LIST.slice(STATUS_SEQUENCE.length).forEach((title, i) => {
   if (i >= DRAFT_COUNT) return;

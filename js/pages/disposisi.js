@@ -30,11 +30,51 @@ const BUILDING_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="non
 const SWATCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg>';
 const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m0 0 6-6m-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-// Label badge Status di halaman ini -- underlying status-nya tetap
-// "dikirim" (data/status.js), tapi dari sudut pandang Kabiro Ortala
-// yang baru nerima, lebih pas disebut "Diterima" sesuai desain.
-const DISPOSISI_STATUS_LABEL_OVERRIDES = {
-  dikirim: 'Diterima'
+// Label + warna badge Status di halaman ini -- underlying status-nya
+// tetap "dikirim"/"proses-reviu" (data/status.js), tapi dari sudut
+// pandang penerima disposisi (Kepala Biro Ortala buat "dikirim",
+// Kepala Bagian Ortala buat "proses-reviu") lebih pas disebut
+// "Diterima"/"Disposisi", warna biru senada (bukan warna asli
+// status-nya) sesuai desain.
+const DISPOSISI_STATUS_META_OVERRIDES = {
+  dikirim: { label: 'Diterima', bg: '#E1EAF6', text: '#2B5C89' },
+  'proses-reviu': { label: 'Disposisi', bg: '#E1EAF6', text: '#2B5C89' }
+};
+
+// Riwayat disposisi masih dummy statis (belum ada data beneran di
+// data/proposal.js buat ini) -- disesuaikan per status, biar nyambung
+// sama tahapnya: "dikirim" = baru masuk dari Kepala Satker ke Kepala
+// Biro Ortala (1 baris), "proses-reviu" = udah diteruskan Kabiro ke
+// Kepala Bagian (2 baris). Status lain belum ada riwayatnya.
+const DUMMY_RIWAYAT_DISPOSISI = {
+  dikirim: [
+    {
+      waktu: '2026-02-26T08:15:22',
+      dariNama: 'Made Wirawan',
+      dariJabatan: 'Kepala Satker Biro TI',
+      kepadaNama: 'Agustina Ratna Puspitasari',
+      kepadaJabatan: 'Kepala Biro',
+      catatan: 'Mohon ditindaklanjuti sesuai ketentuan yang berlaku.'
+    }
+  ],
+  'proses-reviu': [
+    {
+      waktu: '2026-02-26T08:15:22',
+      dariNama: 'Agustina Ratna Puspitasari',
+      dariJabatan: 'Kepala Biro',
+      kepadaNama: 'Telviani Savitri',
+      kepadaJabatan: 'Kepala Bagian',
+      catatan: 'Mohon direviu kesesuaiannya dengan proses bisnis BPK.'
+    },
+    {
+      waktu: '2026-02-26T09:40:05',
+      dariNama: 'Telviani Savitri',
+      dariJabatan: 'Kepala Bagian',
+      kepadaNama: 'Mochammad Taufik',
+      kepadaJabatan: 'Pereviu',
+      catatan: 'Diteruskan untuk direviu lebih lanjut, mohon segera ditindaklanjuti.'
+    }
+  ]
 };
 
 function getIdFromQuery() {
@@ -53,26 +93,47 @@ function renderInfoItem({ icon, label, value }) {
   `;
 }
 
-function renderDocPreview({ headerTitle, headerSubtitle, docTitle }) {
-  const lines = Array.from({ length: 6 })
-    .map((_, i) => `<span class="doc-preview__line${i === 1 || i === 5 ? ' doc-preview__line--short' : ''}"></span>`)
-    .join('');
+function renderRiwayatDisposisiCard(entries) {
+  const rows = entries.length
+    ? entries
+        .map(
+          (row) => `
+            <tr>
+              <td>
+                <span class="data-table__title">${formatDateTimeFullID(row.waktu)}</span>
+              </td>
+              <td>
+                <span class="data-table__title">${row.dariNama}</span>
+                <span class="data-table__code">${row.dariJabatan}</span>
+              </td>
+              <td>
+                <span class="data-table__title">${row.kepadaNama}</span>
+                <span class="data-table__code">${row.kepadaJabatan}</span>
+              </td>
+              <td>${row.catatan}</td>
+            </tr>
+          `
+        )
+        .join('')
+    : `<tr><td class="data-table__empty" colspan="4">Belum ada riwayat disposisi.</td></tr>`;
 
   return `
-    <div class="card doc-preview">
-      <div class="doc-preview__header">
-        <span class="doc-preview__icon">${DOC_ICON}</span>
-        <div>
-          <p class="doc-preview__title">${headerTitle}</p>
-          <p class="doc-preview__subtitle">${headerSubtitle}</p>
-        </div>
+    <div class="card review-card">
+      <div class="review-card__header">
+        <h2 class="card__title">Riwayat Disposisi</h2>
       </div>
-      <div class="doc-preview__body">
-        <div class="doc-preview__sheet">
-          <p class="doc-preview__letterhead">Badan Pemeriksa Keuangan Republik Indonesia</p>
-          <p class="doc-preview__doc-title">${docTitle}</p>
-          <div class="doc-preview__skeleton">${lines}</div>
-        </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Tanggal &amp; Waktu</th>
+              <th>Dari</th>
+              <th>Kepada</th>
+              <th>Catatan Disposisi</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
       </div>
     </div>
   `;
@@ -103,8 +164,12 @@ export function initDisposisiPage(root, user) {
   }
 
   const statusMeta = proposalService.getStatusMeta(item.status);
-  const statusLabel = DISPOSISI_STATUS_LABEL_OVERRIDES[item.status] ?? statusMeta.label;
+  const override = DISPOSISI_STATUS_META_OVERRIDES[item.status];
+  const statusLabel = override?.label ?? statusMeta.label;
+  const badgeBg = override?.bg ?? statusMeta.bg;
+  const badgeText = override?.text ?? statusMeta.text;
   const nomorPengajuan = item.nomorPengajuan || item.id;
+  const riwayat = DUMMY_RIWAYAT_DISPOSISI[item.status] ?? [];
 
   root.innerHTML = `
     <div class="review-page disposisi-page">
@@ -131,31 +196,20 @@ export function initDisposisiPage(root, user) {
               <span class="review-grid__icon">${SWATCH_ICON}</span>
               <div>
                 <p class="review-grid__label">Status</p>
-                <span class="badge badge--outline" style="--tint-text:${statusMeta.text}"><span class="badge__dot" style="background:${statusMeta.text}"></span>${statusLabel}</span>
+                <span class="badge badge--tint" style="--tint-bg:${badgeBg};--tint-text:${badgeText}">${statusLabel}</span>
               </div>
             </div>
           </div>
           <div class="review-grid__col">
             ${renderInfoItem({ icon: PERSON_ICON, label: 'Pejabat Pengusul', value: item.createdBy })}
             ${renderInfoItem({ icon: PENCIL_ICON, label: 'Keterangan', value: statusLabel })}
-            ${renderInfoItem({ icon: DOC_ICON, label: 'File Proposal', value: '<a href="#" data-file-link>proposal.pdf</a>' })}
-            ${renderInfoItem({ icon: DOC_ICON, label: 'File Nota Dinas', value: '<a href="#" data-file-link>nota-dinas.pdf</a>' })}
+            ${renderInfoItem({ icon: DOC_ICON, label: 'File Proposal', value: '<a href="#" data-file-link>test.pdf</a>' })}
+            ${renderInfoItem({ icon: DOC_ICON, label: 'File Nota Dinas', value: '<a href="#" data-file-link>test.pdf</a>' })}
           </div>
         </div>
       </div>
 
-      <div class="review-preview-grid">
-        ${renderDocPreview({
-          headerTitle: 'Pedoman - file konsep.pdf',
-          headerSubtitle: 'File Proposal &middot; Pratinjau dokumen',
-          docTitle: item.title
-        })}
-        ${renderDocPreview({
-          headerTitle: 'Pedoman - file ND konsep.pdf',
-          headerSubtitle: 'File Nota Dinas &middot; Pratinjau dokumen',
-          docTitle: `Nota Dinas Pengajuan Proposal ${nomorPengajuan}`
-        })}
-      </div>
+      ${renderRiwayatDisposisiCard(riwayat)}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
