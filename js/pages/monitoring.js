@@ -76,6 +76,18 @@ const STATUS_LABEL_OVERRIDES = {
   [SUBMISSION_STATUS.TIDAK_DISETUJUI]: { label: 'Tidak Disetujui', bg: '#F8DCD6', text: '#A93226' }
 };
 
+// Sama kayak STATUS_LABEL_OVERRIDES di atas, tapi khusus badge tabel
+// Monitoring Proposal PL milik Kepala Bagian Ortala: status
+// PROSES_REVIU ditampilkan sebagai "Disposisi" (bukan "Proses
+// Reviu"), biar konsisten sama label kartu ringkasannya sendiri
+// (lihat ORTALA_CHAIN_CARD_GROUPS -- kartu "Disposisi" di situ juga
+// isinya PROSES_REVIU). Role lain (LO, Kepala Satker, dst) tidak
+// ikut kena, tetap pakai STATUS_LABEL_OVERRIDES biasa.
+const KEPALA_BAGIAN_STATUS_LABEL_OVERRIDES = {
+  ...STATUS_LABEL_OVERRIDES,
+  [SUBMISSION_STATUS.PROSES_REVIU]: { label: 'Disposisi', bg: '#EFE7FA', text: '#6C3FB5' }
+};
+
 // Kartu ringkasan khusus Monitoring Proposal PL -- beda dari Konsep
 // PL (yang masih pakai 11 kartu 1:1 per status, lihat PROPOSAL_STATUS_META
 // di bawah). Beberapa status digabung jadi satu kartu:
@@ -243,6 +255,9 @@ const MONITORING_CONFIG = {
       [ROLES.PREVIU_BIRO_ORTALA]: ORTALA_CHAIN_CARD_GROUPS
     },
     statusLabelOverrides: STATUS_LABEL_OVERRIDES,
+    statusLabelOverridesByRole: {
+      [ROLES.KEPALA_BAGIAN_ORTALA]: KEPALA_BAGIAN_STATUS_LABEL_OVERRIDES
+    },
     // Toggle "Assign to Me"/"Belum ada Konsep PL" berguna buat semua
     // role yang bisa buka halaman ini (LO maupun reviewer Ortala) --
     // KECUALI "Assign to Me" yang disembunyikan buat LO Biro TI &
@@ -524,7 +539,8 @@ function initMonitoringTable(root, config, user, type) {
     statusMeta,
     cardGroups: defaultCardGroups,
     cardGroupsByRole,
-    statusLabelOverrides,
+    statusLabelOverrides: defaultStatusLabelOverrides,
+    statusLabelOverridesByRole,
     showFilterToggles,
     loBiroTiControls,
     createRoute,
@@ -539,6 +555,7 @@ function initMonitoringTable(root, config, user, type) {
   // lihat kartu ringkasan yang beda dari default -- lihat
   // cardGroupsByRole di MONITORING_CONFIG.
   const cardGroups = cardGroupsByRole?.[user?.role] ?? defaultCardGroups;
+  const statusLabelOverrides = statusLabelOverridesByRole?.[user?.role] ?? defaultStatusLabelOverrides;
   const showToggles = Boolean(showFilterToggles);
   const showCreateButton = Boolean(loBiroTiControls) && user?.role === ROLES.LO_BIRO_TI;
   // Toggle "Assign to Me" disembunyikan buat LO Biro TI & Kepala
