@@ -233,19 +233,34 @@ SEED_PROPOSALS.unshift({
 // Satu lagi DI ATAS PO-2026-045 -- status Selesai Reviu (REVIU_CHAIN
 // udah kelar dibolak-balik sampai Previu, balik lagi ke Kepala
 // Subbagian Ortala buat lanjut diteruskan), buat testing role Kepala
-// Subbagian Ortala. Klik "Lihat" ngarah ke halaman Review Proposal
-// penuh (Tolak/Revisi/Setuju), beda dari PO-2026-044 yang cuma
-// tombol Disposisi.
+// Subbagian Ortala. Kasubbag BUKAN final approver (lihat
+// FINAL_APPROVER_ROLE di js/core/role.js), jadi klik "Lihat" ngarah
+// ke halaman Detail Proposal ringkas (cuma tombol "Disposisi"),
+// SAMA POLA-nya kayak PO-2026-044/PO-2026-045 di atas -- bukan
+// halaman Review Proposal penuh (Tolak/Revisi/Setuju), soalnya belum
+// waktunya dia kasih keputusan final.
+//
+// Field-fieldnya (judul, unit, jenis, pengusul, tanggal) SENGAJA
+// disamain persis sama contoh tampilan yang dikasih (bukan dari
+// JUDUL_LIST/NAMA_LIST biasa) -- nomorPengajuan-nya juga di-pin manual
+// ke "PO-2026-014" tepat setelah loop auto-numbering di bawah, biar
+// nggak ketiban angka otomatis (lihat komentar di dekat
+// submittedCounter buat penjelasan loop-nya).
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-043',
-  unit: 'Biro Organisasi dan Tatalaksana',
-  title: 'Penataan Ulang Struktur Basis Data Kepegawaian Terpusat',
-  jenis: 'Standar Pelayanan',
-  createdBy: 'Siti Nurhaliza',
-  employeeId: '240021847',
-  createdAt: `${BASE_DATE}T10:15:00`,
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Anggit Nendyo Yogantoro',
+  employeeId: '240004492',
+  createdAt: '2026-02-26T07:23:47',
   status: SUBMISSION_STATUS.SELESAI_REVIU,
-  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA
+  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA,
+  // Field khusus buat popup "Disposisi Proposal PL" (lihat
+  // buildDisposisiTujuanData di js/pages/disposisi-tujuan.js) --
+  // item lain nggak punya field ini, jadi fallback ke rumus generik
+  // yang diturunin dari createdAt.
+  nomorNotaDinas: '1532/ND/X.5/06/2026'
 });
 
 // Satu lagi DI ATAS PO-2026-043 -- status Proses Reviu (masuk ke
@@ -296,6 +311,13 @@ SEED_PROPOSALS.forEach((item) => {
   submittedCounter += 1;
   item.nomorPengajuan = `PO-2026-${String(submittedCounter).padStart(3, '0')}`;
 });
+
+// PO-2026-043 (dummy testing Kepala Subbagian Ortala, lihat di atas)
+// nomorPengajuan-nya di-pin manual ke "PO-2026-014" -- SENGAJA nimpa
+// hasil auto-numbering barusan, biar sama persis kayak contoh tampilan
+// yang dikasih (bukan angka urut sesuai posisinya di SEED_PROPOSALS).
+const kasubbagDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-043');
+if (kasubbagDummy) kasubbagDummy.nomorPengajuan = 'PO-2026-014';
 
 export const proposalService = createSubmissionService({
   statusMeta: PROPOSAL_STATUS_META,

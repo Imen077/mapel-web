@@ -24,11 +24,8 @@ const ARROW_RIGHT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="
 const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 
 // Kapan tombol Aksi di tabel ngarah ke halaman lain (bukan cuma
-// tooltip "segera hadir"). Cuma satu kombinasi yang sudah jadi
-// sekarang: Kepala Satker Biro TI review proposal yang masih
-// Menunggu Persetujuan (lihat js/pages/review.js). Tambah entri
-// baru di sini kalau nanti ada kombinasi role+status+type lain yang
-// juga sudah punya halamannya.
+// tooltip "segera hadir"). Tambah entri baru di sini kalau nanti ada
+// kombinasi role+status+type lain yang juga sudah punya halamannya.
 function resolveRowActionRoute({ type, role, status, itemId }) {
   if (type !== 'proposal-pl') return null;
 
@@ -47,15 +44,23 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
   if (role === ROLES.KEPALA_BIRO_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
     return `/pages/kepala-biro-ortala/antrian/review.html?id=${encodeURIComponent(itemId)}`;
   }
-  if (role === ROLES.KEPALA_SUBBAGIAN_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
-    return `/pages/kepala-subbagian-ortala/antrian/review.html?id=${encodeURIComponent(itemId)}`;
-  }
   // Kepala Bagian Ortala (berikutnya di DISPOSISI_CHAIN sesudah
   // Kepala Biro Ortala) -- "Proses Reviu" = kartu "Disposisi"
-  // (proposal yang baru didisposisikan ke dia), pakai halaman
-  // Detail Proposal ringkas yang sama (js/pages/disposisi.js).
+  // (proposal yang baru didisposisikan ke dia), pakai halaman Detail
+  // Proposal ringkas yang sama (js/pages/disposisi.js).
   if (role === ROLES.KEPALA_BAGIAN_ORTALA && status === SUBMISSION_STATUS.PROSES_REVIU) {
     return `/pages/kepala-bagian-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
+  }
+  // Kepala Subbagian Ortala BUKAN final approver (lihat REVIU_CHAIN &
+  // FINAL_APPROVER_ROLE di js/core/role.js -- yang berhak mutuskan
+  // Tolak/Revisi/Setuju cuma Kepala Biro Ortala di ujung rantai),
+  // jadi "Selesai Reviu" di sini artinya sama kayak "Proses Reviu"-nya
+  // Kepala Bagian Ortala di atas: cuma perlu diteruskan (disposisi) ke
+  // pejabat berikutnya, BUKAN keputusan final -- pakai halaman Detail
+  // Proposal ringkas yang sama (js/pages/disposisi.js), bukan Review
+  // Proposal penuh.
+  if (role === ROLES.KEPALA_SUBBAGIAN_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
+    return `/pages/kepala-subbagian-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
   }
   // Previu Biro Ortala -- tujuan akhir rantai disposisi. Halaman
   // review-nya (pakai form template Previu) SENGAJA MASIH KOSONG
@@ -487,12 +492,13 @@ function renderTableRows(service, rows, startIndex, labelOverrides, rowActionCtx
         status: item.status,
         itemId: item.id
       });
+      const actionAttrs = actionRoute ? ` data-aksi-route="${actionRoute}" role="button" tabindex="0"` : '';
       return `
         <tr>
           <td>${startIndex + i + 1}.</td>
           <td>${item.unit}</td>
           <td>
-            <span class="data-table__title${actionRoute ? ' data-table__title--clickable' : ''}"${actionRoute ? ` data-aksi-route="${actionRoute}" role="button" tabindex="0"` : ''}>${item.title}</span>
+            <span class="data-table__title${actionRoute ? ' data-table__title--clickable' : ''}"${actionAttrs}>${item.title}</span>
             <span class="data-table__code">${item.id}</span>
           </td>
           <td>${item.jenis}</td>

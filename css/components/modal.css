@@ -17,6 +17,7 @@
 }
 
 .modal-dialog {
+  position: relative;
   width: 100%;
   max-width: 420px;
   background: #ffffff;
@@ -25,6 +26,62 @@
   padding: var(--space-6) var(--space-5);
   text-align: center;
   animation: modal-pop-in var(--transition-base);
+}
+
+/* Variasi lebar + rata kiri, dipakai buat modal isian form yang lebih
+   panjang (mis. "Disposisi Proposal PL", lihat
+   js/pages/disposisi-tujuan.js -- openDisposisiTujuanModal()) --
+   beda dari modal-dialog biasa yang sempit + rata tengah (buat
+   pesan sukses/konfirmasi singkat). */
+.modal-dialog--wide {
+  max-width: 1040px;
+  max-height: calc(100vh - var(--space-8));
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-dialog__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-paper-muted);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.modal-dialog__close:hover {
+  background: var(--color-paper-dim);
+  color: var(--color-ink-900);
+}
+
+.modal-dialog__header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-paper-line);
+}
+
+.modal-dialog__header-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  margin: 0;
+}
+
+.modal-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--space-5) var(--space-6);
+  overflow-y: auto;
 }
 
 .modal-dialog__icon {

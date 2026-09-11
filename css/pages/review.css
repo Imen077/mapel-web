@@ -265,8 +265,26 @@
   color: var(--color-paper-muted);
 }
 
+/* Grid info versi modal (openDisposisiTujuanModal di
+   js/pages/disposisi-tujuan.js) -- beda dari .disposisi-tujuan__grid
+   di atas (2 kolom, tiap kolom nge-stack sendiri-sendiri): di sini
+   flat 2 kolom, item-nya ngalir baris-per-baris (Judul Proposal |
+   Satker Pengusul, lalu Tanggal Pengajuan | Nomor Pengajuan, dst),
+   sesuai contoh tampilan popup yang dikasih. Dikasih background
+   kertas + rounded biar kebeda dari tabel pejabat di bawahnya. */
+.disposisi-modal__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-6);
+  background: var(--color-paper);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
 @media (max-width: 880px) {
-  .disposisi-tujuan__grid {
+  .disposisi-tujuan__grid,
+  .disposisi-modal__grid {
     grid-template-columns: 1fr;
   }
 }

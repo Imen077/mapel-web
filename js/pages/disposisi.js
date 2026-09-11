@@ -1,14 +1,28 @@
 // ============================================================
 // MAPEL - pages/disposisi.js
-// Halaman "Detail Proposal" versi ringkas (cuma 1 tombol aksi:
-// "Disposisi") -- dibuka Kepala Biro Ortala dari klik judul proposal
-// di Monitoring Proposal PL, KHUSUS buat proposal yang berstatus
-// "Dikirim" (kartu "Diterima" di kartu ringkasan Kabiro Ortala,
-// lihat resolveRowActionRoute di js/pages/monitoring.js). Beda dari
-// Review Proposal (js/pages/review.js) yang dipakai buat status
-// "Selesai Reviu" -- di tahap ini Kabiro cuma perlu neruskan
-// (disposisi) proposalnya ke rantai Ortala, belum ada keputusan
-// setuju/tolak/revisi.
+// "Detail Proposal" versi ringkas (cuma 1 tombol aksi: "Disposisi")
+// -- dipakai bareng oleh role mana pun yang tugasnya di tahap ini
+// cuma NERUSIN proposal (belum berhak/belum waktunya kasih keputusan
+// setuju/tolak/revisi), lihat resolveRowActionRoute di
+// js/pages/monitoring.js buat daftar kombinasi role+status yang
+// ngarah ke sini:
+//   - Kepala Biro Ortala, status "Dikirim" (kartu "Diterima" --
+//     proposal baru masuk ke rantai Ortala dari Kepala Satker)
+//   - Kepala Bagian Ortala, status "Proses Reviu" (kartu "Disposisi"
+//     -- baru didisposisikan dari Kepala Biro Ortala)
+//   - Kepala Subbagian Ortala, status "Selesai Reviu" (kartu "Selesai
+//     Reviu" -- REVIU_CHAIN sudah sampai balik lagi ke dia, tinggal
+//     diteruskan ke Previu, BUKAN keputusan final -- final approver
+//     cuma Kepala Biro Ortala, lihat FINAL_APPROVER_ROLE di
+//     js/core/role.js)
+// Beda dari Review Proposal (js/pages/review.js) yang dipakai KHUSUS
+// buat status yang butuh keputusan setuju/tolak/revisi beneran.
+//
+// Halaman ini tetap navigasi biasa (router.navigate ke
+// monitoring/detail.html?id=...), BUKAN modal -- tombol "Disposisi"
+// di dalamnya yang buka POPUP "Disposisi Proposal PL"
+// (openDisposisiTujuanModal, lihat js/pages/disposisi-tujuan.js) di
+// atas halaman ini.
 //
 // TAHAP INI: tombol "Disposisi" BELUM beneran ngubah status proposal
 // di data/proposal.js atau masuk ke alur workflow.js (yang masih
@@ -19,6 +33,7 @@
 import { router } from '../core/router.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
+import { openDisposisiTujuanModal } from './disposisi-tujuan.js';
 
 const DOC_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 3.5H7a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8.5L13 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 3.5V8h4.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 const FOLDER_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3.5 6.5a1 1 0 0 1 1-1H9l2 2h8.5a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
@@ -81,6 +96,22 @@ function getIdFromQuery() {
   return new URLSearchParams(window.location.search).get('id') || '';
 }
 
+/**
+ * Data turunan buat kartu Detail Proposal (renderDetailCard di bawah)
+ * -- dipisah dari initDisposisiPage supaya lebih ringkas dibaca.
+ * @param {Object} item - hasil proposalService.getById()
+ */
+function buildDetailData(item) {
+  const statusMeta = proposalService.getStatusMeta(item.status);
+  const override = DISPOSISI_STATUS_META_OVERRIDES[item.status];
+  const statusLabel = override?.label ?? statusMeta.label;
+  const badgeBg = override?.bg ?? statusMeta.bg;
+  const badgeText = override?.text ?? statusMeta.text;
+  const nomorPengajuan = item.nomorPengajuan || item.id;
+  const riwayat = DUMMY_RIWAYAT_DISPOSISI[item.status] ?? [];
+  return { statusLabel, badgeBg, badgeText, nomorPengajuan, riwayat };
+}
+
 function renderInfoItem({ icon, label, value }) {
   return `
     <div class="review-grid__item">
@@ -93,11 +124,21 @@ function renderInfoItem({ icon, label, value }) {
   `;
 }
 
+/**
+ * @param {Object[]} entries
+ * @returns {string} HTML kartu, atau string kosong kalau belum ada riwayat
+ *   sama sekali -- dipakai buat status kayak "Selesai Reviu" (Kepala
+ *   Subbagian Ortala) yang di data dummy ini emang belum ada riwayat
+ *   disposisinya (lihat DUMMY_RIWAYAT_DISPOSISI di atas), beda dari
+ *   dulu yang selalu nampilin kartu + baris "Belum ada riwayat" biar
+ *   sesuai sama desain (kartu ini nggak ada sama sekali di desainnya).
+ */
 function renderRiwayatDisposisiCard(entries) {
-  const rows = entries.length
-    ? entries
-        .map(
-          (row) => `
+  if (!entries.length) return '';
+
+  const rows = entries
+    .map(
+      (row) => `
             <tr>
               <td>
                 <span class="data-table__title">${formatDateTimeFullID(row.waktu)}</span>
@@ -113,9 +154,8 @@ function renderRiwayatDisposisiCard(entries) {
               <td>${row.catatan}</td>
             </tr>
           `
-        )
-        .join('')
-    : `<tr><td class="data-table__empty" colspan="4">Belum ada riwayat disposisi.</td></tr>`;
+    )
+    .join('');
 
   return `
     <div class="card review-card">
@@ -139,6 +179,43 @@ function renderRiwayatDisposisiCard(entries) {
   `;
 }
 
+/** Kartu "Detail Proposal" (info + status). */
+function renderDetailCard(item, data) {
+  const { statusLabel, badgeBg, badgeText, nomorPengajuan } = data;
+  return `
+    <div class="card review-card">
+      <div class="review-card__header">
+        <span class="review-card__header-icon">${FOLDER_ICON}</span>
+        <div>
+          <h2 class="card__title">Detail Proposal</h2>
+          <p class="review-card__header-subtitle">Informasi lengkap proposal pengajuan</p>
+        </div>
+      </div>
+      <div class="review-grid">
+        <div class="review-grid__col">
+          ${renderInfoItem({ icon: DOC_ICON, label: 'Judul Proposal', value: item.title })}
+          ${renderInfoItem({ icon: HASH_ICON, label: 'Nomor Pengajuan', value: nomorPengajuan })}
+          ${renderInfoItem({ icon: CALENDAR_ICON, label: 'Tanggal Pengajuan', value: formatDateTimeFullID(item.createdAt) })}
+          ${renderInfoItem({ icon: BUILDING_ICON, label: 'Satker Pengusul', value: item.unit })}
+          <div class="review-grid__item">
+            <span class="review-grid__icon">${SWATCH_ICON}</span>
+            <div>
+              <p class="review-grid__label">Status</p>
+              <span class="badge badge--tint" style="--tint-bg:${badgeBg};--tint-text:${badgeText}">${statusLabel}</span>
+            </div>
+          </div>
+        </div>
+        <div class="review-grid__col">
+          ${renderInfoItem({ icon: PERSON_ICON, label: 'Pejabat Pengusul', value: item.createdBy })}
+          ${renderInfoItem({ icon: PENCIL_ICON, label: 'Keterangan', value: statusLabel })}
+          ${renderInfoItem({ icon: DOC_ICON, label: 'File Proposal', value: '<a href="#" data-file-link>test.pdf</a>' })}
+          ${renderInfoItem({ icon: DOC_ICON, label: 'File Nota Dinas', value: '<a href="#" data-file-link>test.pdf</a>' })}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 /**
  * @param {HTMLElement} root
  * @param {Session} user
@@ -146,9 +223,9 @@ function renderRiwayatDisposisiCard(entries) {
 export function initDisposisiPage(root, user) {
   if (!root) return;
 
-  // Halaman ini cuma dipakai role Kabiro Ortala sekarang, tapi
-  // ditulis ngikutin folder role yang login (bukan di-hardcode)
-  // biar aman kalau nanti dipakai role lain juga.
+  // Dipakai bareng lintas role (Kabiro/Kabag/Kasubbag Ortala, lihat
+  // komentar header file), jadi "kembali"-nya ngikutin folder role
+  // yang lagi login (bukan di-hardcode ke satu role tertentu).
   const backTarget = `/pages/${user?.role}/monitoring/proposal-pl.html`;
   const item = proposalService.getById(getIdFromQuery());
 
@@ -163,13 +240,7 @@ export function initDisposisiPage(root, user) {
     return;
   }
 
-  const statusMeta = proposalService.getStatusMeta(item.status);
-  const override = DISPOSISI_STATUS_META_OVERRIDES[item.status];
-  const statusLabel = override?.label ?? statusMeta.label;
-  const badgeBg = override?.bg ?? statusMeta.bg;
-  const badgeText = override?.text ?? statusMeta.text;
-  const nomorPengajuan = item.nomorPengajuan || item.id;
-  const riwayat = DUMMY_RIWAYAT_DISPOSISI[item.status] ?? [];
+  const data = buildDetailData(item);
 
   root.innerHTML = `
     <div class="review-page disposisi-page">
@@ -178,38 +249,9 @@ export function initDisposisiPage(root, user) {
         <p class="review-page__subtitle">Rincian data pengajuan proposal beserta dokumen pendukung.</p>
       </div>
 
-      <div class="card review-card">
-        <div class="review-card__header">
-          <span class="review-card__header-icon">${FOLDER_ICON}</span>
-          <div>
-            <h2 class="card__title">Detail Proposal</h2>
-            <p class="review-card__header-subtitle">Informasi lengkap proposal pengajuan</p>
-          </div>
-        </div>
-        <div class="review-grid">
-          <div class="review-grid__col">
-            ${renderInfoItem({ icon: DOC_ICON, label: 'Judul Proposal', value: item.title })}
-            ${renderInfoItem({ icon: HASH_ICON, label: 'Nomor Pengajuan', value: nomorPengajuan })}
-            ${renderInfoItem({ icon: CALENDAR_ICON, label: 'Tanggal Pengajuan', value: formatDateTimeFullID(item.createdAt) })}
-            ${renderInfoItem({ icon: BUILDING_ICON, label: 'Satker Pengusul', value: item.unit })}
-            <div class="review-grid__item">
-              <span class="review-grid__icon">${SWATCH_ICON}</span>
-              <div>
-                <p class="review-grid__label">Status</p>
-                <span class="badge badge--tint" style="--tint-bg:${badgeBg};--tint-text:${badgeText}">${statusLabel}</span>
-              </div>
-            </div>
-          </div>
-          <div class="review-grid__col">
-            ${renderInfoItem({ icon: PERSON_ICON, label: 'Pejabat Pengusul', value: item.createdBy })}
-            ${renderInfoItem({ icon: PENCIL_ICON, label: 'Keterangan', value: statusLabel })}
-            ${renderInfoItem({ icon: DOC_ICON, label: 'File Proposal', value: '<a href="#" data-file-link>test.pdf</a>' })}
-            ${renderInfoItem({ icon: DOC_ICON, label: 'File Nota Dinas', value: '<a href="#" data-file-link>test.pdf</a>' })}
-          </div>
-        </div>
-      </div>
+      ${renderDetailCard(item, data)}
 
-      ${renderRiwayatDisposisiCard(riwayat)}
+      ${renderRiwayatDisposisiCard(data.riwayat)}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
@@ -220,7 +262,9 @@ export function initDisposisiPage(root, user) {
 
   root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
+  // Sekarang tampil sebagai MODAL popup di atas halaman ini (lihat
+  // js/pages/disposisi-tujuan.js), bukan pindah ke halaman baru lagi.
   root.querySelector('#btn-disposisi')?.addEventListener('click', () => {
-    router.navigate(`/pages/${user?.role}/monitoring/disposisi-tujuan.html?id=${encodeURIComponent(item.id)}`);
+    openDisposisiTujuanModal(item, user);
   });
 }
