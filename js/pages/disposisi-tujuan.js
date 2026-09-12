@@ -39,7 +39,7 @@ const DUMMY_PEJABAT_TUJUAN_BY_ROLE = {
     { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }
   ],
   [ROLES.KEPALA_BAGIAN_ORTALA]: [
-    { nama: 'Dimas Prasetyo', nip: '240008842', jabatan: 'Kepala Subbagian - Biro Organisasi dan Tata Laksana' }
+    { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }
   ],
   // 6 pilihan pereviu (bukan 1 kayak role lain di atas) -- sesuai
   // contoh tampilan yang dikasih: Kasubbag boleh milih siapa aja dari
@@ -226,6 +226,16 @@ function bindActions(root, pejabatTujuan, backTarget, { onDisposed } = {}) {
  * (gantiin router.navigate() ke halaman disposisi-tujuan.html yang
  * lama, lihat initDisposisiTujuanPage di atas -- masih dibiarin buat
  * kompatibilitas kalau halamannya dibuka langsung lewat URL).
+ *
+ * Isinya sengaja dipola SAMA PERSIS kayak initDisposisiTujuanPage di
+ * atas (kartu "Detail Proposal" + bar biru tua "Disposisi Proposal PL"
+ * + grid 2 kolom bertumpuk .disposisi-tujuan__grid/__col, BUKAN grid
+ * flat .disposisi-modal__grid yang dipakai sebelumnya, dan TANPA
+ * toggle "Prioritas") -- cuma dibungkus modal-dialog, sesuai contoh
+ * tampilan yang dikasih. class .modal-dialog__body--flush (lihat
+ * css/components/modal.css) yang bikin bar birunya bisa nempel ke
+ * tepi modal, sama kayak .disposisi-tujuan-card { padding: 0 } di
+ * versi halaman penuhnya.
  * @param {Object} item - hasil proposalService.getById(), WAJIB sudah
  *   dicek tidak null oleh pemanggil (disposisi.js sudah begitu).
  * @param {Session} user
@@ -250,20 +260,18 @@ export function openDisposisiTujuanModal(item, user, { onDisposed } = {}) {
       <div class="modal-dialog__header">
         <h2 class="modal-dialog__header-title" id="disposisi-modal-title">Disposisi Proposal PL</h2>
       </div>
-      <div class="modal-dialog__body">
-        <div class="disposisi-modal__grid">
-          ${renderRingkasanItem('Judul Proposal', item.title)}
-          ${renderRingkasanItem('Satker Pengusul', item.unit)}
-          ${renderRingkasanItem('Tanggal Pengajuan', formatDateTimeFullID(item.createdAt))}
-          ${renderRingkasanItem('Nomor Pengajuan', nomorPengajuan)}
-          ${renderRingkasanItem('Nomor Nota Dinas', nomorNotaDinas)}
-          <div class="disposisi-tujuan__item">
-            <span class="disposisi-tujuan__label">Prioritas</span>
-            <span class="disposisi-tujuan__sep">:</span>
-            <label class="toggle">
-              <input type="checkbox" class="toggle__input" data-prioritas-toggle>
-              <span class="toggle__track"><span class="toggle__thumb"></span></span>
-            </label>
+      <div class="modal-dialog__body modal-dialog__body--flush">
+        <div class="disposisi-tujuan__subheader">Disposisi Proposal PL</div>
+
+        <div class="disposisi-tujuan__grid">
+          <div class="disposisi-tujuan__col">
+            ${renderRingkasanItem('Judul Proposal', item.title)}
+            ${renderRingkasanItem('Tanggal Pengajuan', formatDateTimeFullID(item.createdAt))}
+            ${renderRingkasanItem('Nomor Nota Dinas', nomorNotaDinas)}
+          </div>
+          <div class="disposisi-tujuan__col">
+            ${renderRingkasanItem('Satker Pengusul', item.unit)}
+            ${renderRingkasanItem('Nomor Pengajuan', nomorPengajuan)}
           </div>
         </div>
 

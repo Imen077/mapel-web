@@ -24,6 +24,21 @@
 // (openDisposisiTujuanModal, lihat js/pages/disposisi-tujuan.js) di
 // atas halaman ini.
 //
+// Di bawah kartu "Detail Proposal" ada konten tambahan yang BEDA per
+// status (nurut contoh tampilan yang dikasih per role):
+// - "dikirim" (Kepala Biro Ortala) -> 2 kartu pratinjau dokumen (File
+//   Proposal & File Nota Dinas) -- renderDocPreview()/
+//   renderDocPreviewGrid() di bawah, dipola sama persis kayak yang
+//   ada di halaman Review Proposal (js/pages/review.js), reuse class
+//   CSS yang sama (.doc-preview di css/pages/pengajuan.css,
+//   .review-preview-grid di css/pages/review.css). TIDAK ada Riwayat
+//   Disposisi di status ini.
+// - "proses-reviu" (Kepala Bagian Ortala) -> kartu "Riwayat Disposisi"
+//   (renderRiwayatDisposisiCard di bawah, isinya DUMMY_RIWAYAT_DISPOSISI).
+//   TIDAK ada pratinjau dokumen di status ini.
+// - "selesai-reviu" (Kepala Subbagian Ortala) -> nggak ada dua-duanya,
+//   cuma kartu Detail Proposal doang.
+//
 // TAHAP INI: tombol "Disposisi" BELUM beneran ngubah status proposal
 // di data/proposal.js atau masuk ke alur workflow.js (yang masih
 // placeholder) -- baru sebatas popup feedback + balik ke Monitoring,
@@ -32,6 +47,7 @@
 
 import { router } from '../core/router.js';
 import { proposalService } from '../../data/proposal.js';
+import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateTimeFullID } from '../core/format.js';
 import { openDisposisiTujuanModal } from './disposisi-tujuan.js';
 
@@ -57,21 +73,13 @@ const DISPOSISI_STATUS_META_OVERRIDES = {
 };
 
 // Riwayat disposisi masih dummy statis (belum ada data beneran di
-// data/proposal.js buat ini) -- disesuaikan per status, biar nyambung
-// sama tahapnya: "dikirim" = baru masuk dari Kepala Satker ke Kepala
-// Biro Ortala (1 baris), "proses-reviu" = udah diteruskan Kabiro ke
-// Kepala Bagian (2 baris). Status lain belum ada riwayatnya.
+// data/proposal.js buat ini) -- CUMA ADA buat status "proses-reviu"
+// (Kepala Bagian Ortala, udah diteruskan Kabiro -> Kabag -> Pereviu,
+// 2 baris), sesuai contoh tampilan yang dikasih. Status lain
+// ("dikirim", "selesai-reviu") sengaja nggak dikasih entry di sini,
+// jadi kartunya otomatis nggak muncul (lihat renderRiwayatDisposisiCard
+// di bawah, return '' kalau entries kosong).
 const DUMMY_RIWAYAT_DISPOSISI = {
-  dikirim: [
-    {
-      waktu: '2026-02-26T08:15:22',
-      dariNama: 'Made Wirawan',
-      dariJabatan: 'Kepala Satker Biro TI',
-      kepadaNama: 'Agustina Ratna Puspitasari',
-      kepadaJabatan: 'Kepala Biro',
-      catatan: 'Mohon ditindaklanjuti sesuai ketentuan yang berlaku.'
-    }
-  ],
   'proses-reviu': [
     {
       waktu: '2026-02-26T08:15:22',
@@ -127,11 +135,9 @@ function renderInfoItem({ icon, label, value }) {
 /**
  * @param {Object[]} entries
  * @returns {string} HTML kartu, atau string kosong kalau belum ada riwayat
- *   sama sekali -- dipakai buat status kayak "Selesai Reviu" (Kepala
- *   Subbagian Ortala) yang di data dummy ini emang belum ada riwayat
- *   disposisinya (lihat DUMMY_RIWAYAT_DISPOSISI di atas), beda dari
- *   dulu yang selalu nampilin kartu + baris "Belum ada riwayat" biar
- *   sesuai sama desain (kartu ini nggak ada sama sekali di desainnya).
+ *   sama sekali -- cuma status "proses-reviu" yang punya entry (lihat
+ *   DUMMY_RIWAYAT_DISPOSISI di atas), status lain ("dikirim",
+ *   "selesai-reviu") otomatis nggak nampilin kartu ini sama sekali.
  */
 function renderRiwayatDisposisiCard(entries) {
   if (!entries.length) return '';
@@ -217,6 +223,55 @@ function renderDetailCard(item, data) {
 }
 
 /**
+ * Pratinjau dokumen (File Proposal & File Nota Dinas) -- dipola sama
+ * persis kayak renderDocPreview() di js/pages/review.js (dipakai bareng
+ * class-nya, .doc-preview di css/pages/pengajuan.css & .review-preview-grid
+ * di css/pages/review.css, keduanya sudah ke-load global lewat main.css).
+ */
+function renderDocPreview({ headerTitle, headerSubtitle, docTitle }) {
+  const lines = Array.from({ length: 6 })
+    .map((_, i) => `<span class="doc-preview__line${i === 1 || i === 5 ? ' doc-preview__line--short' : ''}"></span>`)
+    .join('');
+
+  return `
+    <div class="card doc-preview">
+      <div class="doc-preview__header">
+        <span class="doc-preview__icon">${DOC_ICON}</span>
+        <div>
+          <p class="doc-preview__title">${headerTitle}</p>
+          <p class="doc-preview__subtitle">${headerSubtitle}</p>
+        </div>
+      </div>
+      <div class="doc-preview__body">
+        <div class="doc-preview__sheet">
+          <p class="doc-preview__letterhead">Badan Pemeriksa Keuangan Republik Indonesia</p>
+          <p class="doc-preview__doc-title">${docTitle}</p>
+          <div class="doc-preview__skeleton">${lines}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/** 2 kartu pratinjau (File Proposal + File Nota Dinas), berdampingan. */
+function renderDocPreviewGrid(item, data) {
+  return `
+    <div class="review-preview-grid">
+      ${renderDocPreview({
+        headerTitle: 'Pedoman - file konsep.pdf',
+        headerSubtitle: 'File Proposal &middot; Pratinjau dokumen',
+        docTitle: item.title
+      })}
+      ${renderDocPreview({
+        headerTitle: 'Pedoman - file ND konsep.pdf',
+        headerSubtitle: 'File Nota Dinas &middot; Pratinjau dokumen',
+        docTitle: `Nota Dinas Pengajuan Proposal ${data.nomorPengajuan}`
+      })}
+    </div>
+  `;
+}
+
+/**
  * @param {HTMLElement} root
  * @param {Session} user
  */
@@ -250,6 +305,8 @@ export function initDisposisiPage(root, user) {
       </div>
 
       ${renderDetailCard(item, data)}
+
+      ${item.status === SUBMISSION_STATUS.DIKIRIM ? renderDocPreviewGrid(item, data) : ''}
 
       ${renderRiwayatDisposisiCard(data.riwayat)}
 

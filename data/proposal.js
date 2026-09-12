@@ -198,14 +198,20 @@ SEED_PROPOSALS.unshift({
 // depan) -- status Dikirim (masuk ke kartu "Diterima" di
 // KARO_ORTALA_PROPOSAL_CARD_GROUPS, proposal yang baru dikirim/
 // diterima ke rantai Ortala), buat testing role Kepala Biro Ortala.
+//
+// Field-fieldnya (judul, unit, pengusul, tanggal) SENGAJA disamain
+// persis sama contoh tampilan halaman Detail Proposal yang dikasih --
+// nomorPengajuan-nya juga di-pin manual ke "PO-2026-014" tepat
+// setelah loop auto-numbering di bawah, biar nggak ketiban angka
+// otomatis (sama pola-nya kayak kasubbagDummy di bawah).
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-044',
-  unit: 'BPK Perwakilan Provinsi Jawa Barat',
-  title: 'Digitalisasi Arsip Persuratan Perwakilan',
+  unit: 'Biro Teknologi Informasi',
+  title: 'test',
   jenis: 'Juknis',
-  createdBy: 'Wulan Permatasari',
-  employeeId: '240040567',
-  createdAt: `${BASE_DATE}T13:05:00`,
+  createdBy: 'Anggit Nendyo Yogantoro',
+  employeeId: '240004492',
+  createdAt: '2026-02-26T07:23:47',
   status: SUBMISSION_STATUS.DIKIRIM,
   // Cuma boleh kelihatan (tabel & kartu ringkasan) buat role ini --
   // role lain (LO, Kepala Satker, dst) sama sekali nggak lihat item
@@ -217,15 +223,19 @@ SEED_PROPOSALS.unshift({
 // Satu lagi DI ATAS PO-2026-044 -- status Proses Reviu (masuk ke
 // kartu "Disposisi" di ORTALA_CHAIN_CARD_GROUPS, proposal yang baru
 // didisposisikan ke Kepala Bagian Ortala), buat testing role Kepala
-// Bagian Ortala. Sama pola-nya kayak PO-2026-044 di atas.
+// Bagian Ortala. Sama pola-nya kayak PO-2026-044 di atas -- field-
+// fieldnya (judul, unit, pengusul, tanggal) disamain persis sama
+// contoh tampilan Detail Proposal yang dikasih; nomorPengajuan-nya
+// juga di-pin manual ke "PO-2026-014" tepat setelah loop
+// auto-numbering di bawah (lihat karoDummy/kasubbagDummy).
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-045',
-  unit: 'Biro Sumber Daya Manusia',
-  title: 'Pembaruan Sistem Informasi Kepegawaian Terintegrasi',
-  jenis: 'Instruksi Kerja',
-  createdBy: 'Rian Hidayat',
-  employeeId: '240015739',
-  createdAt: `${BASE_DATE}T15:20:00`,
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  createdAt: '2026-02-26T07:23:47',
   status: SUBMISSION_STATUS.PROSES_REVIU,
   testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA
 });
@@ -318,6 +328,43 @@ SEED_PROPOSALS.forEach((item) => {
 // yang dikasih (bukan angka urut sesuai posisinya di SEED_PROPOSALS).
 const kasubbagDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-043');
 if (kasubbagDummy) kasubbagDummy.nomorPengajuan = 'PO-2026-014';
+
+// PO-2026-044 (dummy testing Kepala Biro Ortala, lihat di atas) --
+// sama pola-nya kayak kasubbagDummy di atas, nomorPengajuan-nya
+// di-pin manual ke "PO-2026-014" juga (sama persis kayak contoh
+// tampilan Detail Proposal yang dikasih) -- kebetulan sama angkanya
+// dengan punya PO-2026-043, tapi nggak masalah, dua-duanya beda role
+// (testOnlyFor beda) jadi nggak akan pernah kelihatan bareng.
+const karoDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-044');
+if (karoDummy) karoDummy.nomorPengajuan = 'PO-2026-014';
+
+// PO-2026-045 (dummy testing Kepala Bagian Ortala, lihat di atas) --
+// sama pola-nya kayak karoDummy/kasubbagDummy di atas, nomorPengajuan-nya
+// di-pin manual ke "PO-2026-014" juga (sama persis kayak contoh
+// tampilan Detail Proposal yang dikasih) -- kebetulan sama angkanya
+// dengan punya PO-2026-043/PO-2026-044, tapi nggak masalah, ketiganya
+// beda role (testOnlyFor beda) jadi nggak akan pernah kelihatan bareng.
+const kabagDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-045');
+if (kabagDummy) kabagDummy.nomorPengajuan = 'PO-2026-014';
+
+// PO-2026-040 ("Aplikasi Presensi Perwakilan") dihapus dari data
+// dummy -- ini baris ke-3 di tabel Monitoring Proposal PL (setelah
+// PO-2026-042 & PO-2026-041), sebelumnya juga berstatus "Menunggu
+// Persetujuan" kayak PO-2026-042, tapi cukup PO-2026-042 saja yang
+// dipakai buat testing alur Review Proposal Kepala Satker Biro TI,
+// biar datanya nggak dobel.
+const duplicateMenungguIndex = SEED_PROPOSALS.findIndex((item) => item.id === 'PO-2026-040');
+if (duplicateMenungguIndex !== -1) SEED_PROPOSALS.splice(duplicateMenungguIndex, 1);
+
+// PO-2026-041 ("SIMONEV Kinerja Unit") dihapus dari data dummy -- ini
+// baris ke-3 di tabel Monitoring Proposal PL Kepala Bagian Ortala
+// (setelah PO-2026-045 & PO-2026-042), sebelumnya juga berstatus
+// "Proses Reviu"/"Disposisi" kayak PO-2026-045 (dummy testing khusus
+// role ini), tapi cukup PO-2026-045 saja yang dipakai buat testing
+// alur Disposisi Kepala Bagian Ortala, biar datanya nggak dobel --
+// sama alasannya kayak penghapusan PO-2026-040 di atas.
+const duplicateProsesReviuIndex = SEED_PROPOSALS.findIndex((item) => item.id === 'PO-2026-041');
+if (duplicateProsesReviuIndex !== -1) SEED_PROPOSALS.splice(duplicateProsesReviuIndex, 1);
 
 export const proposalService = createSubmissionService({
   statusMeta: PROPOSAL_STATUS_META,
