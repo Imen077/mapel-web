@@ -36,7 +36,7 @@ const CLOSE_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
 // dummy (belum baca data pejabat beneran).
 const DUMMY_PEJABAT_TUJUAN_BY_ROLE = {
   [ROLES.KEPALA_BIRO_ORTALA]: [
-    { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }
+    { nama: 'Arny Fitriana Satyawati', nip: '240003585', jabatan: 'Kepala Subbagian - Biro Organisasi dan Tata Laksana' }
   ],
   [ROLES.KEPALA_BAGIAN_ORTALA]: [
     { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }

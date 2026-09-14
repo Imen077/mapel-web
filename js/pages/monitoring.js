@@ -14,6 +14,7 @@ import { proposalService, PROPOSAL_STATUS_META } from '../../data/proposal.js';
 import { konsepService, KONSEP_STATUS_META } from '../../data/konsep.js';
 import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateLongID } from '../core/format.js';
+import { renderAksiCell, bindAksiDropdowns } from '../components/table.js';
 
 const PAGE_SIZE = 7;
 
@@ -21,7 +22,6 @@ const SEARCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 const CHEVRON_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ARROW_LEFT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m14.5 5-7 7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ARROW_RIGHT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9.5 5 7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const AKSI_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 
 // Kapan tombol Aksi di tabel ngarah ke halaman lain (bukan cuma
 // tooltip "segera hadir"). Tambah entri baru di sini kalau nanti ada
@@ -507,9 +507,7 @@ function renderTableRows(service, rows, startIndex, labelOverrides, rowActionCtx
           <td>
             <span class="badge badge--tint" style="--tint-bg:${meta.bg};--tint-text:${meta.text}">${meta.label}</span>
           </td>
-          <td>
-            <button class="data-table__aksi" type="button" title="${actionRoute ? 'Lihat detail' : 'Lihat detail (segera hadir)'}">${AKSI_ICON}</button>
-          </td>
+          ${renderAksiCell(item.id)}
         </tr>
       `;
     })
@@ -669,6 +667,21 @@ function initMonitoringTable(root, config, user, type) {
           go();
         }
       });
+    });
+
+    // Tombol Aksi > "Lihat" pakai resolveRowActionRoute yang sama
+    // dengan klik judul baris (lihat renderTableRows) -- kalau
+    // kombinasi role+status+type-nya belum punya halaman, sengaja
+    // tidak ngapa-ngapain (dummy, sama seperti "Riwayat" yang masih
+    // belum ada halamannya sama sekali).
+    bindAksiDropdowns(root, {
+      onLihat: (id) => {
+        if (!id) return;
+        const item = service.getById(id);
+        if (!item) return;
+        const route = resolveRowActionRoute({ type, role: user?.role, status: item.status, itemId: item.id });
+        if (route) router.navigate(route);
+      }
     });
 
     let debounceTimer;
