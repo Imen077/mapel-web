@@ -1,0 +1,134 @@
+/* ============================================================
+   MAPEL - pages/reviu-proposal.css
+   Halaman "Reviu Proposal" (js/pages/reviu-proposal.js) -- dibuka
+   Previu Biro Ortala dari tombol "Reviu" di Detail Proposal
+   (js/pages/disposisi.js). Reuse banyak class dari review.css
+   (.review-page, .review-card__header, dst), file ini cuma nambahin
+   bagian yang belum ada: layout 2 kolom (kartu "Informasi Proposal"
+   sempit + kartu "Checklist Reviu" lebar), isi kartu itu, dan textarea
+   "Kesimpulan & Catatan".
+   ============================================================ */
+
+.reviu-proposal__layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  align-items: start;
+  gap: var(--space-5);
+}
+
+@media (max-width: 880px) {
+  .reviu-proposal__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reviu-proposal__info-body {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.reviu-proposal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reviu-proposal__field-label {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-paper-muted);
+}
+
+.reviu-proposal__field-value {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-ink-900);
+  font-size: var(--text-sm);
+}
+
+.reviu-proposal__field-value a {
+  color: var(--color-ink-700);
+  text-decoration: none;
+}
+
+.reviu-proposal__field-value a:hover {
+  text-decoration: underline;
+}
+
+.reviu-proposal__divider {
+  height: 1px;
+  background: var(--color-paper-line);
+  margin: var(--space-1) 0;
+}
+
+.reviu-proposal__checklist-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--color-paper-line);
+}
+
+.reviu-proposal__checklist-heading {
+  flex: 1 1 auto;
+}
+
+.reviu-proposal__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-5);
+  color: var(--color-paper-muted);
+}
+
+.reviu-proposal__empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--color-paper-dim);
+  color: var(--color-paper-muted);
+  margin-bottom: var(--space-2);
+}
+
+.reviu-proposal__empty-title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-ink-900);
+  font-size: var(--text-base);
+}
+
+.reviu-proposal__empty-desc {
+  margin: 0;
+  font-size: var(--text-sm);
+  max-width: 360px;
+}
+
+.reviu-proposal__pagination {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-paper-line);
+}
+
+.reviu-proposal__notes-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.reviu-proposal__notes-label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+.reviu-proposal__notes-body .review-notes__textarea + .reviu-proposal__notes-label {
+  margin-top: var(--space-3);
+}

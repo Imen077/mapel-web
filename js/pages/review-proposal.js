@@ -1,97 +1,140 @@
 // ============================================================
-// MAPEL - pages/review-proposal.js
-// Halaman "Review Proposal" -- dibuka Kepala Satker Biro TI pas
-// klik "Lihat" di Monitoring Proposal PL, KHUSUS buat baris yang
-// statusnya "Menunggu Persetujuan" (lihat handleLihat di
-// js/pages/monitoring.js). Kasatker meninjau detail + berkas
-// pendukung, lalu ambil keputusan: Tolak / Revisi / Setuju.
+// MAPEL - pages/reviu-proposal.js
+// "Reviu Proposal" -- halaman form reviu buat Previu Biro Ortala
+// (ujung rantai disposisi, lihat DISPOSISI_CHAIN/REVIU_CHAIN di
+// js/core/role.js), dibuka lewat tombol "Reviu" di halaman Detail
+// Proposal (js/pages/disposisi.js). Beda dari Kabiro/Kabag/Kasubbag
+// yang cuma NERUSIN proposal (disposisi.js + disposisi-tujuan.js),
+// di sini Previu BENERAN ngerjain reviu-nya: catat langkah-langkah
+// checklist reviu, lalu kesimpulan & catatan akhir.
 //
-// TAHAP INI: sama seperti detail.js, data item yang mau ditinjau
-// dioper lewat sessionStorage (REVIEW_HANDOFF_KEY, diisi
-// saveReviewHandoff() dari monitoring.js) alih-alih lewat query
-// param -- router.navigate() di app ini belum dukung itu. Kalau
-// dibuka langsung tanpa lewat klik "Lihat" (atau handoff-nya
-// kosong/dibersihkan), tampil data contoh generik supaya halaman
-// tidak kosong.
-//
-// Tombol Tolak/Revisi/Setuju BELUM benar-benar mengubah status item
-// di data/proposal.js (workflow engine di js/workflow/* masih
-// placeholder) -- baru validasi + popup konfirmasi sesuai desain,
-// lalu balik ke Monitoring. Sambungkan ke workflow beneran begitu
-// itu sudah digarap.
+// TAHAP INI: tombol "+ Tambah Reviu" & "Previous"/"Next" pagination
+// checklist SENGAJA belum di-wire ke logic apapun -- ikut pola
+// tombol lain yang sejenis di app ini (mis. "+ Tambah Akun" di
+// js/pages/pengaturan.js): visualnya duluan, logic-nya menyusul.
+// Checklist-nya juga masih selalu nampilin empty state (belum ada
+// data dummy buat isi checklist-nya).
 // ============================================================
 
 import { router } from '../core/router.js';
+import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
-import { showModal, showSuccessModal } from '../components/modal.js';
 
-const REVIEW_HANDOFF_KEY = 'mapel_review_proposal';
-
+const CALENDAR_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="5.5" width="16" height="14.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M4 9.5h16M8 3.5v3.5M16 3.5v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const CHECK_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="m8 12.5 2.5 2.5L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const PENCIL_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 20l1-4.2L15.8 5a1.5 1.5 0 0 1 2.1 0l1.1 1.1a1.5 1.5 0 0 1 0 2.1L8.2 19 4 20Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const CLIPBOARD_ICON = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="4.5" width="14" height="16" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M9 4.5V3.8a1.3 1.3 0 0 1 1.3-1.3h3.4A1.3 1.3 0 0 1 15 3.8v.7" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const PLUS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m0 0 6-6m-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const CLOSE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-const REVISI_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.6 5.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20v-5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const CHECK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const FOLDER_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6.5a1 1 0 0 1 1-1h4.5l2 2.2H19a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-const FILE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 3.5H7a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8.5L13 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 3.5V8h4.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-const HASH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9.5 4 7 20M17 4l-2.5 16M4 9h16M3.5 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const CALENDAR_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="5.5" width="16" height="14.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M4 9.5h16M8 3.5v3.5M16 3.5v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
-const BUILDING_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 20.5V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v15.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 10.5h5a1 1 0 0 1 1 1v9" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 7.5h0M8 11h0M8 14.5h0M8 18h0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 20.5h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
-const TAG_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11.5 4.5H6a1 1 0 0 0-1 1v5.5a1 1 0 0 0 .3.7l8 8a1 1 0 0 0 1.4 0l5.5-5.5a1 1 0 0 0 0-1.4l-8-8a1 1 0 0 0-.7-.3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="8.7" cy="8.7" r="1.2" fill="currentColor"/></svg>';
-const PERSON_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.3" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
-const PENCIL_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m14.5 5 4.5 4.5L8.5 20H4v-4.5L14.5 5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 
-/** Dipanggil dari monitoring.js pas "Lihat" diklik di baris yang relevan. */
-export function saveReviewHandoff(item) {
-  try {
-    sessionStorage.setItem(REVIEW_HANDOFF_KEY, JSON.stringify(item));
-  } catch (err) {
-    console.error('[review-proposal] Gagal nyimpen review handoff:', err);
-  }
+function getIdFromQuery() {
+  return new URLSearchParams(window.location.search).get('id') || '';
 }
 
-function readReviewHandoff() {
-  try {
-    const raw = sessionStorage.getItem(REVIEW_HANDOFF_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch (err) {
-    console.error('[review-proposal] Gagal baca review handoff:', err);
-    return null;
-  }
+function renderInfoField(label, valueHtml) {
+  return `
+    <div class="reviu-proposal__field">
+      <p class="reviu-proposal__field-label">${label}</p>
+      <p class="reviu-proposal__field-value">${valueHtml}</p>
+    </div>
+  `;
 }
 
-/** Kartu pratinjau dokumen (skeleton statis) -- pola sama dengan pengajuan-proposal.js, cuma subtitle-nya beda (ada label "File Proposal ·"/"File Nota Dinas ·" di depan). */
-function renderPreviewCard({ headerTitle, subtitleLabel, docTitle }) {
-  const lines = Array.from({ length: 6 })
-    .map((_, i) => `<span class="doc-preview__line${i === 1 || i === 5 ? ' doc-preview__line--short' : ''}"></span>`)
-    .join('');
+/** Kartu kiri "Informasi Proposal" -- ringkasan singkat, BUKAN detail lengkap kayak renderDetailCard di disposisi.js. */
+function renderInfoCard(item) {
+  const statusMeta = proposalService.getStatusMeta(item.status);
+  // Reuse label/warna "Disposisi" yang sama kayak badge Status di
+  // halaman Detail Proposal (js/pages/disposisi.js) -- proposal yang
+  // sama, cuma beda halaman.
+  const isProsesReviu = item.status === 'proses-reviu';
+  const badgeBg = isProsesReviu ? '#E1EAF6' : statusMeta.bg;
+  const badgeText = isProsesReviu ? '#2B5C89' : statusMeta.text;
+  const badgeLabel = isProsesReviu ? 'Disposisi' : statusMeta.label;
+
+  // "Tanggal Reviu" = waktu Previu buka halaman ini buat ngerjain
+  // reviu-nya (bukan tanggal pengajuan proposal-nya) -- dihitung pas
+  // halaman dirender, sesuai definisi labelnya sendiri.
+  const tanggalReviu = formatDateTimeFullID(new Date().toISOString());
 
   return `
-    <div class="card doc-preview">
-      <div class="doc-preview__header">
-        <span class="doc-preview__icon">${FILE_ICON}</span>
+    <div class="card review-card reviu-proposal__info">
+      <div class="review-card__header">
+        <span class="review-card__header-icon">${CALENDAR_ICON}</span>
         <div>
-          <p class="doc-preview__title">${headerTitle}</p>
-          <p class="doc-preview__subtitle">${subtitleLabel} &middot; Pratinjau dokumen</p>
+          <h2 class="card__title">Informasi Proposal</h2>
+          <p class="review-card__header-subtitle">Ringkasan data proposal yang didisposisikan</p>
         </div>
       </div>
-      <div class="doc-preview__body">
-        <div class="doc-preview__sheet">
-          <p class="doc-preview__letterhead">Badan Pemeriksa Keuangan Republik Indonesia</p>
-          <p class="doc-preview__doc-title">${docTitle}</p>
-          <div class="doc-preview__skeleton">${lines}</div>
+      <div class="reviu-proposal__info-body">
+        ${renderInfoField('Judul Proposal', item.title)}
+        ${renderInfoField('Unit Kerja', item.unit)}
+        ${renderInfoField('Tanggal Reviu', tanggalReviu)}
+        <div class="reviu-proposal__field">
+          <p class="reviu-proposal__field-label">Status</p>
+          <span class="badge badge--tint" style="--tint-bg:${badgeBg};--tint-text:${badgeText}">${badgeLabel}</span>
         </div>
+        <div class="reviu-proposal__divider"></div>
+        ${renderInfoField('File Proposal', '<a href="#" data-file-link>proposal.pdf</a>')}
+        ${renderInfoField('File Nota Dinas', '<a href="#" data-file-link>nota dinas.pdf</a>')}
       </div>
     </div>
   `;
 }
 
-function renderReviewItem(icon, label, valueHtml) {
+/** Kartu kanan "Checklist Reviu" -- masih selalu empty state (belum ada data dummy checklist). */
+function renderChecklistCard() {
   return `
-    <div class="review-grid__item">
-      <span class="review-grid__icon">${icon}</span>
-      <div class="review-grid__body">
-        <span class="review-grid__label">${label}</span>
-        ${valueHtml}
+    <div class="card review-card reviu-proposal__checklist">
+      <div class="reviu-proposal__checklist-header">
+        <span class="review-card__header-icon">${CHECK_ICON}</span>
+        <div class="reviu-proposal__checklist-heading">
+          <h2 class="card__title">Checklist Reviu</h2>
+          <p class="review-card__header-subtitle">Belum ada langkah reviu yang dicatat untuk proposal ini</p>
+        </div>
+        <button class="btn btn-tint-purple" type="button" id="btn-tambah-reviu">${PLUS_ICON}Tambah Reviu</button>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Langkah Reviu</th>
+              <th>Hasil Reviu</th>
+              <th>Check</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="reviu-proposal__empty">
+        <span class="reviu-proposal__empty-icon">${CLIPBOARD_ICON}</span>
+        <p class="reviu-proposal__empty-title">Belum ada checklist reviu</p>
+        <p class="reviu-proposal__empty-desc">Klik &quot;Tambah Reviu&quot; untuk mulai mengisi langkah-langkah peninjauan proposal ini.</p>
+      </div>
+      <div class="reviu-proposal__pagination">
+        <button class="pagination__text-btn" type="button" disabled>Previous</button>
+        <button class="pagination__text-btn" type="button" disabled>Next</button>
+      </div>
+    </div>
+  `;
+}
+
+/** Kartu bawah "Kesimpulan & Catatan" -- textarea doang, belum tersambung ke logic simpan apapun. */
+function renderKesimpulanCard() {
+  return `
+    <div class="card review-card">
+      <div class="review-card__header">
+        <span class="review-card__header-icon">${PENCIL_ICON}</span>
+        <div>
+          <h2 class="card__title">Kesimpulan & Catatan</h2>
+          <p class="review-card__header-subtitle">Ringkasan akhir hasil peninjauan proposal</p>
+        </div>
+      </div>
+      <div class="review-notes__body reviu-proposal__notes-body">
+        <label class="reviu-proposal__notes-label" for="reviu-kesimpulan">Kesimpulan</label>
+        <textarea class="review-notes__textarea" id="reviu-kesimpulan" rows="3"></textarea>
+        <label class="reviu-proposal__notes-label" for="reviu-catatan">Catatan Hasil Reviu (opsional)</label>
+        <textarea class="review-notes__textarea" id="reviu-catatan" rows="3"></textarea>
       </div>
     </div>
   `;
@@ -101,113 +144,43 @@ function renderReviewItem(icon, label, valueHtml) {
  * @param {HTMLElement} root
  * @param {Session} user
  */
-export function initReviewProposalPage(root, user) {
+export function initReviuProposalPage(root, user) {
   if (!root) return;
 
-  const handoff = readReviewHandoff();
-  const item = handoff ?? {
-    id: 'PO-2026-005',
-    title: 'Proposal POS Pengujian Website',
-    unit: 'Biro Teknologi Informasi',
-    createdBy: user?.name || 'Agustina Ratna Puspitasari',
-    createdAt: '2026-01-26T08:37:00'
-  };
+  const backTarget = `/pages/${user?.role}/monitoring/proposal-pl.html`;
+  const item = proposalService.getById(getIdFromQuery());
+
+  if (!item) {
+    root.innerHTML = `
+      <div class="review-page">
+        <p class="dashboard__subtitle">Proposal tidak ditemukan. Mungkin sudah dipindahkan atau link-nya sudah kedaluwarsa.</p>
+        <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali ke Monitoring</button>
+      </div>
+    `;
+    root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
+    return;
+  }
 
   root.innerHTML = `
-    <div class="page-review">
-      <div class="page-review__intro">
-        <h1 class="page-review__title">${item.title}</h1>
-        <p class="page-review__subtitle">Tinjau data pengajuan dan berkas pendukung, lalu berikan keputusan.</p>
+    <div class="review-page">
+      <div class="review-page__intro">
+        <h1 class="review-page__title">Reviu Atas Kebutuhan Penyusunan/Revisi Perangkat Lunak</h1>
+        <p class="review-page__subtitle">Proposal ini didisposisikan dan belum memiliki riwayat reviu.</p>
       </div>
 
-      <div class="card review-card">
-        <div class="card__header">
-          <div class="card__header-icon-title">
-            <span class="card__header-icon">${FOLDER_ICON}</span>
-            <div>
-              <h2 class="card__title">Detail Proposal</h2>
-              <p class="card__header-subtitle">Informasi lengkap proposal pengajuan</p>
-            </div>
-          </div>
-        </div>
-        <div class="review-grid">
-          <div class="review-grid__col">
-            ${renderReviewItem(FILE_ICON, 'Judul Proposal', `<span class="review-grid__value">${item.title}</span>`)}
-            ${renderReviewItem(HASH_ICON, 'Nomor Pengajuan', `<span class="review-grid__value">${item.id}</span>`)}
-            ${renderReviewItem(CALENDAR_ICON, 'Tanggal Pengajuan', `<span class="review-grid__value">${formatDateTimeFullID(item.createdAt)}</span>`)}
-            ${renderReviewItem(BUILDING_ICON, 'Satker Pengusul', `<span class="review-grid__value">${item.unit}</span>`)}
-            ${renderReviewItem(TAG_ICON, 'Status', `<span class="status-dot-badge">Diajukan</span>`)}
-          </div>
-          <div class="review-grid__col">
-            ${renderReviewItem(PERSON_ICON, 'Pejabat Pengusul', `<span class="review-grid__value">${item.createdBy}</span>`)}
-            ${renderReviewItem(PENCIL_ICON, 'Keterangan', `<span class="review-grid__value">Diajukan</span>`)}
-            ${renderReviewItem(FILE_ICON, 'File Proposal', `<a class="review-grid__link" href="#" data-file-link>proposal.pdf</a>`)}
-            ${renderReviewItem(FILE_ICON, 'File Nota Dinas', `<a class="review-grid__link" href="#" data-file-link>nota-dinas.pdf</a>`)}
-          </div>
-        </div>
+      <div class="reviu-proposal__layout">
+        ${renderInfoCard(item)}
+        ${renderChecklistCard()}
       </div>
 
-      <div class="review-preview-grid">
-        ${renderPreviewCard({ headerTitle: `Pedoman - file konsep.pdf`, subtitleLabel: 'File Proposal', docTitle: item.title })}
-        ${renderPreviewCard({ headerTitle: `Pedoman - file ND konsep.pdf`, subtitleLabel: 'File Nota Dinas', docTitle: `Nota Dinas Pengajuan Proposal ${item.id}` })}
-      </div>
-
-      <div class="card review-catatan-card">
-        <div class="card__header">
-          <h2 class="card__title">Catatan Revisi <span class="review-catatan-hint">(Silahkan diisi apabila ada revisi)</span></h2>
-        </div>
-        <div class="detail-card__body">
-          <textarea class="review-textarea" id="catatan-revisi" placeholder="Beri catatan Revisi"></textarea>
-        </div>
-      </div>
+      ${renderKesimpulanCard()}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
-        <div class="detail-actions__right">
-          <button class="btn btn-danger" type="button" id="btn-tolak">${CLOSE_ICON} Tolak</button>
-          <button class="btn btn-gold" type="button" id="btn-revisi">${REVISI_ICON} Revisi</button>
-          <button class="btn btn-dark" type="button" id="btn-setuju">${CHECK_ICON} Setuju</button>
-        </div>
       </div>
     </div>
   `;
 
-  bindActions(root, item);
-}
-
-function bindActions(root, item) {
-  root.querySelectorAll('[data-file-link]').forEach((link) => {
-    link.addEventListener('click', (e) => e.preventDefault());
-  });
-
-  const goToMonitoring = () => router.navigate('/pages/kepala-satker-biro-ti/monitoring/proposal-pl.html');
-
-  root.querySelector('#btn-kembali')?.addEventListener('click', goToMonitoring);
-
-  root.querySelector('#btn-tolak')?.addEventListener('click', () => {
-    const confirmed = window.confirm(`Tolak proposal "${item.title}"? Tindakan ini tidak bisa dibatalkan.`);
-    if (!confirmed) return;
-    showSuccessModal({ title: 'Proposal Ditolak', message: 'Keputusan sudah dicatat.', onOk: goToMonitoring });
-  });
-
-  root.querySelector('#btn-revisi')?.addEventListener('click', () => {
-    const catatan = root.querySelector('#catatan-revisi');
-    if (!catatan.value.trim()) {
-      catatan.focus();
-      showModal({
-        variant: 'error',
-        title: 'Catatan Revisi Kosong',
-        message: 'Isi dulu catatan revisi sebelum mengirim permintaan revisi ke pengaju.',
-        okLabel: 'Mengerti'
-      });
-      return;
-    }
-    showSuccessModal({ title: 'Permintaan Revisi Terkirim', message: 'Catatan revisi sudah dikirim ke pengaju.', onOk: goToMonitoring });
-  });
-
-  root.querySelector('#btn-setuju')?.addEventListener('click', () => {
-    const confirmed = window.confirm(`Setujui proposal "${item.title}"?`);
-    if (!confirmed) return;
-    showSuccessModal({ title: 'Proposal Disetujui', message: 'Proposal dilanjutkan ke tahap berikutnya.', onOk: goToMonitoring });
-  });
+  root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
+  root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
 }

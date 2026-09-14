@@ -25,8 +25,14 @@ const PAGE_MODULES = {
   'pengajuan/ubah-proposal-pl': () => import('../pages/ubah-proposal.js'),
   'antrian/detail': () => import('../pages/detail.js'),
   'antrian/review': () => import('../pages/review.js'),
+  'antrian/reviu-proposal': () => import('../pages/reviu-proposal.js'),
   'monitoring/detail': () => import('../pages/disposisi.js'),
-  'monitoring/disposisi-tujuan': () => import('../pages/disposisi-tujuan.js')
+  'monitoring/disposisi-tujuan': () => import('../pages/disposisi-tujuan.js'),
+  // Halaman Detail Proposal buat Previu Biro Ortala (ujung rantai
+  // disposisi) -- reuse modul yang sama kayak 'monitoring/detail' di
+  // atas (js/pages/disposisi.js), initDisposisiPage sudah bisa
+  // ngebedain lewat user.role (tombol "Reviu", bukan "Disposisi").
+  'monitoring/review': () => import('../pages/disposisi.js')
 };
 
 // Breadcrumb navbar per pageKey. Halaman yang tidak didaftarkan di
@@ -41,11 +47,18 @@ const PAGE_BREADCRUMBS = {
   'pengajuan/ubah-proposal-pl': ['Antrian', 'Ubah Proposal'],
   'antrian/detail': ['Antrian', 'Detail Proposal'],
   'antrian/review': ['Antrian', 'Review Proposal'],
+  'antrian/reviu-proposal': ['Antrian', 'Reviu Proposal'],
   // Sengaja dibikin sama persis kayak breadcrumb Monitoring Proposal
   // PL (bukan "Detail Proposal") -- ngikutin desain, dianggap
   // sub-halaman dari situ, bukan bagian dari alur Antrian.
   'monitoring/detail': ['Monitoring', 'Monitoring Proposal'],
-  'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal']
+  'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal'],
+  // Beda dari 'monitoring/detail' di atas -- breadcrumb Previu SENGAJA
+  // "Antrian > Detail Proposal" (bukan "Monitoring > Monitoring
+  // Proposal"), sesuai contoh tampilan yang dikasih, walau folder
+  // URL-nya tetap di bawah monitoring/ (lihat resolveRowActionRoute
+  // di js/pages/monitoring.js).
+  'monitoring/review': ['Antrian', 'Detail Proposal']
 };
 
 // Folder yang nama file di dalamnya BUKAN unik (mis. "proposal-pl"

@@ -46,6 +46,7 @@
 // ============================================================
 
 import { router } from '../core/router.js';
+import { ROLES } from '../core/role.js';
 import { proposalService } from '../../data/proposal.js';
 import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateTimeFullID } from '../core/format.js';
@@ -296,6 +297,12 @@ export function initDisposisiPage(root, user) {
   }
 
   const data = buildDetailData(item);
+  // Previu Biro Ortala BENERAN ngereviu (ujung rantai disposisi),
+  // beda dari Kabiro/Kabag/Kasubbag yang cuma neruskan -- tombol
+  // aksinya jadi "Reviu", lihat percabangan di bawah (setelah
+  // root.innerHTML) buat behavior klik-nya.
+  const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
+  const actionLabel = isPreviu ? 'Reviu' : 'Disposisi';
 
   root.innerHTML = `
     <div class="review-page disposisi-page">
@@ -312,16 +319,28 @@ export function initDisposisiPage(root, user) {
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
-        <button class="btn btn-dark" type="button" id="btn-disposisi">Disposisi</button>
+        <button class="btn btn-dark" type="button" id="btn-aksi">${actionLabel}</button>
       </div>
     </div>
   `;
 
   root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
-  // Sekarang tampil sebagai MODAL popup di atas halaman ini (lihat
-  // js/pages/disposisi-tujuan.js), bukan pindah ke halaman baru lagi.
-  root.querySelector('#btn-disposisi')?.addEventListener('click', () => {
-    openDisposisiTujuanModal(item, user);
-  });
+
+  if (isPreviu) {
+    // Previu Biro Ortala = ujung rantai disposisi -- dia yang BENERAN
+    // ngereviu (bukan cuma neruskan kayak Kabiro/Kabag/Kasubbag di
+    // atas), jadi tombolnya "Reviu" dan TIDAK buka popup "Disposisi
+    // Proposal PL" (nggak ada tujuan berikutnya buat didisposisikan) --
+    // pindah ke halaman "Reviu Proposal" (js/pages/reviu-proposal.js).
+    root.querySelector('#btn-aksi')?.addEventListener('click', () => {
+      router.navigate(`/pages/${user?.role}/antrian/reviu-proposal.html?id=${encodeURIComponent(item.id)}`);
+    });
+  } else {
+    // Sekarang tampil sebagai MODAL popup di atas halaman ini (lihat
+    // js/pages/disposisi-tujuan.js), bukan pindah ke halaman baru lagi.
+    root.querySelector('#btn-aksi')?.addEventListener('click', () => {
+      openDisposisiTujuanModal(item, user);
+    });
+  }
 }

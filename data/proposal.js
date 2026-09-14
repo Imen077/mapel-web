@@ -277,16 +277,28 @@ SEED_PROPOSALS.unshift({
 // kartu "Disposisi" di ORTALA_CHAIN_CARD_GROUPS, proposal yang baru
 // didisposisikan sampai ke Previu Ortala, tujuan akhir rantai
 // disposisi), buat testing role Previu Biro Ortala. Klik "Lihat"
-// ngarah ke halaman review pakai form template Previu -- HALAMAN
-// INI SENGAJA MASIH KOSONG (placeholder standar), isinya nyusul.
+// ngarah ke halaman Detail Proposal yang sama dipakai Kepala Bagian/
+// Kepala Subbagian Ortala (js/pages/disposisi.js, cuma tombol
+// aksinya jadi "Reviu" bukan "Disposisi" khusus role ini).
+//
+// Field-fieldnya (judul, unit, pengusul, tanggal) SENGAJA disamain
+// persis kayak PO-2026-045 (dummy Kepala Bagian Ortala) -- proposal
+// yang sama itu-itu juga yang jalan di sepanjang rantai disposisi
+// (Kepala Biro -> Kepala Bagian -> Previu), makanya field & Riwayat
+// Disposisinya (DUMMY_RIWAYAT_DISPOSISI['proses-reviu'] di
+// disposisi.js, udah berakhir ke "Mochammad Taufik / Pereviu") ikut
+// kepakai bareng di sini, sesuai contoh tampilan yang dikasih.
+// nomorPengajuan-nya juga di-pin manual ke "PO-2026-014" tepat
+// setelah loop auto-numbering di bawah, sama pola-nya kayak
+// kasubbagDummy/karoDummy/kabagDummy.
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-046',
-  unit: 'BPK Perwakilan Provinsi Bali',
-  title: 'Sistem Pemantauan Aset Perwakilan Terpadu',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal POS Pengujian Website',
   jenis: 'POS',
-  createdBy: 'Rian Hidayat',
-  employeeId: '240015739',
-  createdAt: `${BASE_DATE}T09:40:00`,
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  createdAt: '2026-02-26T07:23:47',
   status: SUBMISSION_STATUS.PROSES_REVIU,
   testOnlyFor: ROLES.PREVIU_BIRO_ORTALA
 });
@@ -346,6 +358,16 @@ if (karoDummy) karoDummy.nomorPengajuan = 'PO-2026-014';
 // beda role (testOnlyFor beda) jadi nggak akan pernah kelihatan bareng.
 const kabagDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-045');
 if (kabagDummy) kabagDummy.nomorPengajuan = 'PO-2026-014';
+
+// PO-2026-046 (dummy testing Previu Biro Ortala, lihat di atas) --
+// sama pola-nya kayak karoDummy/kabagDummy/kasubbagDummy di atas,
+// nomorPengajuan-nya di-pin manual ke "PO-2026-014" juga (proposal
+// yang sama persis yang jalan di sepanjang rantai disposisi) --
+// kebetulan sama angkanya dengan punya PO-2026-043/044/045, tapi
+// nggak masalah, keempatnya beda role (testOnlyFor beda) jadi nggak
+// akan pernah kelihatan bareng.
+const previuDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-046');
+if (previuDummy) previuDummy.nomorPengajuan = 'PO-2026-014';
 
 // PO-2026-040 ("Aplikasi Presensi Perwakilan") dihapus dari data
 // dummy -- ini baris ke-3 di tabel Monitoring Proposal PL (setelah
