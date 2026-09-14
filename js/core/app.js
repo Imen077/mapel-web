@@ -25,7 +25,6 @@ const PAGE_MODULES = {
   'pengajuan/ubah-proposal-pl': () => import('../pages/ubah-proposal.js'),
   'antrian/detail': () => import('../pages/detail.js'),
   'antrian/review': () => import('../pages/review.js'),
-  'antrian/reviu-proposal': () => import('../pages/reviu-proposal.js'),
   'monitoring/detail': () => import('../pages/disposisi.js'),
   'monitoring/disposisi-tujuan': () => import('../pages/disposisi-tujuan.js'),
   // Halaman Detail Proposal buat Previu Biro Ortala (ujung rantai
@@ -47,7 +46,6 @@ const PAGE_BREADCRUMBS = {
   'pengajuan/ubah-proposal-pl': ['Antrian', 'Ubah Proposal'],
   'antrian/detail': ['Antrian', 'Detail Proposal'],
   'antrian/review': ['Antrian', 'Review Proposal'],
-  'antrian/reviu-proposal': ['Antrian', 'Reviu Proposal'],
   // Sengaja dibikin sama persis kayak breadcrumb Monitoring Proposal
   // PL (bukan "Detail Proposal") -- ngikutin desain, dianggap
   // sub-halaman dari situ, bukan bagian dari alur Antrian.

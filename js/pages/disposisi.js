@@ -46,7 +46,6 @@
 // ============================================================
 
 import { router } from '../core/router.js';
-import { ROLES } from '../core/role.js';
 import { proposalService } from '../../data/proposal.js';
 import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateTimeFullID } from '../core/format.js';
@@ -297,12 +296,7 @@ export function initDisposisiPage(root, user) {
   }
 
   const data = buildDetailData(item);
-  // Previu Biro Ortala BENERAN ngereviu (ujung rantai disposisi),
-  // beda dari Kabiro/Kabag/Kasubbag yang cuma neruskan -- tombol
-  // aksinya jadi "Reviu", lihat percabangan di bawah (setelah
-  // root.innerHTML) buat behavior klik-nya.
-  const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
-  const actionLabel = isPreviu ? 'Reviu' : 'Disposisi';
+  const actionLabel = 'Disposisi';
 
   root.innerHTML = `
     <div class="review-page disposisi-page">
@@ -327,20 +321,14 @@ export function initDisposisiPage(root, user) {
   root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
 
-  if (isPreviu) {
-    // Previu Biro Ortala = ujung rantai disposisi -- dia yang BENERAN
-    // ngereviu (bukan cuma neruskan kayak Kabiro/Kabag/Kasubbag di
-    // atas), jadi tombolnya "Reviu" dan TIDAK buka popup "Disposisi
-    // Proposal PL" (nggak ada tujuan berikutnya buat didisposisikan) --
-    // pindah ke halaman "Reviu Proposal" (js/pages/reviu-proposal.js).
-    root.querySelector('#btn-aksi')?.addEventListener('click', () => {
-      router.navigate(`/pages/${user?.role}/antrian/reviu-proposal.html?id=${encodeURIComponent(item.id)}`);
-    });
-  } else {
-    // Sekarang tampil sebagai MODAL popup di atas halaman ini (lihat
-    // js/pages/disposisi-tujuan.js), bukan pindah ke halaman baru lagi.
-    root.querySelector('#btn-aksi')?.addEventListener('click', () => {
-      openDisposisiTujuanModal(item, user);
-    });
-  }
+  // Semua role di rantai disposisi (termasuk Previu Biro Ortala)
+  // pakai modal "Disposisi Proposal PL" yang sama (lihat
+  // js/pages/disposisi-tujuan.js) -- percabangan "Reviu Proposal"
+  // yang sempat ada di sini dihapus karena halaman tujuannya
+  // (js/pages/review-proposal.js) belum kepasang HTML shell-nya,
+  // jadi selalu 404. Kalau nanti mau dibikin beneran, tinggal
+  // tambahkan lagi percabangannya di sini.
+  root.querySelector('#btn-aksi')?.addEventListener('click', () => {
+    openDisposisiTujuanModal(item, user);
+  });
 }
