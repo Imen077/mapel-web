@@ -49,6 +49,14 @@
   color: #8a641f;
 }
 
+/* Modifier hijau -- dipakai icon centang "Checklist Reviu" di
+   js/pages/review-proposal.js, beda dari default emas yang dipakai
+   card header lain (Informasi Proposal, Kesimpulan & Catatan, dst). */
+.review-card__header-icon--success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
 .review-card__header-subtitle {
   margin: 2px 0 0;
   font-size: var(--text-sm);

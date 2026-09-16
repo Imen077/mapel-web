@@ -15,6 +15,12 @@
 //     diteruskan ke Previu, BUKAN keputusan final -- final approver
 //     cuma Kepala Biro Ortala, lihat FINAL_APPROVER_ROLE di
 //     js/core/role.js)
+//   - Previu Biro Ortala, status "Proses Reviu" (ujung rantai
+//     disposisi) -- SATU-SATUNYA yang tombol aksinya beda: "Reviu"
+//     (bukan "Disposisi"), dan nge-navigate ke halaman checklist
+//     Reviu Proposal (js/pages/review-proposal.js) alih-alih buka
+//     modal "Disposisi Proposal PL", karena dia BENERAN ngerjain
+//     reviu-nya, bukan cuma nerusin ke role berikutnya.
 // Beda dari Review Proposal (js/pages/review.js) yang dipakai KHUSUS
 // buat status yang butuh keputusan setuju/tolak/revisi beneran.
 //
@@ -46,6 +52,7 @@
 // ============================================================
 
 import { router } from '../core/router.js';
+import { ROLES } from '../core/role.js';
 import { proposalService } from '../../data/proposal.js';
 import { SUBMISSION_STATUS } from '../../data/status.js';
 import { formatDateTimeFullID } from '../core/format.js';
@@ -296,7 +303,8 @@ export function initDisposisiPage(root, user) {
   }
 
   const data = buildDetailData(item);
-  const actionLabel = 'Disposisi';
+  const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
+  const actionLabel = isPreviu ? 'Reviu' : 'Disposisi';
 
   root.innerHTML = `
     <div class="review-page disposisi-page">
@@ -321,14 +329,15 @@ export function initDisposisiPage(root, user) {
   root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
 
-  // Semua role di rantai disposisi (termasuk Previu Biro Ortala)
-  // pakai modal "Disposisi Proposal PL" yang sama (lihat
-  // js/pages/disposisi-tujuan.js) -- percabangan "Reviu Proposal"
-  // yang sempat ada di sini dihapus karena halaman tujuannya
-  // (js/pages/review-proposal.js) belum kepasang HTML shell-nya,
-  // jadi selalu 404. Kalau nanti mau dibikin beneran, tinggal
-  // tambahkan lagi percabangannya di sini.
+  // Previu Biro Ortala BENERAN ngerjain reviu-nya (checklist +
+  // kesimpulan, lihat js/pages/review-proposal.js/initReviuProposalPage),
+  // beda dari role lain di rantai disposisi yang cuma NERUSIN proposal
+  // lewat modal "Disposisi Proposal PL" (js/pages/disposisi-tujuan.js).
   root.querySelector('#btn-aksi')?.addEventListener('click', () => {
+    if (isPreviu) {
+      router.navigate(`/pages/${user?.role}/monitoring/reviu-proposal.html?id=${encodeURIComponent(item.id)}`);
+      return;
+    }
     openDisposisiTujuanModal(item, user);
   });
 }

@@ -19,6 +19,7 @@
 import { router } from '../core/router.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
+import { showConfirmModal, showSuccessModal } from '../components/modal.js';
 
 const CALENDAR_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="5.5" width="16" height="14.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M4 9.5h16M8 3.5v3.5M16 3.5v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 const CHECK_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="m8 12.5 2.5 2.5L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -86,7 +87,7 @@ function renderChecklistCard() {
   return `
     <div class="card review-card reviu-proposal__checklist">
       <div class="reviu-proposal__checklist-header">
-        <span class="review-card__header-icon">${CHECK_ICON}</span>
+        <span class="review-card__header-icon review-card__header-icon--success">${CHECK_ICON}</span>
         <div class="reviu-proposal__checklist-heading">
           <h2 class="card__title">Checklist Reviu</h2>
           <p class="review-card__header-subtitle">Belum ada langkah reviu yang dicatat untuk proposal ini</p>
@@ -183,4 +184,20 @@ export function initReviuProposalPage(root, user) {
 
   root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
+
+  // TAHAP INI: belum beneran nambah baris checklist baru (form isi
+  // langkah reviu-nya belum digarap) -- baru alur konfirmasi +
+  // feedback sukses-nya dulu sesuai desain, matching pola yang sama
+  // kayak tombol Disposisi/Setuju di halaman lain.
+  root.querySelector('#btn-tambah-reviu')?.addEventListener('click', () => {
+    showConfirmModal({
+      title: 'Apakah anda yakin ingin melakukan reviu pada proposal tsb?',
+      message: 'Data yang didisposisi tidak dapat dikembalikan.',
+      cancelLabel: 'Batal',
+      confirmLabel: 'Ya',
+      onConfirm: () => {
+        showSuccessModal({ message: 'Data berhasil diubah.' });
+      }
+    });
+  });
 }

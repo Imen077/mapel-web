@@ -31,7 +31,8 @@ const PAGE_MODULES = {
   // disposisi) -- reuse modul yang sama kayak 'monitoring/detail' di
   // atas (js/pages/disposisi.js), initDisposisiPage sudah bisa
   // ngebedain lewat user.role (tombol "Reviu", bukan "Disposisi").
-  'monitoring/review': () => import('../pages/disposisi.js')
+  'monitoring/review': () => import('../pages/disposisi.js'),
+  'monitoring/reviu-proposal': () => import('../pages/review-proposal.js')
 };
 
 // Breadcrumb navbar per pageKey. Halaman yang tidak didaftarkan di
@@ -56,7 +57,8 @@ const PAGE_BREADCRUMBS = {
   // Proposal"), sesuai contoh tampilan yang dikasih, walau folder
   // URL-nya tetap di bawah monitoring/ (lihat resolveRowActionRoute
   // di js/pages/monitoring.js).
-  'monitoring/review': ['Antrian', 'Detail Proposal']
+  'monitoring/review': ['Antrian', 'Detail Proposal'],
+  'monitoring/reviu-proposal': ['Antrian', 'Reviu Proposal']
 };
 
 // Folder yang nama file di dalamnya BUKAN unik (mis. "proposal-pl"

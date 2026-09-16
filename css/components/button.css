@@ -79,6 +79,19 @@
   background: var(--color-paper-dim);
 }
 
+/* Dipakai tombol "+ Tambah Reviu" (js/pages/review-proposal.js) --
+   warna ungu-nya samain sama badge "Proses Reviu"/"Direviu" yang
+   sudah dipakai di tempat lain (mis. STATUS_LABEL_OVERRIDES di
+   js/pages/monitoring.js), biar konsisten satu palet. */
+.btn-tint-purple {
+  background: #EFE7FA;
+  color: #6C3FB5;
+}
+
+.btn-tint-purple:hover {
+  background: #E3D6F5;
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
