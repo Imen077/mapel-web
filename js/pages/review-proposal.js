@@ -54,6 +54,7 @@ function getIdFromQuery() {
 // keisi ini kelihatan). Dipakai buat isi item.checklistReviu di
 // memori pas tombol "Tambah Reviu" dikonfirmasi (lihat bindActions).
 const DUMMY_CHECKLIST_TEMPLATE = {
+  page: 1,
   templateJawabanOptions: [
     'Sudah sesuai dengan ketentuan yang berlaku.',
     'Perlu perbaikan pada bagian substansi dokumen.',
@@ -80,9 +81,35 @@ const DUMMY_CHECKLIST_TEMPLATE = {
     { no: 'a', label: 'Sifat pekerjaan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
     { no: 'b', label: 'Tujuan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
     { no: 'c', label: 'Lingkup', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
-    { no: 'd', label: 'Kebutuhan organisasi', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true }
+    { no: 'd', label: 'Kebutuhan organisasi', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+    { no: 'e', label: 'Rencana Strategis dan RIR', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+    { no: 'f', label: 'Keterkaitan dengan pemangku kepentingan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+    {
+      no: 7,
+      label: 'Keterkaitan dengan perangkat lunak yang sudah ditetapkan di BPK',
+      hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+      checked: false
+    },
+    {
+      no: 8,
+      label: 'Substansi yang diatur bersinergi dengan perangkat lunak lain yang telah ditetapkan baik PL internal maupun eksternal',
+      hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+      checked: false
+    },
+    {
+      no: 9,
+      label: 'Kesesuaian substansi perangkat lunak dengan bentuk perangkat lunak',
+      hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+      checked: true
+    },
+    { no: 10, label: 'Latar belakang diperlukannya PL ini', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true }
   ]
 };
+
+// Jumlah baris checklist per halaman -- 10 baris pertama (nomor 1-5,
+// section 6, sub a-d) di halaman 1, sisanya (sub e-f + nomor 7-10) di
+// halaman 2, sesuai desain yang ada.
+const CHECKLIST_PAGE_SIZE = 10;
 
 function renderInfoField(label, valueHtml) {
   return `
@@ -223,7 +250,23 @@ function renderChecklistCard(checklist) {
     `;
   }
 
-  const rows = checklist.items.map((entry, i) => renderChecklistRow(entry, i, checklist.templateJawabanOptions || [])).join('');
+  const totalPages = Math.max(1, Math.ceil(checklist.items.length / CHECKLIST_PAGE_SIZE));
+  const page = Math.min(Math.max(checklist.page || 1, 1), totalPages);
+  const startIndex = (page - 1) * CHECKLIST_PAGE_SIZE;
+  const pageItems = checklist.items.slice(startIndex, startIndex + CHECKLIST_PAGE_SIZE);
+  // Index dipakai buat data-hasil-input/data-check-toggle/dst SENGAJA
+  // pakai posisi ASLI-nya di checklist.items (startIndex + i), bukan
+  // 0..9 ulang tiap halaman -- biar pas nge-sync balik ke data model
+  // (lihat syncChecklistInputs) tetap nunjuk ke baris yang benar,
+  // sekalipun sedang di halaman 2.
+  const rows = pageItems.map((entry, i) => renderChecklistRow(entry, startIndex + i, checklist.templateJawabanOptions || [])).join('');
+
+  const pageButtons = Array.from({ length: totalPages }, (_, i) => i + 1)
+    .map(
+      (p) =>
+        `<button class="pagination__page${p === page ? ' pagination__page--active' : ''}" type="button" data-checklist-page="${p}">${p}</button>`
+    )
+    .join('');
 
   return `
     <div class="card review-card reviu-proposal__checklist">
@@ -262,12 +305,9 @@ function renderChecklistCard(checklist) {
       </div>
 
       <div class="reviu-proposal__pagination">
-        <button class="pagination__text-btn" type="button" data-checklist-page="prev">Previous</button>
-        <div class="pagination">
-          <button class="pagination__page pagination__page--active" type="button" data-checklist-page="1">1</button>
-          <button class="pagination__page" type="button" data-checklist-page="2">2</button>
-        </div>
-        <button class="pagination__text-btn" type="button" data-checklist-page="next">Next</button>
+        <button class="pagination__text-btn" type="button" data-checklist-page="prev"${page <= 1 ? ' disabled' : ''}>Previous</button>
+        <div class="pagination">${pageButtons}</div>
+        <button class="pagination__text-btn" type="button" data-checklist-page="next"${page >= totalPages ? ' disabled' : ''}>Next</button>
         <button class="btn btn-dark" type="button" id="btn-simpan-checklist">Simpan</button>
       </div>
     </div>
@@ -403,7 +443,7 @@ export function initReviuProposalPage(root, user) {
 
       ${hasChecklist ? renderNotaDinasSection(checklist) : ''}
       ${renderKesimpulanCatatanCard()}
-      ${hasChecklist ? renderCatatanUntukPereviu(checklist.catatanUntukPereviu) : ''}
+      ${hasChecklist && (checklist.page || 1) === 1 ? renderCatatanUntukPereviu(checklist.catatanUntukPereviu) : ''}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
@@ -413,6 +453,25 @@ export function initReviuProposalPage(root, user) {
   `;
 
   bindActions(root, backTarget, item, user);
+}
+
+/**
+ * Baca isian yang lagi kelihatan di DOM (input Hasil Reviu + tombol
+ * Check) balik ke item.checklistReviu.items, berdasarkan index
+ * absolut yang nempel di data-hasil-input/data-check-toggle (lihat
+ * renderChecklistCard). Dipanggil sebelum ganti halaman checklist,
+ * biar isian yang belum di-"Simpan" tetap ke-bawa pas balik lagi ke
+ * halaman itu -- tanpa ini, ganti halaman = balik ke data dummy awal.
+ */
+function syncChecklistInputs(root, checklist) {
+  root.querySelectorAll('[data-hasil-input]').forEach((input) => {
+    const idx = Number(input.getAttribute('data-hasil-input'));
+    if (checklist.items[idx]) checklist.items[idx].hasil = input.value;
+  });
+  root.querySelectorAll('[data-check-toggle]').forEach((btn) => {
+    const idx = Number(btn.getAttribute('data-check-toggle'));
+    if (checklist.items[idx]) checklist.items[idx].checked = btn.classList.contains('reviu-proposal__check-btn--active');
+  });
 }
 
 function bindActions(root, backTarget, item, user) {
@@ -451,6 +510,29 @@ function bindActions(root, backTarget, item, user) {
       const isActive = btn.classList.toggle('reviu-proposal__check-btn--active');
       btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       btn.innerHTML = isActive ? CHECK_SMALL_ICON : '';
+    });
+  });
+
+  // Ganti halaman checklist (Previous/Next/nomor halaman) -- INI
+  // satu-satunya aksi checklist yang beneran re-render (ganti isi
+  // <tbody> ke baris halaman lain), jadi hasil ketikan/centang di
+  // halaman yang lagi dibuka harus di-sync dulu ke item.checklistReviu
+  // SEBELUM render ulang, supaya nggak ke-reset balik ke nilai dummy
+  // awal begitu user balik lagi ke halaman itu.
+  root.querySelectorAll('[data-checklist-page]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled || !item.checklistReviu) return;
+      const checklist = item.checklistReviu;
+      const totalPages = Math.max(1, Math.ceil(checklist.items.length / CHECKLIST_PAGE_SIZE));
+      const current = checklist.page || 1;
+      const raw = btn.getAttribute('data-checklist-page');
+      const target = raw === 'prev' ? current - 1 : raw === 'next' ? current + 1 : Number(raw);
+      const nextPage = Math.min(Math.max(target, 1), totalPages);
+      if (nextPage === current) return;
+
+      syncChecklistInputs(root, checklist);
+      checklist.page = nextPage;
+      initReviuProposalPage(root, user);
     });
   });
 

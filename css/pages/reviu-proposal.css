@@ -35,9 +35,19 @@
   gap: 4px;
 }
 
+/* Badge "Status" ikut jadi elemen flex kolom di atas -- tanpa ini dia
+   ke-stretch (align-items:stretch bawaan flex) jadi selebar card,
+   padahal maunya cuma bulat pas ngikutin teksnya. */
+.reviu-proposal__field .badge {
+  align-self: flex-start;
+}
+
 .reviu-proposal__field-label {
   margin: 0;
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: var(--color-paper-muted);
 }
 
