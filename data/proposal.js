@@ -273,6 +273,23 @@ SEED_PROPOSALS.unshift({
   nomorNotaDinas: '1532/ND/X.5/06/2026'
 });
 
+// Satu lagi DI ATAS PO-2026-043 -- SAMA role+status-nya (Kepala
+// Subbagian Ortala, Selesai Reviu), tapi SENGAJA field-nya dikosongin
+// (cuma judul & satker yang keisi, sisanya "-") -- buat testing
+// tampilan Detail Proposal (js/pages/disposisi.js) versi "kosongan",
+// bukan yang udah lengkap kayak PO-2026-043 di atas.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-047',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal Setelah Reviu` ',
+  jenis: '-',
+  createdBy: '-',
+  employeeId: '-',
+  createdAt: '2026-02-26T07:23:47',
+  status: SUBMISSION_STATUS.SELESAI_REVIU,
+  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA
+});
+
 // Satu lagi DI ATAS PO-2026-043 -- status Proses Reviu (masuk ke
 // kartu "Disposisi" di ORTALA_CHAIN_CARD_GROUPS, proposal yang baru
 // didisposisikan sampai ke Previu Ortala, tujuan akhir rantai
