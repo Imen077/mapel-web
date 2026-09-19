@@ -42,8 +42,12 @@
 // - "proses-reviu" (Kepala Bagian Ortala) -> kartu "Riwayat Disposisi"
 //   (renderRiwayatDisposisiCard di bawah, isinya DUMMY_RIWAYAT_DISPOSISI).
 //   TIDAK ada pratinjau dokumen di status ini.
-// - "selesai-reviu" (Kepala Subbagian Ortala) -> nggak ada dua-duanya,
-//   cuma kartu Detail Proposal doang.
+// - "selesai-reviu" (Kepala Subbagian Ortala) -> kartu "Hasil Reviu"
+//   (renderHasilReviuCard di bawah, isinya DUMMY_HASIL_REVIU) --
+//   ringkasan hasil kerja Previu, tombol "Lihat Reviu"-nya ngarah ke
+//   halaman Reviu Proposal yang sama (js/pages/review-proposal.js).
+//   TIDAK ada Riwayat Disposisi ataupun pratinjau dokumen di status
+//   ini.
 //
 // TAHAP INI: tombol "Disposisi" BELUM beneran ngubah status proposal
 // di data/proposal.js atau masuk ke alur workflow.js (yang masih
@@ -107,6 +111,19 @@ const DUMMY_RIWAYAT_DISPOSISI = {
   ]
 };
 
+// Kartu "Hasil Reviu" -- CUMA buat status "selesai-reviu" (Kepala
+// Subbagian Ortala), nunjukin ringkasan hasil reviu yang udah
+// dikerjain Previu (lihat js/pages/review-proposal.js), sebelum
+// Kasubbag neruskan lagi ke atas. Klik "Lihat Reviu" buka halaman
+// Reviu Proposal yang sama (read-only dari sudut pandang Kasubbag --
+// dia cuma lihat, bukan ngerjain checklist-nya). "Nama PL" SENGAJA
+// nggak disimpen di sini -- diambil langsung dari item.title pas
+// render (lihat renderHasilReviuCard), biar selalu nyambung sama
+// proposal yang lagi dibuka, bukan teks tetap.
+const DUMMY_HASIL_REVIU = {
+  'selesai-reviu': [{ tanggalReviu: '2026-08-06T08:38:52', hasilReviu: '-', kesimpulan: '-' }]
+};
+
 function getIdFromQuery() {
   return new URLSearchParams(window.location.search).get('id') || '';
 }
@@ -124,7 +141,8 @@ function buildDetailData(item) {
   const badgeText = override?.text ?? statusMeta.text;
   const nomorPengajuan = item.nomorPengajuan || item.id;
   const riwayat = DUMMY_RIWAYAT_DISPOSISI[item.status] ?? [];
-  return { statusLabel, badgeBg, badgeText, nomorPengajuan, riwayat };
+  const hasilReviu = DUMMY_HASIL_REVIU[item.status] ?? [];
+  return { statusLabel, badgeBg, badgeText, nomorPengajuan, riwayat, hasilReviu };
 }
 
 function renderInfoItem({ icon, label, value }) {
@@ -183,6 +201,57 @@ function renderRiwayatDisposisiCard(entries) {
               <th>Dari</th>
               <th>Kepada</th>
               <th>Catatan Disposisi</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * @param {Object[]} entries
+ * @param {string} namaPl - judul proposal yang lagi dibuka (item.title)
+ * @param {string} reviuRoute - link tujuan tombol "Lihat Reviu"
+ * @returns {string} HTML kartu, atau string kosong kalau nggak ada entry
+ *   (cuma status "selesai-reviu" yang punya, lihat DUMMY_HASIL_REVIU).
+ */
+function renderHasilReviuCard(entries, namaPl, reviuRoute) {
+  if (!entries.length) return '';
+
+  const rows = entries
+    .map(
+      (row, i) => `
+            <tr>
+              <td>${i + 1}.</td>
+              <td>
+                <span class="data-table__title data-table__title--clickable" data-aksi-route="${reviuRoute}" role="button" tabindex="0">${namaPl}</span>
+              </td>
+              <td>${formatDateTimeFullID(row.tanggalReviu)}</td>
+              <td>${row.hasilReviu}</td>
+              <td><button class="btn btn-dark" type="button" data-aksi-route="${reviuRoute}">Lihat Reviu</button></td>
+              <td>-</td>
+            </tr>
+          `
+    )
+    .join('');
+
+  return `
+    <div class="card review-card">
+      <div class="review-card__header">
+        <h2 class="card__title">Hasil Reviu</h2>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama PL</th>
+              <th>Tanggal Reviu</th>
+              <th>Hasil Reviu</th>
+              <th>Kesimpulan</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -304,7 +373,11 @@ export function initDisposisiPage(root, user) {
 
   const data = buildDetailData(item);
   const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
-  const actionLabel = isPreviu ? 'Reviu' : 'Disposisi';
+  // "Reviu" buat Previu (dia BENERAN ngerjain checklist-nya) DAN
+  // buat status "Selesai Reviu" (Kasubbag/Kabag/Kabiro nerusin hasil
+  // reviu, bukan proposal mentah -- lihat kartu "Hasil Reviu" di
+  // atas). Selain itu tetap "Disposisi".
+  const actionLabel = isPreviu || item.status === SUBMISSION_STATUS.SELESAI_REVIU ? 'Reviu' : 'Disposisi';
 
   root.innerHTML = `
     <div class="review-page disposisi-page">
@@ -319,6 +392,8 @@ export function initDisposisiPage(root, user) {
 
       ${renderRiwayatDisposisiCard(data.riwayat)}
 
+      ${renderHasilReviuCard(data.hasilReviu, item.title, `/pages/${user?.role}/monitoring/reviu-proposal.html?id=${encodeURIComponent(item.id)}`)}
+
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
         <button class="btn btn-dark" type="button" id="btn-aksi">${actionLabel}</button>
@@ -328,6 +403,20 @@ export function initDisposisiPage(root, user) {
 
   root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
+
+  // Baris "Hasil Reviu" -- klik nama PL atau tombol "Lihat Reviu"
+  // sama-sama buka halaman Reviu Proposal (read-only dari sudut
+  // pandang role ini, cuma lihat hasil kerja Previu).
+  root.querySelectorAll('[data-aksi-route]').forEach((el) => {
+    const go = () => router.navigate(el.getAttribute('data-aksi-route'));
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        go();
+      }
+    });
+  });
 
   // Previu Biro Ortala BENERAN ngerjain reviu-nya (checklist +
   // kesimpulan, lihat js/pages/review-proposal.js/initReviuProposalPage),
