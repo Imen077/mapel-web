@@ -364,6 +364,15 @@
   text-decoration: underline;
 }
 
+/* Link file di kolom Nota Dinas versi read-only (role selain Previu):
+   ikon klip + nama file harus satu baris. Tanpa ini, svg kena
+   `display: block` dari reset.css jadi ikonnya nyendiri di baris atas. */
+.reviu-proposal__file-link-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* ---------- Catatan untuk Pereviu ---------- */
 
 .reviu-proposal__pereviu-toggle {
@@ -428,4 +437,22 @@
   margin: 0;
   font-size: var(--text-xs);
   color: var(--color-paper-muted);
+}
+
+/* Teks bantuan merah di judul card "Catatan Koreksi untuk Pereviu"
+   ("Silakan diisi apabila ada koreksi atas reviu"). */
+.reviu-proposal__hint {
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+/* Textarea read-only (mis. "Catatan Hasil Reviu" di role Kepala Biro --
+   diisi Previu, Kabiro cuma lihat): kursor biasa & tanpa ring fokus,
+   biar nggak kelihatan seperti kolom yang bisa diisi. */
+.review-notes__textarea.review-notes__textarea--readonly {
+  cursor: default;
+}
+
+.review-notes__textarea.review-notes__textarea--readonly:focus {
+  outline: none;
 }

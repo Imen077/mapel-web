@@ -36,19 +36,35 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
   // item dummy testing (lihat testOnlyFor di data/proposal.js).
   // "Dikirim" (kartu "Diterima") -> halaman Detail Proposal ringkas,
   // cuma tombol "Disposisi" (belum ada keputusan setuju/tolak/revisi
-  // di tahap ini). "Selesai Reviu" -> halaman Review Proposal penuh
-  // (Tolak/Revisi/Setuju), sama kayak dipakai Kepala Satker.
+  // di tahap ini). "Selesai Reviu" -> halaman Detail Proposal yang
+  // sama juga (js/pages/disposisi.js), tapi tombol aksinya otomatis
+  // jadi "Reviu" (lihat actionLabel di disposisi.js) yang lanjut
+  // nge-navigate ke halaman checklist Reviu Proposal -- BUKAN
+  // langsung ke halaman Review Proposal keputusan (Tolak/Revisi/
+  // Setuju) kayak sebelumnya, biar alurnya konsisten sama role Ortala
+  // lain (Kabag/Kasubbag) yang juga mampir ke Detail Proposal dulu.
   if (role === ROLES.KEPALA_BIRO_ORTALA && status === SUBMISSION_STATUS.DIKIRIM) {
     return `/pages/kepala-biro-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
   }
   if (role === ROLES.KEPALA_BIRO_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
-    return `/pages/kepala-biro-ortala/antrian/review.html?id=${encodeURIComponent(itemId)}`;
+    return `/pages/kepala-biro-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
   }
   // Kepala Bagian Ortala (berikutnya di DISPOSISI_CHAIN sesudah
   // Kepala Biro Ortala) -- "Proses Reviu" = kartu "Disposisi"
   // (proposal yang baru didisposisikan ke dia), pakai halaman Detail
   // Proposal ringkas yang sama (js/pages/disposisi.js).
   if (role === ROLES.KEPALA_BAGIAN_ORTALA && status === SUBMISSION_STATUS.PROSES_REVIU) {
+    return `/pages/kepala-bagian-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
+  }
+  // Kepala Bagian Ortala JUGA BUKAN final approver (sama kayak Kepala
+  // Subbagian Ortala di bawah -- yang berhak mutuskan Tolak/Revisi/
+  // Setuju cuma Kepala Biro Ortala di ujung rantai REVIU_CHAIN), jadi
+  // "Selesai Reviu" di sini artinya sama: proposal balik dari Previu
+  // sampai ke dia, tinggal diteruskan (disposisi) ke pejabat
+  // berikutnya, BUKAN keputusan final -- pakai halaman Detail Proposal
+  // ringkas yang sama (js/pages/disposisi.js), bukan Review Proposal
+  // penuh. Dummy testing: PO-2026-045B (lihat data/proposal.js).
+  if (role === ROLES.KEPALA_BAGIAN_ORTALA && status === SUBMISSION_STATUS.SELESAI_REVIU) {
     return `/pages/kepala-bagian-ortala/monitoring/detail.html?id=${encodeURIComponent(itemId)}`;
   }
   // Kepala Subbagian Ortala BUKAN final approver (lihat REVIU_CHAIN &

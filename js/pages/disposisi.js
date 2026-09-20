@@ -11,16 +11,24 @@
 //   - Kepala Bagian Ortala, status "Proses Reviu" (kartu "Disposisi"
 //     -- baru didisposisikan dari Kepala Biro Ortala)
 //   - Kepala Subbagian Ortala, status "Selesai Reviu" (kartu "Selesai
-//     Reviu" -- REVIU_CHAIN sudah sampai balik lagi ke dia, tinggal
-//     diteruskan ke Previu, BUKAN keputusan final -- final approver
-//     cuma Kepala Biro Ortala, lihat FINAL_APPROVER_ROLE di
-//     js/core/role.js)
+//     Reviu" -- REVIU_CHAIN sudah sampai balik lagi ke dia). Tombol
+//     aksinya berlabel "Reviu" (bukan "Disposisi") dan nge-navigate ke
+//     halaman checklist Reviu Proposal (js/pages/review-proposal.js),
+//     BUKAN modal "Disposisi Proposal PL" -- final approver tetap
+//     cuma Kepala Biro Ortala (lihat FINAL_APPROVER_ROLE di
+//     js/core/role.js), tapi dia tetap perlu buka checklist buat lihat
+//     hasil reviu & kasih Catatan Koreksi kalau perlu, sebelum
+//     diteruskan.
+//   - Kepala Bagian Ortala, status "Selesai Reviu" -- sama persis
+//     pola & alasannya kayak Kepala Subbagian Ortala di atas.
 //   - Previu Biro Ortala, status "Proses Reviu" (ujung rantai
-//     disposisi) -- SATU-SATUNYA yang tombol aksinya beda: "Reviu"
-//     (bukan "Disposisi"), dan nge-navigate ke halaman checklist
-//     Reviu Proposal (js/pages/review-proposal.js) alih-alih buka
-//     modal "Disposisi Proposal PL", karena dia BENERAN ngerjain
-//     reviu-nya, bukan cuma nerusin ke role berikutnya.
+//     disposisi) -- dia BENERAN ngerjain reviu-nya (checklist +
+//     kesimpulan) dari nol, beda dari role lain di atas yang cuma
+//     baca hasil reviu Previu & kasih catatan koreksi/terusin.
+// Tombol aksi "Reviu" (isPreviu ATAU status Selesai Reviu) SELALU
+// nge-navigate ke halaman checklist -- BUKAN buka modal. Modal
+// "Disposisi Proposal PL" cuma dipakai kalau tombolnya berlabel
+// "Disposisi" (lihat actionLabel & click handler #btn-aksi di bawah).
 // Beda dari Review Proposal (js/pages/review.js) yang dipakai KHUSUS
 // buat status yang butuh keputusan setuju/tolak/revisi beneran.
 //
@@ -422,8 +430,15 @@ export function initDisposisiPage(root, user) {
   // kesimpulan, lihat js/pages/review-proposal.js/initReviuProposalPage),
   // beda dari role lain di rantai disposisi yang cuma NERUSIN proposal
   // lewat modal "Disposisi Proposal PL" (js/pages/disposisi-tujuan.js).
+  // Navigasi ke halaman checklist Reviu Proposal (bukan modal
+  // Disposisi) untuk SEMUA kasus tombolnya berlabel "Reviu" -- ini
+  // ngikutin actionLabel di atas (isPreviu ATAU status Selesai Reviu),
+  // supaya perilaku tombol konsisten sama teksnya. Sebelumnya cuma
+  // dicek isPreviu doang, jadi role lain (Kasubbag/Kabag) yang
+  // ketemu status Selesai Reviu ikut kebuka modal "Disposisi Proposal
+  // PL" walau labelnya sudah "Reviu" -- itu bug, sekarang dibetulkan.
   root.querySelector('#btn-aksi')?.addEventListener('click', () => {
-    if (isPreviu) {
+    if (actionLabel === 'Reviu') {
       router.navigate(`/pages/${user?.role}/monitoring/reviu-proposal.html?id=${encodeURIComponent(item.id)}`);
       return;
     }

@@ -194,6 +194,97 @@ SEED_PROPOSALS.unshift({
   status: SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN
 });
 
+// JUDUL SAMA PERSIS dengan PO-2026-044 di bawah ("Proposal POS
+// Pengujian Website"), tapi status Selesai Reviu -- buat testing
+// role Kepala Biro Ortala sebagai FINAL APPROVER (lihat
+// FINAL_APPROVER_ROLE di js/core/role.js): REVIU_CHAIN sudah kelar
+// dibolak-balik (Previu -> Kasubbag -> Kabag), balik lagi ke Kabiro
+// buat keputusan akhir (Setuju/Tolak/Revisi). Klik "Lihat" ngarah ke
+// halaman Review Proposal PENUH (js/pages/review.js), sama kayak yang
+// dipakai Kepala Satker Biro TI -- lihat resolveRowActionRoute di
+// js/pages/monitoring.js (mapping-nya sudah ada dari awal, cuma
+// belum ada data dummy yang mengetes kombinasi ini).
+//
+// SENGAJA ditaruh di sini (bukan lewat unshift() setelah blok
+// PO-2026-044) supaya urutannya persis DI BAWAH PO-2026-044 di tabel
+// (unshift menaruh elemen baru paling depan array, jadi item yang
+// di-unshift belakangan malah muncul lebih dulu -- taruh di sini,
+// SEBELUM unshift PO-2026-044 dieksekusi, biar hasil akhirnya PO-2026-044
+// tetap di depan, PO-2026-044B pas di bawahnya).
+//
+// checklistReviu-nya SENGAJA ditempel langsung di sini (sama pola-nya
+// kayak PO-2026-045B punya Kepala Bagian Ortala) -- biar begitu tombol
+// "Reviu" di halaman Detail Proposal diklik, formnya LANGSUNG kelihatan
+// terisi (hasChecklist = true di js/pages/review-proposal.js), TANPA
+// harus klik tombol "Tambah Reviu" dulu.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-044B',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  createdAt: '2026-02-27T07:23:47',
+  status: SUBMISSION_STATUS.SELESAI_REVIU,
+  testOnlyFor: ROLES.KEPALA_BIRO_ORTALA,
+  checklistReviu: {
+    templateJawabanOptions: [
+      'Sudah sesuai dengan ketentuan yang berlaku.',
+      'Perlu perbaikan pada bagian substansi dokumen.',
+      'Dokumen belum lengkap, mohon dilengkapi.',
+      'Perlu penyesuaian redaksional.',
+      'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
+    ],
+    notaDinasFile: '13408019557224317.pdf',
+    notaDinasNomor: '7163/ND.X.8/07/2026',
+    // Catatan Hasil Reviu dari Previu -- di halaman Reviu Proposal Kepala
+    // Biro cuma DITAMPILKAN (read-only), yang bisa diisi Kabiro cuma
+    // Kesimpulan & Catatan Koreksi untuk Pereviu.
+    catatanHasilReviu:
+      'Secara umum kebutuhan penyusunan Proposal POS Pengujian Website sudah sesuai dengan proses bisnis serta tugas dan fungsi BPK. ' +
+      'Mohon perhatikan penyesuaian redaksional pada bagian latar belakang sebelum dilanjutkan ke tahap berikutnya.',
+    catatanUntukPereviu: [{ catatan: 'cek lagi ya', nama: 'Arny Fitriana Stayawati', tanggal: '2026-08-10T14:29:14' }],
+    items: [
+      { no: 1, label: 'Kesesuaian kebutuhan PL dengan Proses Bisnis BPK', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      {
+        no: 2,
+        label: 'Kesesuaian kebutuhan PL dengan uraian jabatan (tugas dan wewenang yang harus dilaksanakan)',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      { no: 3, label: 'Kesesuaian kebutuhan PL dengan peraturan perundang-undangan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false },
+      { no: 4, label: 'Kesesuaian kebutuhan PL dengan tugas dan fungsi BPK', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { no: 5, label: 'Kesesuaian kebutuhan PL dengan obyek pemeriksaan**)', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { section: true, no: 6, label: 'Skala prioritas kebutuhan PL:' },
+      { no: 'a', label: 'Sifat pekerjaan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'b', label: 'Tujuan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'c', label: 'Lingkup', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'd', label: 'Kebutuhan organisasi', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'e', label: 'Rencana Strategis dan RIR', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'f', label: 'Keterkaitan dengan pemangku kepentingan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      {
+        no: 7,
+        label: 'Keterkaitan dengan perangkat lunak yang sudah ditetapkan di BPK',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      {
+        no: 8,
+        label: 'Substansi yang diatur bersinergi dengan perangkat lunak lain yang telah ditetapkan baik PL internal maupun eksternal',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      {
+        no: 9,
+        label: 'Kesesuaian substansi perangkat lunak dengan bentuk perangkat lunak',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: true
+      },
+      { no: 10, label: 'Latar belakang diperlukannya PL ini', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true }
+    ]
+  }
+});
+
 // Satu lagi DI ATAS item PO-2026-042 (unshift menaruhnya paling
 // depan) -- status Dikirim (masuk ke kartu "Diterima" di
 // KARO_ORTALA_PROPOSAL_CARD_GROUPS, proposal yang baru dikirim/
@@ -207,7 +298,7 @@ SEED_PROPOSALS.unshift({
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-044',
   unit: 'Biro Teknologi Informasi',
-  title: 'test',
+  title: 'Proposal POS Pengujian Website',
   jenis: 'Juknis',
   createdBy: 'Anggit Nendyo Yogantoro',
   employeeId: '240004492',
@@ -238,6 +329,81 @@ SEED_PROPOSALS.unshift({
   createdAt: '2026-02-26T07:23:47',
   status: SUBMISSION_STATUS.PROSES_REVIU,
   testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA
+});
+
+// Satu lagi DI ATAS PO-2026-045 -- JUDUL SAMA PERSIS ("Proposal POS
+// Pengujian Website") tapi status Selesai Reviu, khusus testing role
+// Kepala Bagian Ortala juga (testOnlyFor sama). Dua item ini SENGAJA
+// dibedain cuma dari id & status, biar kelihatan gimana tabel
+// Monitoring Proposal PL nampilin 2 baris berjudul identik dengan
+// status beda ("Disposisi" vs "Selesai Reviu").
+//
+// checklistReviu-nya SENGAJA ditempel langsung di sini (sama pola-nya
+// kayak PO-2026-047 punya Kepala Subbagian Ortala) -- biar begitu
+// halaman Reviu Proposal dibuka, formnya LANGSUNG kelihatan terisi
+// (hasChecklist = true di js/pages/review-proposal.js), TANPA harus
+// klik tombol "Tambah Reviu" dulu (yang cuma muncul kalau checklistnya
+// masih kosong).
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-045B',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  createdAt: '2026-02-27T07:23:47',
+  status: SUBMISSION_STATUS.SELESAI_REVIU,
+  testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA,
+  checklistReviu: {
+    templateJawabanOptions: [
+      'Sudah sesuai dengan ketentuan yang berlaku.',
+      'Perlu perbaikan pada bagian substansi dokumen.',
+      'Dokumen belum lengkap, mohon dilengkapi.',
+      'Perlu penyesuaian redaksional.',
+      'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
+    ],
+    notaDinasFile: '13408019557224317.pdf',
+    notaDinasNomor: '7163/ND.X.8/07/2026',
+    catatanUntukPereviu: [{ catatan: 'cek lagi ya', nama: 'Arny Fitriana Stayawati', tanggal: '2026-08-10T14:29:14' }],
+    items: [
+      { no: 1, label: 'Kesesuaian kebutuhan PL dengan Proses Bisnis BPK', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      {
+        no: 2,
+        label: 'Kesesuaian kebutuhan PL dengan uraian jabatan (tugas dan wewenang yang harus dilaksanakan)',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      { no: 3, label: 'Kesesuaian kebutuhan PL dengan peraturan perundang-undangan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false },
+      { no: 4, label: 'Kesesuaian kebutuhan PL dengan tugas dan fungsi BPK', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { no: 5, label: 'Kesesuaian kebutuhan PL dengan obyek pemeriksaan**)', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { section: true, no: 6, label: 'Skala prioritas kebutuhan PL:' },
+      { no: 'a', label: 'Sifat pekerjaan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'b', label: 'Tujuan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'c', label: 'Lingkup', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'd', label: 'Kebutuhan organisasi', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'e', label: 'Rencana Strategis dan RIR', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'f', label: 'Keterkaitan dengan pemangku kepentingan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      {
+        no: 7,
+        label: 'Keterkaitan dengan perangkat lunak yang sudah ditetapkan di BPK',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      {
+        no: 8,
+        label: 'Substansi yang diatur bersinergi dengan perangkat lunak lain yang telah ditetapkan baik PL internal maupun eksternal',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      {
+        no: 9,
+        label: 'Kesesuaian substansi perangkat lunak dengan bentuk perangkat lunak',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: true
+      },
+      { no: 10, label: 'Latar belakang diperlukannya PL ini', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true }
+    ]
+  }
 });
 
 // Satu lagi DI ATAS PO-2026-045 -- status Selesai Reviu (REVIU_CHAIN
@@ -421,6 +587,14 @@ if (kasubbagDummy) kasubbagDummy.nomorPengajuan = 'PO-2026-014';
 const karoDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-044');
 if (karoDummy) karoDummy.nomorPengajuan = 'PO-2026-014';
 
+// PO-2026-044B (dummy baru, judul sama dgn PO-2026-044, status Selesai
+// Reviu, testing Kepala Biro Ortala sebagai final approver) -- sama
+// pola-nya kayak dummy testing lain, nomorPengajuan-nya di-pin manual
+// ke "PO-2026-014" juga biar konsisten (dianggap proposal yang sama
+// itu-itu juga yang jalan di sepanjang rantai disposisi & reviu).
+const karoDummySelesaiReviu = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-044B');
+if (karoDummySelesaiReviu) karoDummySelesaiReviu.nomorPengajuan = 'PO-2026-014';
+
 // PO-2026-045 (dummy testing Kepala Bagian Ortala, lihat di atas) --
 // sama pola-nya kayak karoDummy/kasubbagDummy di atas, nomorPengajuan-nya
 // di-pin manual ke "PO-2026-014" juga (sama persis kayak contoh
@@ -429,6 +603,13 @@ if (karoDummy) karoDummy.nomorPengajuan = 'PO-2026-014';
 // beda role (testOnlyFor beda) jadi nggak akan pernah kelihatan bareng.
 const kabagDummy = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-045');
 if (kabagDummy) kabagDummy.nomorPengajuan = 'PO-2026-014';
+
+// PO-2026-045B (dummy baru, judul sama dgn PO-2026-045, status Selesai
+// Reviu) -- sama pola-nya kayak dummy testing lain, nomorPengajuan-nya
+// di-pin manual ke "PO-2026-014" juga biar konsisten (dianggap proposal
+// yang sama itu-itu juga yang jalan di sepanjang rantai reviu).
+const kabagDummyReviuSelesai = SEED_PROPOSALS.find((item) => item.id === 'PO-2026-045B');
+if (kabagDummyReviuSelesai) kabagDummyReviuSelesai.nomorPengajuan = 'PO-2026-014';
 
 // PO-2026-046 (dummy testing Previu Biro Ortala, lihat di atas) --
 // sama pola-nya kayak karoDummy/kabagDummy/kasubbagDummy di atas,

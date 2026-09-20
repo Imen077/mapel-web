@@ -367,8 +367,54 @@ function renderNotaDinasSection(checklist, isReadOnly) {
  * (tidak digate hasChecklist kayak renderNotaDinasSection/
  * renderCatatanUntukPereviu di bawah) -- harus tetep kelihatan
  * meski checklist masih kosong, belum sempat "Tambah Reviu".
+ *
+ * Urutan default: Kesimpulan dulu, baru Catatan Hasil Reviu. Kepala
+ * Bagian Ortala & Previu pakai urutan terbalik (catatanFirst = true):
+ * Catatan Hasil Reviu (opsional) dulu, baru Kesimpulan. Kolom yang
+ * READ-ONLY (tidak bisa diisi) diatur lewat catatanReadonly /
+ * kesimpulanReadonly: Kepala Bagian -> Kesimpulan saja, Previu ->
+ * keduanya. Label Catatan Hasil Reviu yang read-only tanpa "(opsional)".
  */
-function renderKesimpulanCatatanCard() {
+function renderKesimpulanCatatanCard({ catatanFirst = false, catatanReadonly = false, kesimpulanReadonly = false } = {}) {
+  const kesimpulanField = `
+        <p class="reviu-proposal__notes-label">Kesimpulan</p>
+        <textarea class="review-notes__textarea${kesimpulanReadonly ? ' review-notes__textarea--readonly' : ''}" id="reviu-kesimpulan" rows="5"${kesimpulanReadonly ? ' readonly' : ''} placeholder="${kesimpulanReadonly ? 'Belum ada kesimpulan reviu.' : 'Tuliskan kesimpulan reviu...'}"></textarea>`;
+  const catatanField = `
+        <p class="reviu-proposal__notes-label">Catatan Hasil Reviu${catatanReadonly ? '' : ' (opsional)'}</p>
+        <textarea class="review-notes__textarea${catatanReadonly ? ' review-notes__textarea--readonly' : ''}" id="reviu-catatan" rows="5"${catatanReadonly ? ' readonly' : ''} placeholder="${catatanReadonly ? 'Belum ada catatan hasil reviu.' : 'Tuliskan catatan tambahan (opsional)...'}"></textarea>`;
+
+  return `
+    <div class="card review-card">
+      <div class="review-card__header">
+        <span class="review-card__header-icon">${PENCIL_ICON}</span>
+        <div>
+          <h2 class="card__title">Kesimpulan &amp; Catatan</h2>
+          <p class="review-card__header-subtitle">Ringkasan akhir hasil peninjauan proposal</p>
+        </div>
+      </div>
+      <div class="review-notes__body reviu-proposal__notes-body">${catatanFirst ? catatanField + kesimpulanField : kesimpulanField + catatanField}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Versi Kepala Biro Ortala dari card Kesimpulan & Catatan di atas --
+ * tetap 1 card gabungan (header + 2 kolom), tapi urutannya Catatan Hasil
+ * Reviu dulu, baru Kesimpulan. Id textarea-nya SAMA dengan versi umum
+ * (reviu-catatan & reviu-kesimpulan).
+ *
+ * Catatan Hasil Reviu di sini READ-ONLY -- isinya dari Previu
+ * (checklist.catatanHasilReviu), Kabiro cuma lihat, makanya labelnya
+ * tanpa "(opsional)". Yang bisa diisi Kabiro cuma Kesimpulan & Catatan
+ * Koreksi untuk Pereviu.
+ */
+function renderKesimpulanCatatanCardKabiro(checklist) {
+  const catatanHasil = (checklist?.catatanHasilReviu || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
   return `
     <div class="card review-card">
       <div class="review-card__header">
@@ -379,10 +425,10 @@ function renderKesimpulanCatatanCard() {
         </div>
       </div>
       <div class="review-notes__body reviu-proposal__notes-body">
+        <p class="reviu-proposal__notes-label">Catatan Hasil Reviu</p>
+        <textarea class="review-notes__textarea review-notes__textarea--readonly" id="reviu-catatan" rows="5" readonly placeholder="Belum ada catatan hasil reviu.">${catatanHasil}</textarea>
         <p class="reviu-proposal__notes-label">Kesimpulan</p>
         <textarea class="review-notes__textarea" id="reviu-kesimpulan" rows="5" placeholder="Tuliskan kesimpulan reviu..."></textarea>
-        <p class="reviu-proposal__notes-label">Catatan Hasil Reviu (opsional)</p>
-        <textarea class="review-notes__textarea" id="reviu-catatan" rows="5" placeholder="Tuliskan catatan tambahan (opsional)..."></textarea>
       </div>
     </div>
   `;
@@ -464,6 +510,15 @@ export function initReviuProposalPage(root, user) {
   }
 
   const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
+  // Kepala Biro Ortala (final approver) punya varian sendiri: urutan
+  // Catatan Hasil Reviu (read-only) -> Kesimpulan, dan tombol aksinya jadi 3
+  // ("Hasil Tidak Diperlukan" / "Koreksi Reviu" / "Hasil Diperlukan"),
+  // bukan "Kirim Reviu" -- role Kabag/Kasubbag tetap pakai varian lama.
+  const isKabiro = user?.role === ROLES.KEPALA_BIRO_ORTALA;
+  // Kepala Bagian Ortala: urutan Catatan Hasil Reviu -> Kesimpulan (read-only),
+  // dan tombol aksi "Koreksi Reviu" + "Kirim Reviu" dikelompokin di kanan
+  // tanpa ikon -- role Kasubbag masih pakai varian lama.
+  const isKabag = user?.role === ROLES.KEPALA_BAGIAN_ORTALA;
 
   const checklist = item.checklistReviu;
   const hasChecklist = Boolean(checklist?.items?.length);
@@ -481,6 +536,21 @@ export function initReviuProposalPage(root, user) {
     ? ''
     : isPreviu
       ? `<button class="btn btn-dark" type="button" id="btn-kirim-reviu">${SEND_ICON} Kirim Reviu</button>`
+      : isKabiro
+        ? `
+        <div class="detail-actions__right">
+          <button class="btn btn-danger" type="button" id="btn-hasil-tidak-diperlukan">Hasil Tidak Diperlukan</button>
+          <button class="btn btn-gold" type="button" id="btn-koreksi-reviu">Koreksi Reviu</button>
+          <button class="btn btn-dark" type="button" id="btn-hasil-diperlukan">Hasil Diperlukan</button>
+        </div>
+      `
+        : isKabag
+          ? `
+        <div class="detail-actions__right">
+          <button class="btn btn-gold" type="button" id="btn-koreksi-reviu">Koreksi Reviu</button>
+          <button class="btn btn-dark" type="button" id="btn-kirim-reviu">Kirim Reviu</button>
+        </div>
+      `
       : `
         <button class="btn btn-gold" type="button" id="btn-koreksi-reviu">${PENCIL_ICON} Koreksi Reviu</button>
         <button class="btn btn-dark" type="button" id="btn-kirim-reviu">${SEND_ICON} Kirim Reviu</button>
@@ -499,7 +569,7 @@ export function initReviuProposalPage(root, user) {
       </div>
 
       ${hasChecklist ? renderNotaDinasSection(checklist, !isPreviu) : ''}
-      ${renderKesimpulanCatatanCard()}
+      ${isKabiro ? renderKesimpulanCatatanCardKabiro(checklist) : renderKesimpulanCatatanCard({ catatanFirst: isKabag || isPreviu, catatanReadonly: isPreviu, kesimpulanReadonly: isKabag || isPreviu })}
       ${hasChecklist && !isPreviu ? renderCatatanKoreksiCard() : ''}
       ${hasChecklist && (checklist.page || 1) === 1 ? renderCatatanUntukPereviu(checklist.catatanUntukPereviu) : ''}
 
@@ -659,4 +729,24 @@ function bindActions(root, backTarget, item, user) {
       }
     });
   });
+
+  // Kepala Biro Ortala -- keputusan akhir hasil reviu ("Hasil Diperlukan"
+  // / "Hasil Tidak Diperlukan"). Sama kayak "Kirim Reviu" di atas, belum
+  // beneran nyimpen apa-apa (workflow engine belum digarap), baru popup
+  // konfirmasi + feedback, lalu balik ke Monitoring.
+  const bindKeputusanHasil = (selector, pertanyaan) => {
+    root.querySelector(selector)?.addEventListener('click', () => {
+      showConfirmModal({
+        title: pertanyaan,
+        message: 'Keputusan yang sudah dikirim tidak dapat dikembalikan.',
+        cancelLabel: 'Batal',
+        confirmLabel: 'Ya',
+        onConfirm: () => {
+          showSuccessModal({ message: 'Keputusan hasil reviu berhasil dikirim.', onOk: () => router.navigate(backTarget) });
+        }
+      });
+    });
+  };
+  bindKeputusanHasil('#btn-hasil-diperlukan', 'Apakah anda yakin hasil reviu ini diperlukan?');
+  bindKeputusanHasil('#btn-hasil-tidak-diperlukan', 'Apakah anda yakin hasil reviu ini tidak diperlukan?');
 }
