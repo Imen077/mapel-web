@@ -85,7 +85,12 @@ async function mountShell(user) {
   if (!app) return;
 
   const pageKey = getPageKey(router.getCurrentPath());
-  const breadcrumb = PAGE_BREADCRUMBS[pageKey];
+  // Konteks "koreksi" (lihat hand-off demo di js/pages/review-proposal.js,
+  // tombol Koreksi Reviu role Kasubbag) sengaja pakai breadcrumb 1 level
+  // ("Koreksi Proposal"), beda dari kunjungan normal lewat Antrian yang
+  // breadcrumb-nya 2 level ("Antrian > Reviu Proposal").
+  const isKoreksiContext = pageKey === 'monitoring/reviu-proposal' && new URLSearchParams(window.location.search).get('ctx') === 'koreksi';
+  const breadcrumb = isKoreksiContext ? ['Koreksi Proposal'] : PAGE_BREADCRUMBS[pageKey];
 
   app.innerHTML = `
     <div class="layout">

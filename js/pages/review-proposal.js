@@ -25,6 +25,7 @@
 // ============================================================
 
 import { router } from '../core/router.js';
+import { auth } from '../core/auth.js';
 import { ROLES } from '../core/role.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
@@ -40,7 +41,7 @@ const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><
 const DOWNLOAD_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17.5v2a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const TEMPLATE_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h8M8 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 const UPLOAD_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 15V4m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15.5v3A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-const SEND_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v13m0 0-4.5-4.5M12 18l4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const SEND_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 3 3 10.5l7.5 3L14 21l3-8 4-10Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10.5 13.5 21 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 const CLIP_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 12.5V7a4 4 0 1 1 8 0v9.5a2.5 2.5 0 0 1-5 0V8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function getIdFromQuery() {
@@ -473,6 +474,13 @@ export function initReviuProposalPage(root, user) {
   }
 
   const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
+  // Normalnya kartu "Catatan Koreksi untuk Pereviu" cuma buat role
+  // yang MENULIS catatan itu (Kasubbag/Kabag/Kabiro), bukan buat
+  // Previu sendiri. Tapi pas Previu nyampe ke halaman ini lewat
+  // hand-off demo "Koreksi Reviu" (ctx=koreksi di URL, lihat
+  // js/core/app.js buat breadcrumb-nya juga), dia justru PERLU liat
+  // kartu itu -- isinya catatan yang ditujukan buat dia.
+  const isKoreksiContext = new URLSearchParams(window.location.search).get('ctx') === 'koreksi';
   // Kepala Biro Ortala (final approver) punya varian sendiri: urutan
   // Catatan Hasil Reviu (read-only) -> Kesimpulan, dan tombol aksinya jadi 3
   // ("Hasil Tidak Diperlukan" / "Koreksi Reviu" / "Hasil Diperlukan"),
@@ -515,8 +523,10 @@ export function initReviuProposalPage(root, user) {
         </div>
       `
       : `
-        <button class="btn btn-gold" type="button" id="btn-koreksi-reviu">${PENCIL_ICON} Koreksi Reviu</button>
-        <button class="btn btn-dark" type="button" id="btn-kirim-reviu">${SEND_ICON} Kirim Reviu</button>
+        <div class="detail-actions__right">
+          <button class="btn btn-gold" type="button" id="btn-koreksi-reviu">${PENCIL_ICON} Koreksi Reviu</button>
+          <button class="btn btn-dark" type="button" id="btn-kirim-reviu">${SEND_ICON} Kirim Reviu</button>
+        </div>
       `;
 
   root.innerHTML = `
@@ -532,8 +542,8 @@ export function initReviuProposalPage(root, user) {
       </div>
 
       ${hasChecklist ? renderNotaDinasSection(checklist, !isPreviu) : ''}
-      ${isKabiro ? renderKesimpulanCatatanCardKabiro(checklist) : renderKesimpulanCatatanCard({ catatanFirst: isKabag || isPreviu, catatanReadonly: isPreviu, kesimpulanReadonly: isKabag || isPreviu })}
-      ${hasChecklist && !isPreviu ? renderCatatanKoreksiCard() : ''}
+      ${isKabiro ? renderKesimpulanCatatanCardKabiro(checklist) : renderKesimpulanCatatanCard({ catatanFirst: isKabag || isPreviu || user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA, catatanReadonly: isPreviu || user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA, kesimpulanReadonly: isKabag || isPreviu })}
+      ${hasChecklist && (!isPreviu || isKoreksiContext) ? renderCatatanKoreksiCard() : ''}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
@@ -666,17 +676,47 @@ function bindActions(root, backTarget, item, user) {
   // popup konfirmasi + feedback, matching pola tombol serupa di
   // halaman lain (Disposisi, Setuju, dst).
   root.querySelector('#btn-simpan-checklist')?.addEventListener('click', () => {
-    showSuccessModal({ message: 'Checklist reviu berhasil disimpan.' });
+    showConfirmModal({
+      title: 'Apakah anda yakin',
+      message: '',
+      cancelLabel: 'Tidak',
+      confirmLabel: 'Ya',
+      onConfirm: () => {
+        showSuccessModal({ message: 'Data berhasil diubah.' });
+      }
+    });
+  });
+
+  root.querySelector('#btn-koreksi-reviu')?.addEventListener('click', () => {
+    showConfirmModal({
+      title: 'Apakah anda yakin akan mengembalikan Proposal untuk dimintakan Koreksi Reviu?',
+      message: 'Data yang dimintakan Koreksi Reviu tidak dapat dikembalikan.',
+      cancelLabel: 'Batal',
+      confirmLabel: 'Ya',
+      onConfirm: () => {
+        showSuccessModal({
+          message: 'Data berhasil diubah.',
+          onOk: () => {
+            // KHUSUS DEMO: simulasikan proposal "turun" balik ke Previu
+            // buat dikoreksi -- ganti sesi ke user Previu, lanjut ke
+            // halaman reviu miliknya buat proposal yang sama. Bukan
+            // hand-off sungguhan (belum ada workflow engine beneran).
+            auth.loginAsRole(ROLES.PREVIU_BIRO_ORTALA);
+            router.navigate(`/pages/${ROLES.PREVIU_BIRO_ORTALA}/monitoring/reviu-proposal.html?id=${item.id}&ctx=koreksi`);
+          }
+        });
+      }
+    });
   });
 
   root.querySelector('#btn-kirim-reviu')?.addEventListener('click', () => {
     showConfirmModal({
-      title: 'Apakah anda yakin ingin mengirim hasil reviu ini?',
-      message: 'Data yang sudah dikirim tidak dapat dikembalikan.',
+      title: 'Apakah anda yakin ingin mengirim data ini untuk proses selanjutnya?',
+      message: 'Pastikan data yang anda ubah sudah disimpan sebelum dikirim. Data yang dikirim tidak dapat dikembalikan.',
       cancelLabel: 'Batal',
       confirmLabel: 'Ya',
       onConfirm: () => {
-        showSuccessModal({ message: 'Hasil reviu berhasil dikirim.', onOk: () => router.navigate(backTarget) });
+        showSuccessModal({ message: 'Data berhasil dikirim.', onOk: () => router.navigate(backTarget) });
       }
     });
   });

@@ -52,6 +52,32 @@ function logout() {
   storage.remove(STORAGE_KEYS.SESSION);
 }
 
+/**
+ * KHUSUS DEMO: ganti sesi aktif jadi user pertama dengan role tertentu,
+ * tanpa lewat form login. Dipakai buat simulasi "hand-off" antar role
+ * dalam satu alur klik (mis. abis Koreksi Reviu di role Kasubbag,
+ * lanjut ke halaman reviu milik Previu) -- BUKAN pola auth sungguhan,
+ * jangan dipakai di luar keperluan demo/prototype.
+ * @param {string} role
+ * @returns {Session | null}
+ */
+function loginAsRole(role) {
+  const users = storage.read(STORAGE_KEYS.USERS, []);
+  const found = users.find((u) => u.role === role);
+  if (!found) return null;
+
+  const session = {
+    userId: found.id,
+    username: found.username,
+    name: found.name,
+    role: found.role,
+    loginAt: Date.now()
+  };
+
+  storage.write(STORAGE_KEYS.SESSION, session);
+  return session;
+}
+
 /** @returns {Session | null} */
 function getCurrentUser() {
   return storage.read(STORAGE_KEYS.SESSION, null);
@@ -61,4 +87,4 @@ function isAuthenticated() {
   return getCurrentUser() !== null;
 }
 
-export const auth = { login, logout, getCurrentUser, isAuthenticated };
+export const auth = { login, logout, getCurrentUser, isAuthenticated, loginAsRole };
