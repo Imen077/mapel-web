@@ -14,9 +14,8 @@
 //     "+ Tambah Reviu", belum ngisi apa-apa).
 //   - Ada isinya -> tabel checklist penuh (Download Checklist, Filter,
 //     tiap baris ada input Hasil Reviu + toggle Template Jawaban +
-//     Check), plus Nota Dinas Penyampaian, Catatan Hasil Reviu,
-//     Kesimpulan, dan Catatan untuk Pereviu (riwayat catatan orang
-//     lain, collapsible).
+//     Check), plus Nota Dinas Penyampaian, Catatan Hasil Reviu, dan
+//     Kesimpulan.
 //
 // TAHAP INI: checkbox/Template Jawaban/upload file/textarea semua
 // interaktif di sisi tampilan (state di memori, ilang kalau halaman
@@ -39,7 +38,6 @@ const CLIPBOARD_ICON = '<svg width="28" height="28" viewBox="0 0 24 24" fill="no
 const PLUS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m0 0 6-6m-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const DOWNLOAD_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17.5v2a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-const CHEVRON_DOWN_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const TEMPLATE_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h8M8 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 const UPLOAD_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 15V4m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15.5v3A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const SEND_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v13m0 0-4.5-4.5M12 18l4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -364,9 +362,9 @@ function renderNotaDinasSection(checklist, isReadOnly) {
  * Card gabungan "Kesimpulan & Catatan" -- Kesimpulan + Catatan Hasil
  * Reviu ditaro dalam SATU card (bukan 2 card terpisah kayak
  * sebelumnya), sesuai desain yang dikasih. SENGAJA selalu tampil
- * (tidak digate hasChecklist kayak renderNotaDinasSection/
- * renderCatatanUntukPereviu di bawah) -- harus tetep kelihatan
- * meski checklist masih kosong, belum sempat "Tambah Reviu".
+ * (tidak digate hasChecklist kayak renderNotaDinasSection) -- harus
+ * tetep kelihatan meski checklist masih kosong, belum sempat
+ * "Tambah Reviu".
  *
  * Urutan default: Kesimpulan dulu, baru Catatan Hasil Reviu. Kepala
  * Bagian Ortala & Previu pakai urutan terbalik (catatanFirst = true):
@@ -449,41 +447,6 @@ function renderCatatanKoreksiCard() {
       <div class="review-notes__body reviu-proposal__notes-body">
         <textarea class="review-notes__textarea" id="catatan-koreksi" rows="5" placeholder="Tuliskan catatan tambahan (opsional)..."></textarea>
       </div>
-    </div>
-  `;
-}
-
-/** Format tanggal pendek buat catatan pereviu, mis. "10/8/2026, 14:29:14". */
-function formatShortDateTime(dateInput) {
-  const date = new Date(dateInput);
-  const tanggal = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' }).format(date);
-  const waktu = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(date);
-  return `${tanggal}, ${waktu}`;
-}
-
-/** Card collapsible "Catatan untuk Pereviu" -- riwayat catatan dari orang lain (bukan input Previu sendiri), cuma tampil kalau ada datanya. */
-function renderCatatanUntukPereviu(notes) {
-  if (!notes?.length) return '';
-
-  const items = notes
-    .map(
-      (n) => `
-        <div class="reviu-proposal__pereviu-note">
-          <p class="reviu-proposal__pereviu-note-text">${n.catatan}</p>
-          <p class="reviu-proposal__pereviu-note-name">${n.nama}</p>
-          <p class="reviu-proposal__pereviu-note-date">${formatShortDateTime(n.tanggal)}</p>
-        </div>
-      `
-    )
-    .join('');
-
-  return `
-    <div class="card review-card">
-      <button class="reviu-proposal__pereviu-toggle" type="button" id="btn-toggle-pereviu" aria-expanded="true">
-        <span class="reviu-proposal__section-title">Catatan untuk Pereviu :</span>
-        <span class="reviu-proposal__pereviu-chevron">${CHEVRON_DOWN_ICON}</span>
-      </button>
-      <div class="reviu-proposal__pereviu-body" id="pereviu-body">${items}</div>
     </div>
   `;
 }
@@ -571,7 +534,6 @@ export function initReviuProposalPage(root, user) {
       ${hasChecklist ? renderNotaDinasSection(checklist, !isPreviu) : ''}
       ${isKabiro ? renderKesimpulanCatatanCardKabiro(checklist) : renderKesimpulanCatatanCard({ catatanFirst: isKabag || isPreviu, catatanReadonly: isPreviu, kesimpulanReadonly: isKabag || isPreviu })}
       ${hasChecklist && !isPreviu ? renderCatatanKoreksiCard() : ''}
-      ${hasChecklist && (checklist.page || 1) === 1 ? renderCatatanUntukPereviu(checklist.catatanUntukPereviu) : ''}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
@@ -697,17 +659,6 @@ function bindActions(root, backTarget, item, user) {
   fileInput?.addEventListener('change', () => {
     const hint = root.querySelector('#file-hint');
     if (hint) hint.textContent = fileInput.files?.[0]?.name || 'Tidak ada file yang dipilih';
-  });
-
-  // Collapse/expand "Catatan untuk Pereviu".
-  const pereviuToggle = root.querySelector('#btn-toggle-pereviu');
-  pereviuToggle?.addEventListener('click', () => {
-    const body = root.querySelector('#pereviu-body');
-    const isHidden = body?.hasAttribute('hidden');
-    if (isHidden) body?.removeAttribute('hidden');
-    else body?.setAttribute('hidden', '');
-    pereviuToggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-    pereviuToggle.classList.toggle('reviu-proposal__pereviu-toggle--collapsed', !isHidden);
   });
 
   // "Simpan" (checklist) & "Kirim Reviu" -- belum beneran nyimpen
