@@ -26,6 +26,7 @@
 // ============================================================
 
 import { router } from '../core/router.js';
+import { ROLES } from '../core/role.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
 import { showConfirmModal, showSuccessModal } from '../components/modal.js';
@@ -63,6 +64,7 @@ const DUMMY_CHECKLIST_TEMPLATE = {
     'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
   ],
   notaDinasFile: '13408019557224317.pdf',
+  notaDinasNomor: '7163/ND.X.8/07/2026',
   catatanUntukPereviu: [
     { catatan: 'cek lagi ya', nama: 'Arny Fitriana Stayawati', tanggal: '2026-08-10T14:29:14' }
   ],
@@ -315,24 +317,43 @@ function renderChecklistCard(checklist) {
 }
 
 /** 2 kolom: nomor Nota Dinas Penyampaian (input teks) & file-nya (upload). */
-function renderNotaDinasSection(checklist) {
+/**
+ * @param {Object} checklist
+ * @param {boolean} isReadOnly - true buat role selain Previu (Kasubbag/Kabag/Kabiro
+ *   yang cuma LIHAT hasil reviu yang udah Previu isi, bukan lagi ngerjain-nya) --
+ *   nomor & file nota dinas ditampilin sebagai teks terisi, bukan input/tombol upload.
+ */
+function renderNotaDinasSection(checklist, isReadOnly) {
   const fileName = checklist?.notaDinasFile || '';
+  const nomor = checklist?.notaDinasNomor || '';
+
+  const nomorField = isReadOnly
+    ? `<div class="reviu-proposal__text-input reviu-proposal__text-input--display">${nomor || '-'}</div>`
+    : `<input type="text" class="reviu-proposal__text-input" id="nota-dinas-nomor" placeholder="cth. ND-118/BTI/07/2026" value="${nomor}">`;
+
+  const fileField = isReadOnly
+    ? `<div class="reviu-proposal__text-input reviu-proposal__text-input--display">${
+        fileName ? `<a class="reviu-proposal__file-link-inline" href="#" data-file-link>${CLIP_ICON} ${fileName}</a>` : '-'
+      }</div>`
+    : `
+      <div class="reviu-proposal__file-row">
+        <button class="btn btn-ghost" type="button" id="btn-pilih-file">${UPLOAD_ICON} Pilih File</button>
+        <span class="reviu-proposal__file-hint" id="file-hint">Tidak ada file yang dipilih</span>
+        <input type="file" id="input-file-nota" hidden>
+      </div>
+      ${fileName ? `<a class="reviu-proposal__file-link" href="#" data-file-link id="file-existing-link">${CLIP_ICON} ${fileName}</a>` : ''}
+    `;
 
   return `
     <div class="card review-card reviu-proposal__nota-dinas">
       <div class="reviu-proposal__nota-dinas-grid">
         <div class="reviu-proposal__field-group">
           <label class="reviu-proposal__notes-label" for="nota-dinas-nomor">No. Nota Dinas Penyampaian:</label>
-          <input type="text" class="reviu-proposal__text-input" id="nota-dinas-nomor" placeholder="cth. ND-118/BTI/07/2026">
+          ${nomorField}
         </div>
         <div class="reviu-proposal__field-group">
           <label class="reviu-proposal__notes-label">Nota Dinas Penyampaian:</label>
-          <div class="reviu-proposal__file-row">
-            <button class="btn btn-ghost" type="button" id="btn-pilih-file">${UPLOAD_ICON} Pilih File</button>
-            <span class="reviu-proposal__file-hint" id="file-hint">Tidak ada file yang dipilih</span>
-            <input type="file" id="input-file-nota" hidden>
-          </div>
-          ${fileName ? `<a class="reviu-proposal__file-link" href="#" data-file-link id="file-existing-link">${CLIP_ICON} ${fileName}</a>` : ''}
+          ${fileField}
         </div>
       </div>
     </div>
@@ -362,6 +383,25 @@ function renderKesimpulanCatatanCard() {
         <textarea class="review-notes__textarea" id="reviu-kesimpulan" rows="5" placeholder="Tuliskan kesimpulan reviu..."></textarea>
         <p class="reviu-proposal__notes-label">Catatan Hasil Reviu (opsional)</p>
         <textarea class="review-notes__textarea" id="reviu-catatan" rows="5" placeholder="Tuliskan catatan tambahan (opsional)..."></textarea>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Card "Catatan Koreksi untuk Pereviu" -- CUMA buat role selain Previu
+ * (Kasubbag/Kabag/Kabiro yang lihat hasil reviu Previu terus mau minta
+ * koreksi). Previu sendiri nggak butuh ini (dia yang ngisi reviu-nya,
+ * bukan yang ngoreksi).
+ */
+function renderCatatanKoreksiCard() {
+  return `
+    <div class="card review-card">
+      <div class="card__header">
+        <h2 class="card__title">Catatan Koreksi untuk Pereviu <span class="reviu-proposal__hint">(Silakan diisi apabila ada koreksi atas reviu)</span></h2>
+      </div>
+      <div class="review-notes__body reviu-proposal__notes-body">
+        <textarea class="review-notes__textarea" id="catatan-koreksi" rows="5" placeholder="Tuliskan catatan tambahan (opsional)..."></textarea>
       </div>
     </div>
   `;
@@ -423,11 +463,28 @@ export function initReviuProposalPage(root, user) {
     return;
   }
 
+  const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
+
   const checklist = item.checklistReviu;
   const hasChecklist = Boolean(checklist?.items?.length);
   const subtitle = hasChecklist
     ? 'Lengkapi checklist reviu untuk menentukan kelayakan proposal.'
     : 'Proposal ini didisposisikan dan belum memiliki riwayat reviu.';
+  // Previu = yang BENERAN ngerjain reviu-nya (isi checklist, upload
+  // nota dinas). Role lain (Kasubbag/Kabag/Kabiro) cuma LIHAT hasil
+  // kerja Previu buat diteruskan/dikoreksi -- makanya Nota Dinas-nya
+  // ditampilin sebagai teks terisi (bukan input/tombol upload), ada
+  // tambahan kartu "Catatan Koreksi untuk Pereviu", dan tombol
+  // aksinya jadi 2 ("Koreksi Reviu" + "Kirim Reviu"), bukan cuma 1.
+
+  const actionButtons = !hasChecklist
+    ? ''
+    : isPreviu
+      ? `<button class="btn btn-dark" type="button" id="btn-kirim-reviu">${SEND_ICON} Kirim Reviu</button>`
+      : `
+        <button class="btn btn-gold" type="button" id="btn-koreksi-reviu">${PENCIL_ICON} Koreksi Reviu</button>
+        <button class="btn btn-dark" type="button" id="btn-kirim-reviu">${SEND_ICON} Kirim Reviu</button>
+      `;
 
   root.innerHTML = `
     <div class="review-page">
@@ -441,18 +498,19 @@ export function initReviuProposalPage(root, user) {
         ${renderChecklistCard(checklist)}
       </div>
 
-      ${hasChecklist ? renderNotaDinasSection(checklist) : ''}
+      ${hasChecklist ? renderNotaDinasSection(checklist, !isPreviu) : ''}
       ${renderKesimpulanCatatanCard()}
+      ${hasChecklist && !isPreviu ? renderCatatanKoreksiCard() : ''}
       ${hasChecklist && (checklist.page || 1) === 1 ? renderCatatanUntukPereviu(checklist.catatanUntukPereviu) : ''}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
-        ${hasChecklist ? `<button class="btn btn-dark" type="button" id="btn-kirim-reviu">${SEND_ICON} Kirim Reviu</button>` : ''}
+        ${actionButtons}
       </div>
     </div>
   `;
 
-  bindActions(root, backTarget, item, user);
+  bindActions(root, backTarget, item, user, isPreviu);
 }
 
 /**

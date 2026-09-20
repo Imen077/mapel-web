@@ -277,17 +277,71 @@ SEED_PROPOSALS.unshift({
 // Subbagian Ortala, Selesai Reviu), tapi SENGAJA field-nya dikosongin
 // (cuma judul & satker yang keisi, sisanya "-") -- buat testing
 // tampilan Detail Proposal (js/pages/disposisi.js) versi "kosongan",
-// bukan yang udah lengkap kayak PO-2026-043 di atas.
+// bukan yang udah lengkap kayak PO-2026-043 di atas. Checklist-nya
+// SENGAJA ditempel langsung di sini (bukan lewat auto-populate
+// generik di review-proposal.js) -- khusus item ini doang yang
+// harus langsung kelihatan "Selesai Reviu" pas dibuka, PO-2026-043
+// di atas biarin apa adanya (belum ada checklistReviu).
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-047',
   unit: 'Biro Teknologi Informasi',
-  title: 'Proposal Setelah Reviu` ',
+  title: 'Proposal Setelah Reviu',
   jenis: '-',
   createdBy: '-',
   employeeId: '-',
   createdAt: '2026-02-26T07:23:47',
   status: SUBMISSION_STATUS.SELESAI_REVIU,
-  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA
+  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA,
+  checklistReviu: {
+    templateJawabanOptions: [
+      'Sudah sesuai dengan ketentuan yang berlaku.',
+      'Perlu perbaikan pada bagian substansi dokumen.',
+      'Dokumen belum lengkap, mohon dilengkapi.',
+      'Perlu penyesuaian redaksional.',
+      'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
+    ],
+    notaDinasFile: '13408019557224317.pdf',
+    notaDinasNomor: '7163/ND.X.8/07/2026',
+    catatanUntukPereviu: [{ catatan: 'cek lagi ya', nama: 'Arny Fitriana Stayawati', tanggal: '2026-08-10T14:29:14' }],
+    items: [
+      { no: 1, label: 'Kesesuaian kebutuhan PL dengan Proses Bisnis BPK', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      {
+        no: 2,
+        label: 'Kesesuaian kebutuhan PL dengan uraian jabatan (tugas dan wewenang yang harus dilaksanakan)',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      { no: 3, label: 'Kesesuaian kebutuhan PL dengan peraturan perundang-undangan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false },
+      { no: 4, label: 'Kesesuaian kebutuhan PL dengan tugas dan fungsi BPK', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { no: 5, label: 'Kesesuaian kebutuhan PL dengan obyek pemeriksaan**)', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { section: true, no: 6, label: 'Skala prioritas kebutuhan PL:' },
+      { no: 'a', label: 'Sifat pekerjaan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'b', label: 'Tujuan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'c', label: 'Lingkup', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'd', label: 'Kebutuhan organisasi', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'e', label: 'Rencana Strategis dan RIR', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { no: 'f', label: 'Keterkaitan dengan pemangku kepentingan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      {
+        no: 7,
+        label: 'Keterkaitan dengan perangkat lunak yang sudah ditetapkan di BPK',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      {
+        no: 8,
+        label: 'Substansi yang diatur bersinergi dengan perangkat lunak lain yang telah ditetapkan baik PL internal maupun eksternal',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: false
+      },
+      {
+        no: 9,
+        label: 'Kesesuaian substansi perangkat lunak dengan bentuk perangkat lunak',
+        hasil: 'Sudah sesuai dengan ketentuan yang berlaku.',
+        checked: true
+      },
+      { no: 10, label: 'Latar belakang diperlukannya PL ini', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true }
+    ]
+  }
 });
 
 // Satu lagi DI ATAS PO-2026-043 -- status Proses Reviu (masuk ke
