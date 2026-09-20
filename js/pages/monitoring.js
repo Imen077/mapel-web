@@ -27,6 +27,17 @@ const ARROW_RIGHT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="
 // tooltip "segera hadir"). Tambah entri baru di sini kalau nanti ada
 // kombinasi role+status+type lain yang juga sudah punya halamannya.
 function resolveRowActionRoute({ type, role, status, itemId }) {
+  // Konsep PL SECARA UMUM belum punya halaman detail sama sekali --
+  // KECUALI dummy KL-2026-050 ini (lihat data/konsep.js), yang
+  // SENGAJA dicek lewat itemId, bukan status/role, karena isi & alur
+  // Konsep PL buat LO Biro TI belum diputusin. Halaman tujuannya
+  // (js/pages/detail-konsep.js) juga masih kosongan, cuma biar
+  // barisnya bisa diklik dulu. Dicek PALING AWAL (sebelum guard
+  // `type !== 'proposal-pl'` di bawah) justru supaya guard itu tidak
+  // ikut nge-block dummy Konsep PL ini.
+  if (type === 'konsep-pl' && itemId === 'KL-2026-050') {
+    return `/pages/lo-biro-ti/monitoring/detail-konsep.html?id=${encodeURIComponent(itemId)}`;
+  }
   if (type !== 'proposal-pl') return null;
 
   if (role === ROLES.KEPALA_SATKER_BIRO_TI && status === SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN) {
@@ -501,7 +512,11 @@ function renderTableRows(service, rows, startIndex, labelOverrides, rowActionCtx
   return rows
     .map((item, i) => {
       const baseMeta = service.getStatusMeta(item.status);
-      const meta = { ...baseMeta, ...(labelOverrides?.[item.status] || {}) };
+      // item.tableStatusOverride (kalau ada) menang paling akhir --
+      // override per-item buat kasus dummy testing tertentu (lihat
+      // PO-2026-043 di data/proposal.js), beda dari labelOverrides
+      // yang berlaku ke SEMUA item dengan status yang sama.
+      const meta = { ...baseMeta, ...(labelOverrides?.[item.status] || {}), ...(item.tableStatusOverride || {}) };
       const actionRoute = resolveRowActionRoute({
         type: rowActionCtx?.type,
         role: rowActionCtx?.role,

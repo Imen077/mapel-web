@@ -436,7 +436,16 @@ SEED_PROPOSALS.unshift({
   // buildDisposisiTujuanData di js/pages/disposisi-tujuan.js) --
   // item lain nggak punya field ini, jadi fallback ke rumus generik
   // yang diturunin dari createdAt.
-  nomorNotaDinas: '1532/ND/X.5/06/2026'
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
+  // Badge status di tabel (Monitoring & Antrian Proposal PL) SENGAJA
+  // ditampilin "Disposisi" khusus buat item dummy ini doang, bukan
+  // label asli "Selesai Reviu" -- override per-item, dibaca di
+  // renderTableRows (js/pages/monitoring.js & antrian.js), jadi TIDAK
+  // ikut ngubah label item lain yang statusnya sama (mis. PO-2026-047
+  // di bawah, tetap tampil "Selesai Reviu" apa adanya). Warnanya
+  // disamain kayak label "Disposisi" yang sudah dipakai di tempat lain
+  // (lihat KEPALA_BAGIAN_STATUS_LABEL_OVERRIDES di monitoring.js).
+  tableStatusOverride: { label: 'Disposisi', bg: '#EFE7FA', text: '#6C3FB5' }
 });
 
 // Satu lagi DI ATAS PO-2026-043 -- SAMA role+status-nya (Kepala

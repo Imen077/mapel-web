@@ -32,7 +32,11 @@ const PAGE_MODULES = {
   // atas (js/pages/disposisi.js), initDisposisiPage sudah bisa
   // ngebedain lewat user.role (tombol "Reviu", bukan "Disposisi").
   'monitoring/review': () => import('../pages/disposisi.js'),
-  'monitoring/reviu-proposal': () => import('../pages/review-proposal.js')
+  'monitoring/reviu-proposal': () => import('../pages/review-proposal.js'),
+  // Halaman Detail Konsep (masih kosongan) buat dummy KL-2026-050 di
+  // Monitoring Konsep PL role LO Biro TI -- lihat resolveRowActionRoute
+  // di js/pages/monitoring.js & komentar di js/pages/detail-konsep.js.
+  'monitoring/detail-konsep': () => import('../pages/detail-konsep.js')
 };
 
 // Breadcrumb navbar per pageKey. Halaman yang tidak didaftarkan di
@@ -58,7 +62,8 @@ const PAGE_BREADCRUMBS = {
   // URL-nya tetap di bawah monitoring/ (lihat resolveRowActionRoute
   // di js/pages/monitoring.js).
   'monitoring/review': ['Antrian', 'Detail Proposal'],
-  'monitoring/reviu-proposal': ['Antrian', 'Reviu Proposal']
+  'monitoring/reviu-proposal': ['Antrian', 'Reviu Proposal'],
+  'monitoring/detail-konsep': ['Monitoring', 'Monitoring Konsep']
 };
 
 // Folder yang nama file di dalamnya BUKAN unik (mis. "proposal-pl"

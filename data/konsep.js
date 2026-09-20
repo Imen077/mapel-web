@@ -14,6 +14,7 @@
 
 import { SUBMISSION_STATUS, buildStatusMeta } from './status.js';
 import { createSubmissionService } from './submission-service.js';
+import { ROLES } from '../js/core/role.js';
 
 export const KONSEP_STATUS = SUBMISSION_STATUS;
 
@@ -210,6 +211,36 @@ JUDUL_LIST.slice(STATUS_SEQUENCE.length).forEach((title, i) => {
     createdAt: daysBeforeISO(BASE_DATE, (STATUS_SEQUENCE.length + i) * 2),
     status: SUBMISSION_STATUS.DRAFT
   });
+});
+
+// Satu dummy tambahan buat Monitoring Konsep PL, status & isinya
+// SENGAJA dikosongin dulu (belum diputusin mau status/konten apa) --
+// pola sama kayak PO-2026-047 di data/proposal.js: status asli tetap
+// diisi status "submitted" yang valid (MENUNGGU_PERSETUJUAN) supaya
+// tetap muncul di tabel (Monitoring nyaring keluar item DRAFT, lihat
+// getFiltered di submission-service.js), tapi badge-nya di-blank
+// pakai tableStatusOverride (dibaca di renderTableRows, js/pages/
+// monitoring.js & antrian.js) -- BUKAN diganti ke status/label
+// beneran. Field lain dikosongin '-' biar konten pas diklik (halaman
+// detail/reviu) juga kosong dulu. Nanti kalau sudah fix status &
+// isinya apa, tinggal timpa field-field ini + hapus
+// tableStatusOverride-nya.
+SEED_KONSEP.unshift({
+  id: 'KL-2026-050',
+  unit: '-',
+  title: '-',
+  jenis: '-',
+  createdBy: '-',
+  employeeId: '-',
+  nomorPengajuan: null,
+  koreksiKe: 0,
+  createdAt: '2026-08-01T00:00:00',
+  status: SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN,
+  testOnlyFor: ROLES.LO_BIRO_TI,
+  // Warna disamain sama badge "Disetujui" yang sudah dipakai di
+  // tempat lain (lihat STATUS_LABEL_OVERRIDES di js/pages/
+  // monitoring.js & antrian.js).
+  tableStatusOverride: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' }
 });
 
 export const konsepService = createSubmissionService({

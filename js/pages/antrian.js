@@ -125,7 +125,10 @@ function renderTableRows(service, rows, startIndex, options = {}) {
   return rows
     .map((item, i) => {
       const baseMeta = service.getStatusMeta(item.status);
-      const meta = { ...baseMeta, ...(labelOverrides[item.status] || {}) };
+      // item.tableStatusOverride (kalau ada) menang paling akhir --
+      // sama pola-nya kayak di js/pages/monitoring.js, lihat komentar
+      // di sana buat penjelasan (kasus dummy PO-2026-043).
+      const meta = { ...baseMeta, ...(labelOverrides[item.status] || {}), ...(item.tableStatusOverride || {}) };
       const koreksiCell = showKoreksi ? `<td>${renderKoreksiBadge(item.koreksiKe)}</td>` : '';
       return `
         <tr>
