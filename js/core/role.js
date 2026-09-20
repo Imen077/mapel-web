@@ -74,10 +74,19 @@ export const ROLE_MENUS = {
   ],
   [ROLES.LO_BIRO_TI]: [
     { label: 'Dashboard', path: '/pages/lo-biro-ti/dashboard.html', icon: 'home' },
-    { label: 'Pengajuan Proposal PL', path: '/pages/lo-biro-ti/pengajuan/proposal-pl.html', icon: 'file-plus' },
+    // activePaths: halaman lain yang tetap bikin item ini ke-highlight
+    // (form Pengajuan Konsep PL bukan menu sendiri, tapi masih bagian
+    // dari menu ini -- lihat renderMenuItem di sidebar-pegawai.js).
+    {
+      label: 'Pengajuan Proposal PL',
+      path: '/pages/lo-biro-ti/pengajuan/proposal-pl.html',
+      icon: 'file-plus',
+      activePaths: ['/pages/lo-biro-ti/pengajuan/konsep-pl.html']
+    },
     {
       label: 'Monitoring',
       icon: 'activity',
+      activePaths: ['/pages/lo-biro-ti/monitoring/detail-proposal-konsep.html'],
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/lo-biro-ti/monitoring/proposal-pl.html' },
         { label: 'Monitoring Konsep PL', path: '/pages/lo-biro-ti/monitoring/konsep-pl.html' },

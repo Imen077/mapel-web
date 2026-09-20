@@ -31,6 +31,17 @@ function isGroupActive(children, currentPath) {
 }
 
 /**
+ * Halaman detail yang bukan menu (terdaftar di activePaths item)
+ * cuma bikin label grup ke-highlight, TANPA ngebuka submenunya --
+ * beda dari halaman anak grup yang sekalian ngebuka submenu.
+ * @param {{activePaths?:string[]}} item
+ * @param {string} currentPath
+ */
+function isOnActivePath(item, currentPath) {
+  return (item.activePaths || []).some((p) => currentPath.endsWith(p));
+}
+
+/**
  * Render satu item menu. Item dengan "children" jadi grup
  * accordion (tombol buka/tutup + daftar sub-link); item biasa
  * tetap jadi link langsung seperti sebelumnya.
@@ -42,6 +53,7 @@ function renderMenuItem(item, currentPath) {
 
   if (item.children && item.children.length) {
     const expanded = isGroupActive(item.children, currentPath);
+    const highlighted = expanded || isOnActivePath(item, currentPath);
     const subItems = item.children
       .map((child) => {
         const isActive = currentPath.endsWith(child.path);
@@ -61,7 +73,7 @@ function renderMenuItem(item, currentPath) {
     return `
       <div class="sidebar__group">
         <button
-          class="sidebar__item sidebar__item--parent${expanded ? ' sidebar__item--active' : ''}"
+          class="sidebar__item sidebar__item--parent${highlighted ? ' sidebar__item--active' : ''}"
           type="button"
           aria-expanded="${expanded}"
         >
@@ -76,7 +88,7 @@ function renderMenuItem(item, currentPath) {
     `;
   }
 
-  const isActive = currentPath.endsWith(item.path);
+  const isActive = currentPath.endsWith(item.path) || isOnActivePath(item, currentPath);
   return `
     <a
       class="sidebar__item${isActive ? ' sidebar__item--active' : ''}"

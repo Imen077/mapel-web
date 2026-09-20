@@ -213,28 +213,31 @@ JUDUL_LIST.slice(STATUS_SEQUENCE.length).forEach((title, i) => {
   });
 });
 
-// Satu dummy tambahan buat Monitoring Konsep PL, status & isinya
-// SENGAJA dikosongin dulu (belum diputusin mau status/konten apa) --
-// pola sama kayak PO-2026-047 di data/proposal.js: status asli tetap
-// diisi status "submitted" yang valid (MENUNGGU_PERSETUJUAN) supaya
-// tetap muncul di tabel (Monitoring nyaring keluar item DRAFT, lihat
-// getFiltered di submission-service.js), tapi badge-nya di-blank
-// pakai tableStatusOverride (dibaca di renderTableRows, js/pages/
-// monitoring.js & antrian.js) -- BUKAN diganti ke status/label
-// beneran. Field lain dikosongin '-' biar konten pas diklik (halaman
-// detail/reviu) juga kosong dulu. Nanti kalau sudah fix status &
-// isinya apa, tinggal timpa field-field ini + hapus
-// tableStatusOverride-nya.
+// Satu dummy tambahan buat Monitoring Konsep PL (role LO Biro TI),
+// sesuai mockup "Detail Konsep PL - LO Biro TI": judul, satker,
+// jenis, dan pembuat sudah diisi. Isinya sebenarnya proposal yang
+// sudah Disetujui (titik awal LO menekan "Buat Konsep PL"), makanya
+// halaman detailnya (js/pages/detail-konsep.js) masih berjudul
+// "Detail Proposal". Status asli tetap status "submitted" yang valid
+// (MENUNGGU_PERSETUJUAN) supaya muncul di tabel (Monitoring nyaring
+// keluar item DRAFT, lihat getFiltered di submission-service.js),
+// tapi badge-nya ditampilkan "Disetujui" lewat tableStatusOverride
+// (dibaca di renderTableRows, js/pages/monitoring.js & antrian.js).
+// nomorPengajuan, createdAt, dan nomorNotaDinas juga sudah disamakan
+// dengan mockup (PO-2026-042, 05 Agustus 2026 11:32:40, dan
+// 1532/ND/X.5/06/2026) -- dipakai halaman Detail Proposal dan Konsep
+// (js/pages/detail-proposal-konsep.js). employeeId masih "-".
 SEED_KONSEP.unshift({
   id: 'KL-2026-050',
-  unit: '-',
-  title: '-',
-  jenis: '-',
-  createdBy: '-',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
   employeeId: '-',
-  nomorPengajuan: null,
+  nomorPengajuan: 'PO-2026-042',
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
   koreksiKe: 0,
-  createdAt: '2026-08-01T00:00:00',
+  createdAt: '2026-08-05T11:32:40',
   status: SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN,
   testOnlyFor: ROLES.LO_BIRO_TI,
   // Warna disamain sama badge "Disetujui" yang sudah dipakai di

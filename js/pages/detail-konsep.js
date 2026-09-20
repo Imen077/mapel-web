@@ -20,9 +20,10 @@
 // item.tableStatusOverride kalau ada (pola sama kayak renderTableRows
 // di js/pages/monitoring.js), biar konsisten sama badge di tabel.
 //
-// TOMBOL "Buat Konsep PL" & "Lihat Reviu" SENGAJA belum diarahkan ke
-// mana pun (belum ada halamannya) -- sama kayak halaman-halaman lain
-// yang sejenis di app ini.
+// TOMBOL "Buat Konsep PL" ngarah ke form Pengajuan Konsep PL
+// (js/pages/pengajuan-konsep.js). Tombol "Lihat Reviu" SENGAJA belum
+// diarahkan ke mana pun (belum ada halamannya) -- sama kayak
+// halaman-halaman lain yang sejenis di app ini.
 // ============================================================
 
 import { router } from '../core/router.js';
@@ -194,7 +195,13 @@ export function initDetailKonsepPage(root, user) {
   root.querySelectorAll('[data-file-link]').forEach((link) => link.addEventListener('click', (e) => e.preventDefault()));
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
 
-  // "Lihat Reviu" & "Buat Konsep PL" SENGAJA belum diarahkan ke mana
-  // pun -- belum ada halaman Reviu Konsep ataupun form Buat Konsep PL
-  // yang bisa dituju (lihat header file).
+  // "Buat Konsep PL" -> form Pengajuan Konsep PL, id proposal induknya
+  // ikut dibawa lewat query supaya tombol "Batal" di form bisa balik
+  // ke halaman ini lagi.
+  root.querySelector('#btn-buat-konsep')?.addEventListener('click', () => {
+    router.navigate(`/pages/lo-biro-ti/pengajuan/konsep-pl.html?proposalId=${encodeURIComponent(item.id)}`);
+  });
+
+  // "Lihat Reviu" SENGAJA belum diarahkan ke mana pun -- belum ada
+  // halaman Reviu Konsep yang bisa dituju (lihat header file).
 }

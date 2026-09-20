@@ -60,6 +60,15 @@
   background: #a4301f;
 }
 
+.btn-success {
+  background: #0f9d70;
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  background: #0b8560;
+}
+
 .btn-muted {
   background: var(--color-paper-muted);
   color: #ffffff;

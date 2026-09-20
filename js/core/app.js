@@ -22,6 +22,7 @@ const PAGE_MODULES = {
   'monitoring/proposal-pl': () => import('../pages/monitoring.js'),
   'monitoring/konsep-pl': () => import('../pages/monitoring.js'),
   'pengajuan/proposal-pl': () => import('../pages/pengajuan-proposal.js'),
+  'pengajuan/konsep-pl': () => import('../pages/pengajuan-konsep.js'),
   'pengajuan/ubah-proposal-pl': () => import('../pages/ubah-proposal.js'),
   'antrian/detail': () => import('../pages/detail.js'),
   'antrian/review': () => import('../pages/review.js'),
@@ -36,7 +37,10 @@ const PAGE_MODULES = {
   // Halaman Detail Konsep (masih kosongan) buat dummy KL-2026-050 di
   // Monitoring Konsep PL role LO Biro TI -- lihat resolveRowActionRoute
   // di js/pages/monitoring.js & komentar di js/pages/detail-konsep.js.
-  'monitoring/detail-konsep': () => import('../pages/detail-konsep.js')
+  'monitoring/detail-konsep': () => import('../pages/detail-konsep.js'),
+  // Halaman Detail Proposal dan Konsep Perangkat Lunak -- dibuka lewat
+  // tombol "Simpan" di form Pengajuan Konsep PL (role LO Biro TI).
+  'monitoring/detail-proposal-konsep': () => import('../pages/detail-proposal-konsep.js')
 };
 
 // Breadcrumb navbar per pageKey. Halaman yang tidak didaftarkan di
@@ -48,6 +52,9 @@ const PAGE_BREADCRUMBS = {
   'monitoring/proposal-pl': ['Monitoring', 'Monitoring Proposal'],
   'monitoring/konsep-pl': ['Monitoring', 'Monitoring Konsep'],
   'pengajuan/proposal-pl': ['Pengajuan Proposal PL'],
+  // Form Konsep PL dianggap bagian dari menu "Pengajuan Proposal PL"
+  // (satu-satunya menu pengajuan LO Biro TI), ngikutin contoh tampilan.
+  'pengajuan/konsep-pl': ['Pengajuan Proposal PL'],
   'pengajuan/ubah-proposal-pl': ['Antrian', 'Ubah Proposal'],
   'antrian/detail': ['Antrian', 'Detail Proposal'],
   'antrian/review': ['Antrian', 'Review Proposal'],
@@ -63,7 +70,11 @@ const PAGE_BREADCRUMBS = {
   // di js/pages/monitoring.js).
   'monitoring/review': ['Antrian', 'Detail Proposal'],
   'monitoring/reviu-proposal': ['Antrian', 'Reviu Proposal'],
-  'monitoring/detail-konsep': ['Monitoring', 'Monitoring Konsep']
+  'monitoring/detail-konsep': ['Monitoring', 'Monitoring Konsep'],
+  // Ngikutin contoh tampilan: breadcrumb-nya "Pengajuan Proposal PL"
+  // walau folder URL-nya di bawah monitoring/ (menu Monitoring yang
+  // ke-highlight di sidebar, lihat activePaths di role.js).
+  'monitoring/detail-proposal-konsep': ['Pengajuan Proposal PL']
 };
 
 // Folder yang nama file di dalamnya BUKAN unik (mis. "proposal-pl"
