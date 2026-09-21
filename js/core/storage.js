@@ -17,7 +17,7 @@ export const STORAGE_KEYS = {
 
 // Naikkan angka ini kalau struktur data seed berubah,
 // biar seed lama ke-replace otomatis pas user buka lagi.
-const CURRENT_SEED_VERSION = 3;
+const CURRENT_SEED_VERSION = 4;
 
 function read(key, fallback = null) {
   try {

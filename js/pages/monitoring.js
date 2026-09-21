@@ -226,9 +226,31 @@ const KONSEP_ORTALA_CHAIN_CARD_GROUPS = [
 // Kepala Biro Ortala ada di paling depan rantai Ortala buat Konsep
 // PL juga (sama seperti di Proposal PL), jadi masih lihat kartu
 // "Diterima" -- role di bawahnya (Kabag/Kasubbag/Previu) enggak.
+// Khusus Kabiro juga ada kartu "Dicabut" di paling akhir (= status
+// TIDAK_DISETUJUI, lihat KONSEP_STATUS_META di data/konsep.js; sama
+// persis dengan punya LO Biro TI & Kepala Satker).
 const KARO_ORTALA_KONSEP_CARD_GROUPS = [
   { label: 'Diterima', statuses: [SUBMISSION_STATUS.DIKIRIM], text: '#2B5C89', blob: '#C2D8F0' },
-  ...KONSEP_ORTALA_CHAIN_CARD_GROUPS
+  ...KONSEP_ORTALA_CHAIN_CARD_GROUPS,
+  { label: 'Dicabut', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#9AA0AA', blob: '#DCD5C2' }
+];
+
+// Kepala Bagian & Kepala Subbagian Ortala: 9 kartu rantai Ortala (tanpa
+// "Diterima", itu cuma buat Kabiro) + kartu "Dicabut" di paling akhir
+// (sama persis dengan punya Kabiro). Previu belum dikasih kartu ini --
+// lihat KONSEP_PREVIU_CARD_GROUPS di bawah.
+const KONSEP_ORTALA_DICABUT_CARD_GROUPS = [
+  ...KONSEP_ORTALA_CHAIN_CARD_GROUPS,
+  { label: 'Dicabut', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#9AA0AA', blob: '#DCD5C2' }
+];
+
+// Previu Biro Ortala: kartu rantai Ortala TANPA "Pengesahan Satker" (8
+// kartu) + kartu "Dicabut" di paling akhir (jadi 9 kartu, "Dicabut" jatuh
+// sendirian di baris ketiga, otomatis di tengah). Role Ortala lain tetap
+// pakai daftar aslinya.
+const KONSEP_PREVIU_CARD_GROUPS = [
+  ...KONSEP_ORTALA_CHAIN_CARD_GROUPS.filter((group) => group.label !== 'Pengesahan Satker'),
+  { label: 'Dicabut', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#9AA0AA', blob: '#DCD5C2' }
 ];
 
 // Kartu ringkasan Monitoring Konsep PL khusus LO Biro TI -- beda dari
@@ -239,6 +261,12 @@ const KARO_ORTALA_KONSEP_CARD_GROUPS = [
 // masing (bukan digabung ke "Proses Reviu"/"Disetujui" seperti di
 // Proposal PL) supaya LO bisa lihat progres tahap pengesahan lebih
 // rinci -- "Pengesahan Satker" ditaruh tepat setelah "Koreksi Ortala".
+// Kartu "Final" (status FINAL) ditaruh tepat setelah "Proses Reviu".
+// Kartu "Disetujui" & "Tidak Disetujui" TIDAK ada di daftar ini. Di ujung
+// daftar ada 3 kartu: "Legislasi", "Indeksasi", dan "Dicabut" (= status
+// TIDAK_DISETUJUI yang di Konsep PL memang ditampilkan dengan nama
+// "Dicabut" + warna abu-abu, lihat KONSEP_STATUS_META di data/konsep.js).
+// Total 12 kartu.
 const LO_BIRO_TI_KONSEP_CARD_GROUPS = [
   { label: 'Konsep', statuses: [SUBMISSION_STATUS.DRAFT], text: '#2B935B', blob: '#E7E9EC' },
   { label: 'Menunggu Persetujuan', statuses: [SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN], text: '#12664D', blob: '#DCF3E7' },
@@ -246,22 +274,22 @@ const LO_BIRO_TI_KONSEP_CARD_GROUPS = [
   { label: 'Koreksi Satker', statuses: [SUBMISSION_STATUS.KOREKSI_SATKER], text: '#C15343', blob: '#FBDAD5' },
   { label: 'Ditolak Kasatker', statuses: [SUBMISSION_STATUS.DITOLAK_KASATKER], text: '#9F7327', blob: '#F7E7C4' },
   { label: 'Proses Reviu', statuses: [SUBMISSION_STATUS.PROSES_REVIU], text: '#BD5444', blob: '#FBDAD5' },
+  { label: 'Final', statuses: [SUBMISSION_STATUS.FINAL], text: '#3C7A5C', blob: '#B9DDC7' },
   { label: 'Koreksi Ortala', statuses: [SUBMISSION_STATUS.KOREKSI_ORTALA], text: '#B03A6E', blob: '#F5B8D3' },
   { label: 'Pengesahan Satker', statuses: [SUBMISSION_STATUS.PENGESAHAN_SATKER], text: '#3B4F9E', blob: '#C2CCF0' },
-  {
-    label: 'Disetujui',
-    statuses: [SUBMISSION_STATUS.FINAL, SUBMISSION_STATUS.LEGISLASI, SUBMISSION_STATUS.INDEKSASI],
-    text: '#888A92',
-    blob: '#EDEEF0'
-  },
-  { label: 'Tidak Disetujui', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#C0392B', blob: '#DCF3E7' }
+  { label: 'Legislasi', statuses: [SUBMISSION_STATUS.LEGISLASI], text: '#7A3FA0', blob: '#DFC0EF' },
+  { label: 'Indeksasi', statuses: [SUBMISSION_STATUS.INDEKSASI], text: '#1F8A63', blob: '#A9E8C7' },
+  { label: 'Dicabut', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#9AA0AA', blob: '#DCD5C2' }
 ];
 
 // Kartu ringkasan Monitoring Konsep PL khusus Kepala Satker Biro TI --
 // mirip LO_BIRO_TI_KONSEP_CARD_GROUPS di atas, tapi kartu "Disetujui"
 // dipecah jadi 3 kartu terpisah (Final, Legislasi, Indeksasi) supaya
 // Kepala Satker bisa lihat lebih rinci ada di tahap mana persisnya --
-// total jadi 12 kartu (vs 10 punya LO).
+// total jadi 12 kartu. Kartu "Final" ditaruh tepat setelah "Proses Reviu"
+// (sama seperti di LO_BIRO_TI_KONSEP_CARD_GROUPS). Kartu terakhir "Dicabut"
+// (= status TIDAK_DISETUJUI, lihat KONSEP_STATUS_META di data/konsep.js)
+// juga sama persis dengan punya LO.
 const KEPALA_SATKER_KONSEP_CARD_GROUPS = [
   { label: 'Konsep', statuses: [SUBMISSION_STATUS.DRAFT], text: '#2B935B', blob: '#E7E9EC' },
   { label: 'Menunggu Persetujuan', statuses: [SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN], text: '#12664D', blob: '#DCF3E7' },
@@ -269,12 +297,12 @@ const KEPALA_SATKER_KONSEP_CARD_GROUPS = [
   { label: 'Koreksi Satker', statuses: [SUBMISSION_STATUS.KOREKSI_SATKER], text: '#C15343', blob: '#FBDAD5' },
   { label: 'Ditolak Kasatker', statuses: [SUBMISSION_STATUS.DITOLAK_KASATKER], text: '#9F7327', blob: '#F7E7C4' },
   { label: 'Proses Reviu', statuses: [SUBMISSION_STATUS.PROSES_REVIU], text: '#BD5444', blob: '#FBDAD5' },
+  { label: 'Final', statuses: [SUBMISSION_STATUS.FINAL], text: '#3C7A5C', blob: '#B9DDC7' },
   { label: 'Koreksi Ortala', statuses: [SUBMISSION_STATUS.KOREKSI_ORTALA], text: '#B03A6E', blob: '#F5B8D3' },
   { label: 'Pengesahan Satker', statuses: [SUBMISSION_STATUS.PENGESAHAN_SATKER], text: '#3B4F9E', blob: '#C2CCF0' },
-  { label: 'Final', statuses: [SUBMISSION_STATUS.FINAL], text: '#3C7A5C', blob: '#B9DDC7' },
   { label: 'Legislasi', statuses: [SUBMISSION_STATUS.LEGISLASI], text: '#7A3FA0', blob: '#DFC0EF' },
   { label: 'Indeksasi', statuses: [SUBMISSION_STATUS.INDEKSASI], text: '#1F8A63', blob: '#A9E8C7' },
-  { label: 'Tidak Disetujui', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#C0392B', blob: '#DCF3E7' }
+  { label: 'Dicabut', statuses: [SUBMISSION_STATUS.TIDAK_DISETUJUI], text: '#9AA0AA', blob: '#DCD5C2' }
 ];
 
 // Konfigurasi per tipe monitoring -- cukup tambah entri baru di
@@ -332,11 +360,11 @@ const MONITORING_CONFIG = {
     // tetap pakai 11 kartu default (statusMeta) apa adanya.
     cardGroupsByRole: {
       [ROLES.KEPALA_BIRO_ORTALA]: KARO_ORTALA_KONSEP_CARD_GROUPS,
-      // 9 kartu, sama kayak Kabiro tapi tanpa "Diterima" -- lihat
-      // KONSEP_ORTALA_CHAIN_CARD_GROUPS di atas.
-      [ROLES.KEPALA_BAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
-      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
-      [ROLES.PREVIU_BIRO_ORTALA]: KONSEP_ORTALA_CHAIN_CARD_GROUPS,
+      // 10 kartu (Kabag & Kasubbag), sama kayak Kabiro tapi tanpa
+      // "Diterima" -- lihat KONSEP_ORTALA_DICABUT_CARD_GROUPS di atas.
+      [ROLES.KEPALA_BAGIAN_ORTALA]: KONSEP_ORTALA_DICABUT_CARD_GROUPS,
+      [ROLES.KEPALA_SUBBAGIAN_ORTALA]: KONSEP_ORTALA_DICABUT_CARD_GROUPS,
+      [ROLES.PREVIU_BIRO_ORTALA]: KONSEP_PREVIU_CARD_GROUPS,
       [ROLES.LO_BIRO_TI]: LO_BIRO_TI_KONSEP_CARD_GROUPS,
       [ROLES.KEPALA_SATKER_BIRO_TI]: KEPALA_SATKER_KONSEP_CARD_GROUPS
     },
@@ -346,6 +374,14 @@ const MONITORING_CONFIG = {
     // tampil sebagai "Proses Reviu" -- statusnya sama persis dengan
     // Proposal PL jadi override-nya dipakai bareng.
     statusLabelOverrides: STATUS_LABEL_OVERRIDES,
+    // Toggle "Assign to Me" (di kanan filter status) -- SAJA, tanpa
+    // "Belum ada Konsep PL" -- baru dikasih ke role yang disebut di
+    // sini. Sekarang Kepala Biro, Kepala Bagian, & Kepala Subbagian Ortala.
+    assignToggleRoles: [
+      ROLES.KEPALA_BIRO_ORTALA,
+      ROLES.KEPALA_BAGIAN_ORTALA,
+      ROLES.KEPALA_SUBBAGIAN_ORTALA
+    ],
     // Disamain sama Monitoring Proposal PL biar tabelnya nggak
     // "gede" (judul konsep gak pecah jadi 3 baris) -- lihat komentar
     // compactTable di config 'proposal-pl' di atas.
@@ -414,6 +450,7 @@ function renderFilterBar({
   searchPlaceholder,
   showToggles,
   showAssignToggle,
+  showAssignOnly,
   showCreateButton,
   belumAdaKonsep,
   assignToMe,
@@ -443,7 +480,7 @@ function renderFilterBar({
   // ke satkernya, bukan filter "punya saya"). Role rantai Ortala
   // (Kabiro/Kabag/Kasubbag/Previu) yang me-review tetap butuh
   // toggle-nya.
-  const loControls = (showToggles || showCreateButton)
+  const loControls = (showToggles || showAssignOnly || showCreateButton)
     ? `
       ${
         showToggles
@@ -465,9 +502,19 @@ function renderFilterBar({
             : ''
         }
       </div>`
-          : ''
-      }
+          : showAssignOnly
+            ? `
       <span class="filter-bar__spacer"></span>
+      <div class="filter-bar__toggles">
+        <label class="toggle">
+          <input type="checkbox" class="toggle__input" id="filter-assign-me" ${assignToMe ? 'checked' : ''}>
+          <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          <span class="toggle__label">Assign to Me</span>
+        </label>
+      </div>`
+            : ''
+      }
+      ${showAssignOnly ? '' : '<span class="filter-bar__spacer"></span>'}
       ${showCreateButton ? `<button class="btn btn-dark" type="button" id="btn-create-proposal">${PLUS_ICON}${createLabel}</button>` : ''}
     `
     : '';
@@ -587,6 +634,7 @@ function initMonitoringTable(root, config, user, type) {
     statusLabelOverrides: defaultStatusLabelOverrides,
     statusLabelOverridesByRole,
     showFilterToggles,
+    assignToggleRoles,
     loBiroTiControls,
     createRoute,
     createLabel,
@@ -611,6 +659,12 @@ function initMonitoringTable(root, config, user, type) {
   // tetap butuh toggle-nya.
   const showAssignToggle =
     showToggles && user?.role !== ROLES.LO_BIRO_TI && user?.role !== ROLES.KEPALA_SATKER_BIRO_TI;
+  // Halaman yang TIDAK pakai paket toggle lengkap (showFilterToggles,
+  // mis. Monitoring Konsep PL -- "Belum ada Konsep PL" memang cuma
+  // relevan buat Proposal PL) tapi tetap butuh toggle "Assign to Me"
+  // saja buat role tertentu: lihat assignToggleRoles di
+  // MONITORING_CONFIG.
+  const showAssignOnly = !showToggles && Boolean(assignToggleRoles?.includes(user?.role));
   const state = { search: '', status: '', year: '', page: 1, assignToMe: false, belumAdaKonsep: false };
   const years = service.getAvailableYears();
 
@@ -648,6 +702,7 @@ function initMonitoringTable(root, config, user, type) {
             searchPlaceholder,
             showToggles,
             showAssignToggle,
+            showAssignOnly,
             showCreateButton,
             belumAdaKonsep: state.belumAdaKonsep,
             assignToMe: state.assignToMe,

@@ -7,6 +7,7 @@
 // ============================================================
 
 import { storage, STORAGE_KEYS } from './storage.js';
+import { auth } from './auth.js';
 import { router } from './router.js';
 import { SEED_USERS } from '../../data/users.js';
 import { sidebar } from '../components/sidebar/sidebar-pegawai.js';
@@ -143,6 +144,9 @@ const App = {
     storage.seed({
       [STORAGE_KEYS.USERS]: SEED_USERS
     });
+    // Sesi lama bisa masih nyimpen username/nama versi sebelum seed
+    // di-update -- samakan dulu sebelum guard & render halaman.
+    auth.syncSession();
 
     const pathname = router.getCurrentPath();
 

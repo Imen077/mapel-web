@@ -13,9 +13,9 @@ const DUMMY_PASSWORD = 'mapel123';
 export const SEED_USERS = [
   {
     id: 'u-pegawai-01',
-    username: 'pegawai.bpj',
+    username: 'pegawai.bpk',
     password: DUMMY_PASSWORD,
-    name: 'Pegawai Bpj',
+    name: 'Pegawai Bpk',
     role: 'pegawai'
   },
   {

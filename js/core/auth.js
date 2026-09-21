@@ -78,6 +78,40 @@ function loginAsRole(role) {
   return session;
 }
 
+/**
+ * Samakan sesi yang tersimpan di browser dengan daftar user terbaru
+ * (hasil seed). Perlu, karena sesi menyimpan salinan username & nama --
+ * kalau data user di data/users.js berubah (mis. ganti username/nama),
+ * sesi lama tetap nampilin data lama di navbar, sapaan dashboard, dll
+ * sampai user logout-login lagi. Dicocokkan lewat userId; kalau akunnya
+ * sudah tidak ada sama sekali, sesi dibuang (jadinya balik ke login).
+ */
+function syncSession() {
+  const session = storage.read(STORAGE_KEYS.SESSION, null);
+  if (!session) return;
+
+  const users = storage.read(STORAGE_KEYS.USERS, []);
+  const found = users.find((u) => u.id === session.userId);
+
+  if (!found) {
+    storage.remove(STORAGE_KEYS.SESSION);
+    return;
+  }
+
+  if (
+    found.username !== session.username ||
+    found.name !== session.name ||
+    found.role !== session.role
+  ) {
+    storage.write(STORAGE_KEYS.SESSION, {
+      ...session,
+      username: found.username,
+      name: found.name,
+      role: found.role
+    });
+  }
+}
+
 /** @returns {Session | null} */
 function getCurrentUser() {
   return storage.read(STORAGE_KEYS.SESSION, null);
@@ -87,4 +121,4 @@ function isAuthenticated() {
   return getCurrentUser() !== null;
 }
 
-export const auth = { login, logout, getCurrentUser, isAuthenticated, loginAsRole };
+export const auth = { login, logout, getCurrentUser, isAuthenticated, loginAsRole, syncSession };
