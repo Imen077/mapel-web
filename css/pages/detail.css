@@ -73,6 +73,10 @@
   justify-self: start;
 }
 
+.detail-grid__item > .badge--outline {
+  padding: 3px var(--space-3);
+}
+
 .detail-grid__value--muted {
   font-weight: 400;
   color: var(--color-paper-muted);

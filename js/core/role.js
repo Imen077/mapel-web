@@ -86,7 +86,10 @@ export const ROLE_MENUS = {
     {
       label: 'Monitoring',
       icon: 'activity',
-      activePaths: ['/pages/lo-biro-ti/monitoring/detail-proposal-konsep.html'],
+      activePaths: [
+        '/pages/lo-biro-ti/monitoring/detail-konsep.html',
+        '/pages/lo-biro-ti/monitoring/detail-proposal-konsep.html'
+      ],
       children: [
         { label: 'Monitoring Proposal PL', path: '/pages/lo-biro-ti/monitoring/proposal-pl.html' },
         { label: 'Monitoring Konsep PL', path: '/pages/lo-biro-ti/monitoring/konsep-pl.html' },

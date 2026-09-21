@@ -27,6 +27,9 @@ const PAGE_MODULES = {
   'pengajuan/ubah-proposal-pl': () => import('../pages/ubah-proposal.js'),
   'antrian/detail': () => import('../pages/detail.js'),
   'antrian/review': () => import('../pages/review.js'),
+  // Detail Proposal dan Konsep + keputusan Revisi/Setuju (Kepala Satker),
+  // lihat js/pages/review-konsep.js.
+  'antrian/review-konsep': () => import('../pages/review-konsep.js'),
   'monitoring/detail': () => import('../pages/disposisi.js'),
   'monitoring/disposisi-tujuan': () => import('../pages/disposisi-tujuan.js'),
   // Halaman Detail Proposal buat Previu Biro Ortala (ujung rantai
@@ -35,9 +38,10 @@ const PAGE_MODULES = {
   // ngebedain lewat user.role (tombol "Reviu", bukan "Disposisi").
   'monitoring/review': () => import('../pages/disposisi.js'),
   'monitoring/reviu-proposal': () => import('../pages/review-proposal.js'),
-  // Halaman Detail Konsep (masih kosongan) buat dummy KL-2026-050 di
-  // Monitoring Konsep PL role LO Biro TI -- lihat resolveRowActionRoute
-  // di js/pages/monitoring.js & komentar di js/pages/detail-konsep.js.
+  // Halaman Detail Proposal (yang sudah Disetujui + tombol "Buat Konsep
+  // PL") buat dummy PO-2026-048 di Monitoring Proposal PL role LO Biro
+  // TI -- lihat resolveRowActionRoute di js/pages/monitoring.js &
+  // komentar di js/pages/detail-konsep.js.
   'monitoring/detail-konsep': () => import('../pages/detail-konsep.js'),
   // Halaman Detail Proposal dan Konsep Perangkat Lunak -- dibuka lewat
   // tombol "Simpan" di form Pengajuan Konsep PL (role LO Biro TI).
@@ -59,6 +63,8 @@ const PAGE_BREADCRUMBS = {
   'pengajuan/ubah-proposal-pl': ['Antrian', 'Ubah Proposal'],
   'antrian/detail': ['Antrian', 'Detail Proposal'],
   'antrian/review': ['Antrian', 'Review Proposal'],
+  // Breadcrumb ngikutin contoh tampilan ("Monitoring > Monitoring Proposal").
+  'antrian/review-konsep': ['Monitoring', 'Monitoring Proposal'],
   // Sengaja dibikin sama persis kayak breadcrumb Monitoring Proposal
   // PL (bukan "Detail Proposal") -- ngikutin desain, dianggap
   // sub-halaman dari situ, bukan bagian dari alur Antrian.
@@ -71,7 +77,7 @@ const PAGE_BREADCRUMBS = {
   // di js/pages/monitoring.js).
   'monitoring/review': ['Antrian', 'Detail Proposal'],
   'monitoring/reviu-proposal': ['Antrian', 'Reviu Proposal'],
-  'monitoring/detail-konsep': ['Monitoring', 'Monitoring Konsep'],
+  'monitoring/detail-konsep': ['Monitoring', 'Monitoring Proposal'],
   // Ngikutin contoh tampilan: breadcrumb-nya "Pengajuan Proposal PL"
   // walau folder URL-nya di bawah monitoring/ (menu Monitoring yang
   // ke-highlight di sidebar, lihat activePaths di role.js).

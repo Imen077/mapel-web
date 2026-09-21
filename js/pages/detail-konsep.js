@@ -1,8 +1,11 @@
 // ============================================================
 // MAPEL - pages/detail-konsep.js
-// Halaman "Detail Konsep" -- dibuka dari baris dummy KL-2026-050 di
-// Monitoring Konsep PL (role LO Biro TI, lihat data/konsep.js &
-// resolveRowActionRoute di js/pages/monitoring.js).
+// Halaman "Detail Proposal" (proposal yang sudah Disetujui) -- dibuka
+// dari baris dummy PO-2026-048 di Monitoring Proposal PL (role LO Biro
+// TI, lihat data/proposal.js & resolveRowActionRoute di js/pages/
+// monitoring.js). Nama file-nya masih "detail-konsep" karena dari sini
+// LO lanjut bikin Konsep PL. Dulu dummy ini ada di Monitoring Konsep PL
+// dengan id KL-2026-050.
 //
 // Layout & class CSS-nya SENGAJA dipola sama persis kayak halaman
 // "Detail Proposal" yang lain (js/pages/detail.js: .detail-page,
@@ -14,8 +17,8 @@
 // kosong, karena flow bikin konsep dari proposal yang disetujui
 // belum digarap).
 //
-// Field-nya dibaca DINAMIS dari konsepService.getById() (bukan
-// hardcode), jadi kalau nanti dummy KL-2026-050 diisi datanya,
+// Field-nya dibaca DINAMIS dari proposalService.getById() (bukan
+// hardcode), jadi kalau nanti dummy PO-2026-048 diisi datanya,
 // halaman ini otomatis ikut berubah. Badge status ikut
 // item.tableStatusOverride kalau ada (pola sama kayak renderTableRows
 // di js/pages/monitoring.js), biar konsisten sama badge di tabel.
@@ -27,7 +30,7 @@
 // ============================================================
 
 import { router } from '../core/router.js';
-import { konsepService } from '../../data/konsep.js';
+import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
 
 const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m0 0 6-6m-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -54,7 +57,7 @@ function renderDetailItem(label, valueHtml) {
 
 /** Data turunan buat kartu Detail Proposal -- status ikut tableStatusOverride kalau ada (lihat header file). */
 function buildDetailData(item) {
-  const baseMeta = konsepService.getStatusMeta(item.status);
+  const baseMeta = proposalService.getStatusMeta(item.status);
   const meta = { ...baseMeta, ...(item.tableStatusOverride || {}) };
   return {
     statusLabel: meta.label,
@@ -159,13 +162,13 @@ function renderKonsepPlSection() {
 export function initDetailKonsepPage(root, user) {
   if (!root) return;
 
-  const backTarget = `/pages/${user?.role}/monitoring/konsep-pl.html`;
-  const item = konsepService.getById(getIdFromQuery());
+  const backTarget = `/pages/${user?.role}/monitoring/proposal-pl.html`;
+  const item = proposalService.getById(getIdFromQuery());
 
   if (!item) {
     root.innerHTML = `
       <div class="detail-page">
-        <p class="dashboard__subtitle">Konsep tidak ditemukan. Mungkin sudah dipindahkan atau link-nya sudah kedaluwarsa.</p>
+        <p class="dashboard__subtitle">Proposal tidak ditemukan. Mungkin sudah dipindahkan atau link-nya sudah kedaluwarsa.</p>
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali ke Monitoring</button>
       </div>
     `;

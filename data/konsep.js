@@ -213,37 +213,31 @@ JUDUL_LIST.slice(STATUS_SEQUENCE.length).forEach((title, i) => {
   });
 });
 
-// Satu dummy tambahan buat Monitoring Konsep PL (role LO Biro TI),
-// sesuai mockup "Detail Konsep PL - LO Biro TI": judul, satker,
-// jenis, dan pembuat sudah diisi. Isinya sebenarnya proposal yang
-// sudah Disetujui (titik awal LO menekan "Buat Konsep PL"), makanya
-// halaman detailnya (js/pages/detail-konsep.js) masih berjudul
-// "Detail Proposal". Status asli tetap status "submitted" yang valid
-// (MENUNGGU_PERSETUJUAN) supaya muncul di tabel (Monitoring nyaring
-// keluar item DRAFT, lihat getFiltered di submission-service.js),
-// tapi badge-nya ditampilkan "Disetujui" lewat tableStatusOverride
-// (dibaca di renderTableRows, js/pages/monitoring.js & antrian.js).
-// nomorPengajuan, createdAt, dan nomorNotaDinas juga sudah disamakan
-// dengan mockup (PO-2026-042, 05 Agustus 2026 11:32:40, dan
-// 1532/ND/X.5/06/2026) -- dipakai halaman Detail Proposal dan Konsep
-// (js/pages/detail-proposal-konsep.js). employeeId masih "-".
+// Satu dummy khusus Monitoring Konsep PL role Kepala Satker Biro TI,
+// status Menunggu Persetujuan (= konsep yang baru dikirim LO Biro TI
+// dan tinggal menunggu keputusannya). testOnlyFor bikin item ini cuma
+// kelihatan di role Kepala Satker (tabel & kartu ringkasan), role lain
+// tidak ikut kehitung. Ditaruh setelah semua item lain supaya jadi baris
+// pertama (tanggal paling baru), dan nomor 035 lanjutan dari 034.
+// Judul nyambung sama dummy proposal PO-2026-048 di data/proposal.js
+// ("Proposal POS Pengujian Website" -> konsep "POS Pengujian Website"),
+// dan proposalId-nya nunjuk ke proposal itu -- baris ini bisa diklik
+// (halaman js/pages/review-konsep.js nampilin proposal induk + konsep).
+const DUMMY_KASATKER_CREATED_AT = '2026-08-07T09:15:20';
 SEED_KONSEP.unshift({
-  id: 'KL-2026-050',
+  id: 'KL-2026-035',
   unit: 'Biro Teknologi Informasi',
-  title: 'Proposal POS Pengujian Website',
+  title: 'POS Pengujian Website',
   jenis: 'POS',
   createdBy: 'Agustina Ratna Puspitasari',
-  employeeId: '-',
-  nomorPengajuan: 'PO-2026-042',
+  employeeId: '240004492',
+  nomorPengajuan: buildNomorPengajuan(35, DUMMY_KASATKER_CREATED_AT),
+  proposalId: 'PO-2026-048',
   nomorNotaDinas: '1532/ND/X.5/06/2026',
   koreksiKe: 0,
-  createdAt: '2026-08-05T11:32:40',
+  createdAt: DUMMY_KASATKER_CREATED_AT,
   status: SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN,
-  testOnlyFor: ROLES.LO_BIRO_TI,
-  // Warna disamain sama badge "Disetujui" yang sudah dipakai di
-  // tempat lain (lihat STATUS_LABEL_OVERRIDES di js/pages/
-  // monitoring.js & antrian.js).
-  tableStatusOverride: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' }
+  testOnlyFor: ROLES.KEPALA_SATKER_BIRO_TI
 });
 
 export const konsepService = createSubmissionService({

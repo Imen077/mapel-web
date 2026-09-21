@@ -27,18 +27,30 @@ const ARROW_RIGHT_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="
 // tooltip "segera hadir"). Tambah entri baru di sini kalau nanti ada
 // kombinasi role+status+type lain yang juga sudah punya halamannya.
 function resolveRowActionRoute({ type, role, status, itemId }) {
-  // Konsep PL SECARA UMUM belum punya halaman detail sama sekali --
-  // KECUALI dummy KL-2026-050 ini (lihat data/konsep.js), yang
-  // SENGAJA dicek lewat itemId, bukan status/role, karena isi & alur
-  // Konsep PL buat LO Biro TI belum diputusin. Halaman tujuannya
-  // (js/pages/detail-konsep.js) juga masih kosongan, cuma biar
-  // barisnya bisa diklik dulu. Dicek PALING AWAL (sebelum guard
-  // `type !== 'proposal-pl'` di bawah) justru supaya guard itu tidak
-  // ikut nge-block dummy Konsep PL ini.
-  if (type === 'konsep-pl' && itemId === 'KL-2026-050') {
-    return `/pages/lo-biro-ti/monitoring/detail-konsep.html?id=${encodeURIComponent(itemId)}`;
+  // Konsep PL: baru Kepala Satker Biro TI + "Menunggu Persetujuan" yang
+  // punya halaman (js/pages/review-konsep.js, Detail Proposal dan Konsep
+  // + keputusan Revisi/Setuju). Halaman itu nampilin proposal induk
+  // juga, jadi cuma konsep yang sudah punya proposalId (lihat KL-2026-035
+  // di data/konsep.js) yang bisa dibuka. Kombinasi lain belum punya
+  // halaman detail.
+  if (type === 'konsep-pl') {
+    const linkedToProposal = Boolean(konsepService.getById(itemId)?.proposalId);
+    if (role === ROLES.KEPALA_SATKER_BIRO_TI && status === SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN && linkedToProposal) {
+      return `/pages/kepala-satker-biro-ti/antrian/review-konsep.html?id=${encodeURIComponent(itemId)}`;
+    }
+    return null;
   }
   if (type !== 'proposal-pl') return null;
+
+  // Dummy proposal Disetujui punya LO Biro TI (lihat PO-2026-048 di
+  // data/proposal.js) -> halaman Detail Proposal yang ada tombol
+  // "Buat Konsep PL"-nya (js/pages/detail-konsep.js). SENGAJA dicek
+  // lewat itemId, bukan status/role, karena proposal FINAL lain
+  // (data acak) belum punya isi detail yang layak. Sebelumnya dummy ini
+  // ada di Monitoring Konsep PL dengan id KL-2026-050.
+  if (role === ROLES.LO_BIRO_TI && itemId === 'PO-2026-048') {
+    return `/pages/lo-biro-ti/monitoring/detail-konsep.html?id=${encodeURIComponent(itemId)}`;
+  }
 
   if (role === ROLES.KEPALA_SATKER_BIRO_TI && status === SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN) {
     return `/pages/kepala-satker-biro-ti/antrian/review.html?id=${encodeURIComponent(itemId)}`;

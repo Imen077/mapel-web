@@ -649,6 +649,41 @@ if (duplicateMenungguIndex !== -1) SEED_PROPOSALS.splice(duplicateMenungguIndex,
 const duplicateProsesReviuIndex = SEED_PROPOSALS.findIndex((item) => item.id === 'PO-2026-041');
 if (duplicateProsesReviuIndex !== -1) SEED_PROPOSALS.splice(duplicateProsesReviuIndex, 1);
 
+// Dummy buat Monitoring Proposal PL role LO Biro TI, sesuai mockup
+// "Detail Konsep PL - LO Biro TI": proposal yang sudah DISETUJUI --
+// titik awal LO menekan "Buat Konsep PL" (Konsep PL cuma boleh
+// diajukan setelah proposalnya disetujui semua pihak). Klik judulnya
+// di tabel buka js/pages/detail-konsep.js (lihat
+// resolveRowActionRoute di js/pages/monitoring.js). Dipindah dari
+// data/konsep.js (dulu id-nya KL-2026-050).
+//
+// - id sengaja BUKAN PO-2026-042: id itu sudah dipakai proposal SMKI
+//   (dummy testing Kepala Satker Biro TI, lihat atas). nomorPengajuan-
+//   nya di-pin manual ke "PO-2026-042" sesuai mockup (pola sama kayak
+//   nomorPengajuan yang di-pin di atas: beda dari id internal).
+// - Ditaruh PALING AKHIR (setelah loop penomoran otomatis) supaya
+//   nomorPengajuan item lain tidak ikut bergeser.
+// - Status FINAL = "Disetujui" di tabel (lihat STATUS_LABEL_OVERRIDES di
+//   js/pages/monitoring.js), tapi label bawaan proposalService-nya
+//   "Final", jadi tableStatusOverride di bawah dipakai biar halaman
+//   detail (yang baca item langsung) juga nampilin "Disetujui".
+// - nomorNotaDinas dipakai halaman Detail Proposal dan Konsep
+//   (js/pages/detail-proposal-konsep.js).
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-048',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PO-2026-042',
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
+  createdAt: '2026-08-05T11:32:40',
+  status: SUBMISSION_STATUS.FINAL,
+  testOnlyFor: ROLES.LO_BIRO_TI,
+  tableStatusOverride: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' }
+});
+
 export const proposalService = createSubmissionService({
   statusMeta: PROPOSAL_STATUS_META,
   items: SEED_PROPOSALS
