@@ -6,10 +6,11 @@
 //   - Selalu tampil sebagai HALAMAN PENUH (bukan modal), sesuai
 //     contoh tampilan yang dikasih (breadcrumb "Monitoring >
 //     Monitoring Proposal" tetap kelihatan di navbar).
-//   - Kartu ringkasannya 3 kolom (bukan 2): Judul/Tanggal/Nomor Nota
-//     Dinas, lalu Satker Pengusul/Nomor Pengajuan, lalu File Konsep
-//     PL/File Nota Dinas -- konsep punya 2 file (proposal cuma
-//     ditampilkan filenya di kartu detailnya sendiri, bukan di sini).
+//   - Kartu ringkasannya beda jumlah kolom per role: Kepala Biro
+//     Ortala tetap 3 kolom (Judul/Tanggal/Nomor Nota Dinas, Satker
+//     Pengusul/Nomor Pengajuan, File Konsep PL/File Nota Dinas).
+//     Kepala Bagian Ortala cuma 2 kolom TANPA kolom file, sesuai
+//     contoh tampilan "Disposisi PL - Kepala Bagian" yang dikasih.
 //   - Bar subheader "Disposisi Konsep PL" pakai warna hijau tua
 //     (.disposisi-tujuan__subheader--konsep di css/pages/review.css),
 //     beda dari bar biru tua punya Proposal PL, biar 2 flow ini
@@ -40,6 +41,12 @@ const BACK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><
 const DUMMY_PEJABAT_TUJUAN_KONSEP_BY_ROLE = {
   [ROLES.KEPALA_BIRO_ORTALA]: [
     { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }
+  ],
+  // Berikutnya di DISPOSISI_CHAIN sesudah Kepala Bagian Ortala adalah
+  // Kepala Subbagian Ortala -- namanya disamakan dengan akun asli
+  // role itu (lihat data/users.js: "Arny Satyawaty").
+  [ROLES.KEPALA_BAGIAN_ORTALA]: [
+    { nama: 'Arny Fitriana Satyawati', nip: '240003585', jabatan: 'Kepala Subbagian - Biro Organisasi dan Tata Laksana' }
   ]
 };
 const DEFAULT_PEJABAT_TUJUAN = DUMMY_PEJABAT_TUJUAN_KONSEP_BY_ROLE[ROLES.KEPALA_BIRO_ORTALA];
@@ -117,18 +124,33 @@ export function initDisposisiTujuanKonsepPage(root, user) {
   const pejabatTujuan = DUMMY_PEJABAT_TUJUAN_KONSEP_BY_ROLE[user?.role] ?? DEFAULT_PEJABAT_TUJUAN;
   const rows = pejabatTujuan.map(renderPejabatRow).join('');
 
+  // Kepala Bagian Ortala: kartu ringkasan cuma 2 kolom, TANPA kolom
+  // File Konsep PL/File Nota Dinas -- sesuai contoh tampilan "Disposisi
+  // PL - Kepala Bagian" yang dikasih (beda dari versi Kepala Biro
+  // Ortala yang tetap 3 kolom + file, lihat komentar di atas & di
+  // css/pages/review.css).
+  const isKepalaBagian = user?.role === ROLES.KEPALA_BAGIAN_ORTALA;
+  const gridClass = isKepalaBagian ? 'disposisi-tujuan__grid' : 'disposisi-tujuan__grid disposisi-tujuan__grid--3col';
+  const fileColumn = isKepalaBagian
+    ? ''
+    : `
+          <div class="disposisi-tujuan__col">
+            ${renderRingkasanItem('File Konsep PL', DEFAULT_FILE_KONSEP)}
+            ${renderRingkasanItem('File Nota Dinas', DEFAULT_FILE_NOTA_DINAS)}
+          </div>`;
+
   root.innerHTML = `
     <div class="review-page">
       <div class="review-page__intro">
-        <h1 class="review-page__title">Detail Konsep</h1>
-        <p class="review-page__subtitle">Rincian data pengajuan proposal beserta dokumen pendukung.</p>
+        <h1 class="review-page__title">Detail Konsep PL</h1>
+        <p class="review-page__subtitle">Rincian data pengajuan konsep beserta dokumen pendukung.</p>
       </div>
 
       <div class="card disposisi-tujuan-card">
-        <div class="card__header"><h2 class="card__title">Detail Konsep</h2></div>
+        <div class="card__header"><h2 class="card__title">Detail Konsep PL</h2></div>
         <div class="disposisi-tujuan__subheader disposisi-tujuan__subheader--konsep">Disposisi Konsep PL</div>
 
-        <div class="disposisi-tujuan__grid disposisi-tujuan__grid--3col">
+        <div class="${gridClass}">
           <div class="disposisi-tujuan__col">
             ${renderRingkasanItem('Judul Konsep PL', konsep.title)}
             ${renderRingkasanItem('Tanggal Pengajuan', formatDateTimeFullID(konsep.createdAt))}
@@ -137,11 +159,7 @@ export function initDisposisiTujuanKonsepPage(root, user) {
           <div class="disposisi-tujuan__col">
             ${renderRingkasanItem('Satker Pengusul', konsep.unit)}
             ${renderRingkasanItem('Nomor Pengajuan', nomorPengajuan)}
-          </div>
-          <div class="disposisi-tujuan__col">
-            ${renderRingkasanItem('File Konsep PL', DEFAULT_FILE_KONSEP)}
-            ${renderRingkasanItem('File Nota Dinas', DEFAULT_FILE_NOTA_DINAS)}
-          </div>
+          </div>${fileColumn}
         </div>
 
         <div class="data-table-wrap">

@@ -45,8 +45,47 @@ function getIdFromQuery() {
   return new URLSearchParams(window.location.search).get('id') || '';
 }
 
-/** Kartu "Riwayat Disposisi" -- belum ada data, jadi cuma header tabel + tampilan kosong. */
-function renderRiwayatDisposisiCard() {
+/**
+ * Kartu "Riwayat Disposisi". Kalau item belum punya riwayat (lihat
+ * field `riwayatDisposisi` di data/konsep.js), tampil empty state
+ * seperti sebelumnya -- begitu ada datanya (mis. KL-2026-038, sesuai
+ * contoh tampilan Kepala Bagian Ortala), dirender jadi baris tabel
+ * beneran. Pola & class CSS-nya (data-table__title/__code) sama
+ * persis dengan versi Proposal PL (js/pages/disposisi.js), biar
+ * konsisten.
+ * @param {Object[]} [entries]
+ */
+function renderRiwayatDisposisiCard(entries = []) {
+  const body = entries.length
+    ? entries
+        .map(
+          (row) => `
+            <tr>
+              <td><span class="data-table__title">${formatDateTimeFullID(row.waktu)}</span></td>
+              <td>
+                <span class="data-table__title">${row.dariNama}</span>
+                <span class="data-table__code">${row.dariJabatan}</span>
+              </td>
+              <td>
+                <span class="data-table__title">${row.kepadaNama}</span>
+                <span class="data-table__code">${row.kepadaJabatan}</span>
+              </td>
+              <td>${row.catatan}</td>
+            </tr>
+          `
+        )
+        .join('')
+    : `
+        <tr>
+          <td colspan="4">
+            <div class="detail-empty-state">
+              <span class="detail-empty-state__icon">${CLIPBOARD_ICON}</span>
+              <p class="detail-empty-state__text">Belum ada riwayat disposisi</p>
+            </div>
+          </td>
+        </tr>
+      `;
+
   return `
     <div class="card detail-card">
       <div class="card__header"><h2 class="card__title">Riwayat Disposisi</h2></div>
@@ -61,16 +100,7 @@ function renderRiwayatDisposisiCard() {
                 <th>Catatan Disposisi</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td colspan="4">
-                  <div class="detail-empty-state">
-                    <span class="detail-empty-state__icon">${CLIPBOARD_ICON}</span>
-                    <p class="detail-empty-state__text">Belum ada riwayat disposisi</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+            <tbody>${body}</tbody>
           </table>
         </div>
       </div>
@@ -121,7 +151,7 @@ export function initDisposisiKonsepPage(root, user) {
 
       ${renderCollapsibleCard({ id: 'panel-proposal', title: 'Detail Proposal Perangkat Lunak', bodyHtml: renderProposalBody(proposal), collapsible: false })}
       ${renderCollapsibleCard({ id: 'panel-konsep', title: 'Konsep Perangkat Lunak', bodyHtml: renderKonsepBody(konsepFields, renderBadge(statusMeta, statusMeta.label)) })}
-      ${renderRiwayatDisposisiCard()}
+      ${renderRiwayatDisposisiCard(konsep.riwayatDisposisi)}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>

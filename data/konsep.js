@@ -274,23 +274,48 @@ SEED_KONSEP.unshift({
 // GROUPS, dipakai bareng semua role rantai Ortala -- lihat
 // js/pages/monitoring.js). testOnlyFor bikin item ini cuma kelihatan
 // di role Kepala Bagian (tabel & kartu ringkasan).
-// TAHAP INI baris ini SENGAJA belum punya proposalId/nomorNotaDinas
-// (isinya kosongan dulu) -- baru dibikin bisa diklik (lihat
-// resolveRowActionRoute di js/pages/monitoring.js), halaman
-// tujuannya juga masih placeholder "sedang dalam pengembangan"
-// (belum didaftarkan di PAGE_MODULES, js/core/app.js).
+// Sekarang sudah dilengkapi proposalId & nomorNotaDinas (nyambung ke
+// proposal PO-2026-048 & konsep KL-2026-036 -- satu rantai demo yang
+// sama, yang sebelumnya diteruskan Kepala Biro Ortala ke Kepala
+// Bagian Ortala). Halaman tujuannya (js/pages/disposisi-konsep.js,
+// dipakai ulang lewat key 'monitoring/konsep-disposisi') sudah
+// didaftarkan di PAGE_MODULES (js/core/app.js), jadi baris ini
+// sekarang bisa diklik dan menampilkan Detail Proposal dan Konsep +
+// tombol Disposisi (lanjut ke Kepala Subbagian Ortala).
+// unit & createdAt disamakan dengan punya KL-2026-036 (item yang sama
+// pas masih di tangan Kepala Biro Ortala, sebelum diteruskan ke
+// Kepala Bagian) -- sesuai contoh tampilan "Detail Proposal dan
+// Konsep Perangkat Lunak" Kepala Bagian yang dikasih. tableStatusOverride
+// bikin badge status di kartu detail & tabel Monitoring tampil
+// "Disposisi" (hijau), bukan label mentah "Proses Reviu" (ungu).
+// riwayatDisposisi juga sesuai contoh tampilan itu -- 1 baris: Kepala
+// Biro (Agustina) meneruskan ke Kepala Bagian (Telviani Savitri, user
+// yang lagi login), dibaca oleh js/pages/disposisi-konsep.js.
 SEED_KONSEP.unshift({
   id: 'KL-2026-038',
-  unit: 'Biro Organisasi dan Tatalaksana',
+  unit: 'Biro Teknologi Informasi',
   title: 'POS Pengujian Website',
   jenis: 'POS',
   createdBy: 'Agustina Ratna Puspitasari',
   employeeId: '240004492',
   nomorPengajuan: 'PL-2026-031',
+  proposalId: 'PO-2026-048',
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
   koreksiKe: 0,
-  createdAt: '2026-08-20T10:05:12',
+  createdAt: '2026-08-19T09:19:56',
   status: SUBMISSION_STATUS.PROSES_REVIU,
-  testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA
+  testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA,
+  tableStatusOverride: { label: 'Disposisi', bg: '#E1EFE7', text: '#3C7A5C' },
+  riwayatDisposisi: [
+    {
+      waktu: '2026-08-20T08:15:22',
+      dariNama: 'Agustina Ratna Puspitasari',
+      dariJabatan: 'Kepala Biro',
+      kepadaNama: 'Telviani Savitri',
+      kepadaJabatan: 'Kepala Bagian',
+      catatan: 'Mohon direviu kesesuaiannya.'
+    }
+  ]
 });
 
 export const konsepService = createSubmissionService({

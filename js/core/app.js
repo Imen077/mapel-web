@@ -42,6 +42,13 @@ const PAGE_MODULES = {
   // "Diterima" role Kepala Biro Ortala -- lihat resolveRowActionRoute di
   // js/pages/monitoring.js & js/pages/disposisi-konsep.js.
   'monitoring/disposisi-konsep': () => import('../pages/disposisi-konsep.js'),
+  // Sama persis kayak 'monitoring/disposisi-konsep' di atas (reuse
+  // modul yang sama, initDisposisiKonsepPage sudah generik lewat
+  // user.role) -- key beda cuma karena file HTML Kepala Bagian
+  // Ortala sengaja dikasih nama beda ("konsep-disposisi", lihat
+  // komentar di pages/kepala-bagian-ortala/monitoring/konsep-disposisi.html)
+  // biar tidak nabrak PAGE_MODULES punya Kepala Biro Ortala.
+  'monitoring/konsep-disposisi': () => import('../pages/disposisi-konsep.js'),
   // "Disposisi Konsep PL" -- dibuka lewat tombol "Disposisi" di
   // halaman di atas (monitoring/disposisi-konsep), lihat
   // js/pages/disposisi-tujuan-konsep.js.
@@ -79,6 +86,10 @@ const PAGE_BREADCRUMBS = {
   'monitoring/detail': ['Monitoring', 'Monitoring Proposal'],
   // Ngikutin contoh tampilan ("Monitoring > Monitoring Proposal").
   'monitoring/disposisi-konsep': ['Monitoring', 'Monitoring Proposal'],
+  // Sama kayak breadcrumb 'monitoring/disposisi-konsep' di atas
+  // (Kepala Biro Ortala) -- ngikutin pola yang sama buat Kepala
+  // Bagian Ortala.
+  'monitoring/konsep-disposisi': ['Monitoring', 'Monitoring Proposal'],
   'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal'],
   // Sama persis (breadcrumb-nya ngikutin contoh tampilan "Disposisi
   // Kepala Biro" yang dikasih -- tetap "Monitoring Proposal", bukan
