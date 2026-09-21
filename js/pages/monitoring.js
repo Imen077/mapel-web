@@ -64,6 +64,19 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
     ) {
       return `/pages/kepala-bagian-ortala/monitoring/konsep-disposisi.html?id=${encodeURIComponent(itemId)}`;
     }
+    // Kepala Subbagian Ortala + "Disposisi" (PROSES_REVIU): dummy khusus
+    // role itu (lihat KL-2026-039 di data/konsep.js). Pakai halaman
+    // Detail Proposal dan Konsep + Riwayat Disposisi yang sama kayak
+    // Kepala Bagian di atas (reuse js/pages/disposisi-konsep.js lewat
+    // key 'monitoring/konsep-disposisi' di PAGE_MODULES). Nama file
+    // HTML-nya ikut punya Kabag ("konsep-disposisi").
+    if (
+      role === ROLES.KEPALA_SUBBAGIAN_ORTALA &&
+      status === SUBMISSION_STATUS.PROSES_REVIU &&
+      konsepService.getById(itemId)?.testOnlyFor === role
+    ) {
+      return `/pages/kepala-subbagian-ortala/monitoring/konsep-disposisi.html?id=${encodeURIComponent(itemId)}`;
+    }
     return null;
   }
   if (type !== 'proposal-pl') return null;

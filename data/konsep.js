@@ -318,6 +318,51 @@ SEED_KONSEP.unshift({
   ]
 });
 
+// Satu dummy khusus Monitoring Konsep PL role Kepala Subbagian Ortala,
+// status PROSES_REVIU (= kartu "Disposisi", sama kayak punya Kepala
+// Bagian). testOnlyFor bikin item ini cuma kelihatan di role Kepala
+// Subbagian (tabel & kartu ringkasan). Lanjutan rantai demo yang sama
+// dengan KL-2026-036/038 (proposal PO-2026-048): sebelumnya Kepala
+// Bagian (Telviani) meneruskan ke Kepala Subbagian (Arny, user yang
+// lagi login). Badge tampil "Disposisi" (hijau) lewat
+// tableStatusOverride.
+SEED_KONSEP.unshift(
+  {
+    id: 'KL-2026-039',
+    unit: 'Biro Teknologi Informasi',
+    title: 'POS Pengujian Website',
+    jenis: 'POS',
+    createdBy: 'Agustina Ratna Puspitasari',
+    employeeId: '240004492',
+    nomorPengajuan: 'PL-2026-031',
+    proposalId: 'PO-2026-048',
+    nomorNotaDinas: '1532/ND/X.5/06/2026',
+    koreksiKe: 0,
+    createdAt: '2026-08-19T09:19:56',
+    status: SUBMISSION_STATUS.PROSES_REVIU,
+    testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA,
+    tableStatusOverride: { label: 'Disposisi', bg: '#E1EFE7', text: '#3C7A5C' },
+    riwayatDisposisi: [
+      {
+        waktu: '2026-08-20T08:15:22',
+        dariNama: 'Agustina Ratna Puspitasari',
+        dariJabatan: 'Kepala Biro',
+        kepadaNama: 'Telviani Savitri',
+        kepadaJabatan: 'Kepala Bagian',
+        catatan: 'Mohon direviu kesesuaiannya.'
+      },
+      {
+        waktu: '2026-08-21T10:42:05',
+        dariNama: 'Telviani Savitri',
+        dariJabatan: 'Kepala Bagian',
+        kepadaNama: 'Arny Satyawaty',
+        kepadaJabatan: 'Kepala Subbagian',
+        catatan: 'Mohon ditindaklanjuti sesuai ketentuan.'
+      }
+    ]
+  }
+);
+
 export const konsepService = createSubmissionService({
   statusMeta: KONSEP_STATUS_META,
   items: SEED_KONSEP
