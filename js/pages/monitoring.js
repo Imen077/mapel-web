@@ -33,10 +33,21 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
   // juga, jadi cuma konsep yang sudah punya proposalId (lihat KL-2026-035
   // di data/konsep.js) yang bisa dibuka. Kombinasi lain belum punya
   // halaman detail.
+  // Kepala Biro Ortala + "Diterima" (DIKIRIM): baru dummy khusus role itu
+  // (testOnlyFor, lihat KL-2026-036 di data/konsep.js) yang bisa dibuka,
+  // ke halaman Detail Proposal dan Konsep + Riwayat Disposisi
+  // (js/pages/disposisi-konsep.js).
   if (type === 'konsep-pl') {
     const linkedToProposal = Boolean(konsepService.getById(itemId)?.proposalId);
     if (role === ROLES.KEPALA_SATKER_BIRO_TI && status === SUBMISSION_STATUS.MENUNGGU_PERSETUJUAN && linkedToProposal) {
       return `/pages/kepala-satker-biro-ti/antrian/review-konsep.html?id=${encodeURIComponent(itemId)}`;
+    }
+    if (
+      role === ROLES.KEPALA_BIRO_ORTALA &&
+      status === SUBMISSION_STATUS.DIKIRIM &&
+      konsepService.getById(itemId)?.testOnlyFor === role
+    ) {
+      return `/pages/kepala-biro-ortala/monitoring/disposisi-konsep.html?id=${encodeURIComponent(itemId)}`;
     }
     return null;
   }

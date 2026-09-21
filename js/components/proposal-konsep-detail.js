@@ -45,12 +45,14 @@ export function renderBadge(meta, label) {
   return `<span class="badge" style="background:${meta.bg};color:${meta.text}">${escapeHtml(label)}</span>`;
 }
 
-/** Kartu yang bisa dilipat lewat tombol panah di pojok kanan header. */
-export function renderCollapsibleCard({ id, title, bodyHtml }) {
-  return `
-    <div class="card detail-card" data-collapsible-card>
-      <div class="card__header">
-        <h2 class="card__title">${title}</h2>
+/**
+ * Kartu yang bisa dilipat lewat tombol panah di pojok kanan header.
+ * collapsible=false -> kartu biasa tanpa tombol panah (mis. kartu
+ * proposal di halaman Kepala Biro, sesuai contoh tampilannya).
+ */
+export function renderCollapsibleCard({ id, title, bodyHtml, collapsible = true }) {
+  const toggle = collapsible
+    ? `
         <button
           class="detail-card__toggle"
           type="button"
@@ -59,7 +61,12 @@ export function renderCollapsibleCard({ id, title, bodyHtml }) {
           aria-label="Ciutkan ${title}"
           data-collapse-toggle="${id}"
           data-title="${title}"
-        >${CHEVRON_UP_ICON}</button>
+        >${CHEVRON_UP_ICON}</button>`
+    : '';
+  return `
+    <div class="card detail-card" data-collapsible-card>
+      <div class="card__header">
+        <h2 class="card__title">${title}</h2>${toggle}
       </div>
       <div id="${id}">${bodyHtml}</div>
     </div>
@@ -91,7 +98,8 @@ export function renderProposalBody(item) {
 
 /**
  * Isi kartu "Konsep Perangkat Lunak".
- * @param {{judul:string, satuanKerja:string, pejabatPengusul:string, fileKonsep:string, fileNotaDinas:string, nomorNotaDinas?:string}} konsep
+ * @param {{judul:string, satuanKerja:string, pejabatPengusul:string, fileKonsep:string, fileNotaDinas:string, nomorNotaDinas?:string, nomorPengajuan?:string, tanggalPengajuan?:string}} konsep
+ *   nomorPengajuan & tanggalPengajuan opsional -- kosong tampil "-" (konsep yang belum punya nomor).
  * @param {string} statusHtml - badge status yang sudah jadi (beda tiap halaman: LO "Konsep", Kepala Satker "Menunggu Konsep")
  */
 export function renderKonsepBody(konsep, statusHtml) {
@@ -99,8 +107,8 @@ export function renderKonsepBody(konsep, statusHtml) {
     <div class="detail-grid">
       <div class="detail-grid__col">
         ${renderDetailItem('Judul Konsep PL', renderValue(konsep.judul))}
-        ${renderDetailItem('Nomor Pengajuan', renderMutedDash())}
-        ${renderDetailItem('Tanggal Pengajuan', renderMutedDash())}
+        ${renderDetailItem('Nomor Pengajuan', konsep.nomorPengajuan ? renderValue(konsep.nomorPengajuan) : renderMutedDash())}
+        ${renderDetailItem('Tanggal Pengajuan', konsep.tanggalPengajuan ? renderValue(konsep.tanggalPengajuan) : renderMutedDash())}
         ${renderDetailItem('Satker Pengusul', renderValue(konsep.satuanKerja))}
         ${renderDetailItem('Status', statusHtml)}
         ${renderDetailItem('Koreksi Ke-', '<span class="koreksi-badge">0</span>')}

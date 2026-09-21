@@ -240,6 +240,35 @@ SEED_KONSEP.unshift({
   testOnlyFor: ROLES.KEPALA_SATKER_BIRO_TI
 });
 
+// Satu dummy khusus Monitoring Konsep PL role Kepala Biro Ortala, status
+// "Diterima" (= kartu "Diterima" di Kabiro, isinya status DIKIRIM: konsep
+// yang baru masuk ke rantai Ortala). testOnlyFor bikin item ini cuma
+// kelihatan di role Kepala Biro (tabel & kartu ringkasan).
+// Isinya disamain sama contoh tampilan "Detail Proposal dan Konsep
+// Perangkat Lunak" Kepala Biro: judul "POS Pengujian Website", nomor
+// PL-2026-031, tanggal 19 Agustus 2026 09:19:56. proposalId nunjuk ke
+// proposal induknya (PO-2026-048, data/proposal.js).
+// Label bawaan status DIKIRIM tertulis "Dikirim" & berwarna biru, jadi
+// tableStatusOverride ngeganti jadi "Diterima" + warna hijau (badge di
+// tabel & di halaman detail, js/pages/disposisi-konsep.js). Baris ini bisa
+// diklik (lihat resolveRowActionRoute di js/pages/monitoring.js).
+SEED_KONSEP.unshift({
+  id: 'KL-2026-036',
+  unit: 'Biro Teknologi Informasi',
+  title: 'POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PL-2026-031',
+  proposalId: 'PO-2026-048',
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
+  koreksiKe: 0,
+  createdAt: '2026-08-19T09:19:56',
+  status: SUBMISSION_STATUS.DIKIRIM,
+  testOnlyFor: ROLES.KEPALA_BIRO_ORTALA,
+  tableStatusOverride: { label: 'Diterima', bg: '#E1EFE7', text: '#3C7A5C' }
+});
+
 export const konsepService = createSubmissionService({
   statusMeta: KONSEP_STATUS_META,
   items: SEED_KONSEP

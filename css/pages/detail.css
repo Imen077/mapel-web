@@ -200,6 +200,38 @@
   line-height: var(--leading-relaxed);
 }
 
+/* ---------- Kartu tabel dengan tampilan kosong (Riwayat Disposisi) ---------- */
+
+.detail-card__table {
+  padding: 0 var(--space-5) var(--space-5);
+}
+
+.detail-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+}
+
+.detail-empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: var(--color-paper-dim);
+  color: var(--color-ink-700);
+}
+
+.detail-empty-state__text {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
 @media (max-width: 720px) {
   .detail-grid {
     grid-template-columns: 1fr;

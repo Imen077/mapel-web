@@ -38,6 +38,10 @@ const PAGE_MODULES = {
   // ngebedain lewat user.role (tombol "Reviu", bukan "Disposisi").
   'monitoring/review': () => import('../pages/disposisi.js'),
   'monitoring/reviu-proposal': () => import('../pages/review-proposal.js'),
+  // Detail Proposal dan Konsep + Riwayat Disposisi buat dummy konsep
+  // "Diterima" role Kepala Biro Ortala -- lihat resolveRowActionRoute di
+  // js/pages/monitoring.js & js/pages/disposisi-konsep.js.
+  'monitoring/disposisi-konsep': () => import('../pages/disposisi-konsep.js'),
   // Halaman Detail Proposal (yang sudah Disetujui + tombol "Buat Konsep
   // PL") buat dummy PO-2026-048 di Monitoring Proposal PL role LO Biro
   // TI -- lihat resolveRowActionRoute di js/pages/monitoring.js &
@@ -69,6 +73,8 @@ const PAGE_BREADCRUMBS = {
   // PL (bukan "Detail Proposal") -- ngikutin desain, dianggap
   // sub-halaman dari situ, bukan bagian dari alur Antrian.
   'monitoring/detail': ['Monitoring', 'Monitoring Proposal'],
+  // Ngikutin contoh tampilan ("Monitoring > Monitoring Proposal").
+  'monitoring/disposisi-konsep': ['Monitoring', 'Monitoring Proposal'],
   'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal'],
   // Beda dari 'monitoring/detail' di atas -- breadcrumb Previu SENGAJA
   // "Antrian > Detail Proposal" (bukan "Monitoring > Monitoring
