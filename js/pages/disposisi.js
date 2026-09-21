@@ -132,6 +132,28 @@ const DUMMY_HASIL_REVIU = {
   'selesai-reviu': [{ tanggalReviu: '2026-08-06T08:38:52', hasilReviu: '-', kesimpulan: '-' }]
 };
 
+// Riwayat disposisi buat Kepala Subbagian Ortala (item dummy
+// PO-2026-043): Kabiro -> Kabag -> Kasubbag, jadi baris terakhirnya
+// berhenti di dia (bukan diteruskan ke Pereviu kayak punya Kabag).
+const DUMMY_RIWAYAT_DISPOSISI_KASUBBAG = [
+  {
+    waktu: '2026-02-26T08:15:22',
+    dariNama: 'Agustina Ratna Puspitasari',
+    dariJabatan: 'Kepala Biro',
+    kepadaNama: 'Telviani Savitri',
+    kepadaJabatan: 'Kepala Bagian',
+    catatan: 'Mohon direviu kesesuaiannya dengan proses bisnis BPK.'
+  },
+  {
+    waktu: '2026-02-26T09:40:05',
+    dariNama: 'Telviani Savitri',
+    dariJabatan: 'Kepala Bagian',
+    kepadaNama: 'Arny Fitriana Stayawati',
+    kepadaJabatan: 'Kepala Subbagian',
+    catatan: 'Diteruskan untuk direviu lebih lanjut, mohon segera ditindaklanjuti.'
+  }
+];
+
 function getIdFromQuery() {
   return new URLSearchParams(window.location.search).get('id') || '';
 }
@@ -141,15 +163,19 @@ function getIdFromQuery() {
  * -- dipisah dari initDisposisiPage supaya lebih ringkas dibaca.
  * @param {Object} item - hasil proposalService.getById()
  */
-function buildDetailData(item) {
+function buildDetailData(item, { asDisposisi = false } = {}) {
   const statusMeta = proposalService.getStatusMeta(item.status);
-  const override = DISPOSISI_STATUS_META_OVERRIDES[item.status];
+  // asDisposisi: item dummy Kepala Subbagian yang di tabel Monitoring
+  // berlabel "Disposisi" (PO-2026-043, lihat tableStatusOverride di
+  // data/proposal.js) -- di halaman ini juga diperlakukan sebagai
+  // Disposisi (badge, Keterangan, riwayat, tombol), bukan Selesai Reviu.
+  const override = asDisposisi ? DISPOSISI_STATUS_META_OVERRIDES['proses-reviu'] : DISPOSISI_STATUS_META_OVERRIDES[item.status];
   const statusLabel = override?.label ?? statusMeta.label;
   const badgeBg = override?.bg ?? statusMeta.bg;
   const badgeText = override?.text ?? statusMeta.text;
   const nomorPengajuan = item.nomorPengajuan || item.id;
-  const riwayat = DUMMY_RIWAYAT_DISPOSISI[item.status] ?? [];
-  const hasilReviu = DUMMY_HASIL_REVIU[item.status] ?? [];
+  const riwayat = asDisposisi ? DUMMY_RIWAYAT_DISPOSISI_KASUBBAG : (DUMMY_RIWAYAT_DISPOSISI[item.status] ?? []);
+  const hasilReviu = asDisposisi ? [] : (DUMMY_HASIL_REVIU[item.status] ?? []);
   return { statusLabel, badgeBg, badgeText, nomorPengajuan, riwayat, hasilReviu };
 }
 
@@ -355,6 +381,97 @@ function renderDocPreviewGrid(item, data) {
   `;
 }
 
+// ------------------------------------------------------------
+// Tampilan baru halaman Detail Proposal (sesuai contoh "Detail
+// Proposal Kepala Bagian Ortala") -- dipakai Kepala Bagian & Kepala
+// Subbagian Ortala. Kabiro & Previu masih pakai tampilan lama di atas.
+// Gayanya ada di css/pages/review.css (prefix .dp-).
+// ------------------------------------------------------------
+const CLIP_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m20 11-8.6 8.6a5 5 0 0 1-7.1-7.1l9-9a3.3 3.3 0 0 1 4.7 4.7l-9 9a1.7 1.7 0 0 1-2.4-2.4l8.3-8.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/** "Kamis, 26 Feb 2026" + "08:15:22" (dua baris di sel Tanggal & Waktu). */
+function formatWaktuRiwayat(dateInput) {
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return { tanggal: '-', jam: '' };
+  const tanggal = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' })
+    .format(date)
+    .replace(/\b\p{L}/gu, (ch) => ch.toUpperCase());
+  const pad = (n) => String(n).padStart(2, '0');
+  return { tanggal, jam: `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}` };
+}
+
+function renderInfoRowBaru(label, value) {
+  return `
+    <div class="dp-info__row">
+      <span class="dp-info__label">${label}</span>
+      <span class="dp-info__value">${value}</span>
+    </div>
+  `;
+}
+
+/** Kartu "Detail Proposal" versi baru: baris label/nilai polos, tanpa ikon. */
+function renderDetailCardBaru(item, data) {
+  const { statusLabel, nomorPengajuan } = data;
+  const fileLink = `<a href="#" data-file-link>${CLIP_ICON}test.pdf</a>`;
+  return `
+    <div class="dp-card">
+      <div class="dp-card__header"><h2 class="dp-card__title">Detail Proposal</h2></div>
+      <div class="dp-info">
+        <div class="dp-info__col">
+          ${renderInfoRowBaru('Judul Proposal', item.title)}
+          ${renderInfoRowBaru('Nomor Pengajuan', nomorPengajuan)}
+          ${renderInfoRowBaru('Tanggal Pengajuan', formatDateTimeFullID(item.createdAt))}
+          ${renderInfoRowBaru('Satker Pengusul', item.unit)}
+          ${renderInfoRowBaru('Status', `<span class="dp-pill">${statusLabel}</span>`)}
+        </div>
+        <div class="dp-info__col">
+          ${renderInfoRowBaru('Pejabat Pengusul', item.createdBy)}
+          ${renderInfoRowBaru('Keterangan', statusLabel)}
+          ${renderInfoRowBaru('File Proposal', fileLink)}
+          ${renderInfoRowBaru('File Nota Dinas', fileLink)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/** Kartu "Riwayat Disposisi" versi baru (tabel berbingkai, tanggal 2 baris). */
+function renderRiwayatBaru(entries) {
+  if (!entries.length) return '';
+  const rows = entries
+    .map((row) => {
+      const { tanggal, jam } = formatWaktuRiwayat(row.waktu);
+      return `
+            <tr>
+              <td><span class="dp-table__title">${tanggal}</span><span class="dp-table__sub dp-table__sub--mono">${jam}</span></td>
+              <td><span class="dp-table__title">${row.dariNama}</span><span class="dp-table__sub">${row.dariJabatan}</span></td>
+              <td><span class="dp-table__title">${row.kepadaNama}</span><span class="dp-table__sub">${row.kepadaJabatan}</span></td>
+              <td>${row.catatan}</td>
+            </tr>
+          `;
+    })
+    .join('');
+
+  return `
+    <div class="dp-card">
+      <div class="dp-card__header"><h2 class="dp-card__title">Riwayat Disposisi</h2></div>
+      <div class="dp-table-wrap">
+        <table class="dp-table">
+          <thead>
+            <tr>
+              <th>Tanggal &amp; Waktu</th>
+              <th>Dari</th>
+              <th>Kepada</th>
+              <th>Catatan Disposisi</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
 /**
  * @param {HTMLElement} root
  * @param {Session} user
@@ -379,33 +496,45 @@ export function initDisposisiPage(root, user) {
     return;
   }
 
-  const data = buildDetailData(item);
+  // Tampilan baru cuma buat Kepala Bagian & Kepala Subbagian Ortala.
+  const isNewLayout = user?.role === ROLES.KEPALA_BAGIAN_ORTALA || user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA;
+  const asDisposisi = user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA && item.tableStatusOverride?.label === 'Disposisi';
+  const data = buildDetailData(item, { asDisposisi });
   const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
   // "Reviu" buat Previu (dia BENERAN ngerjain checklist-nya) DAN
   // buat status "Selesai Reviu" (Kasubbag/Kabag/Kabiro nerusin hasil
   // reviu, bukan proposal mentah -- lihat kartu "Hasil Reviu" di
   // atas). Selain itu tetap "Disposisi".
-  const actionLabel = isPreviu || item.status === SUBMISSION_STATUS.SELESAI_REVIU ? 'Reviu' : 'Disposisi';
+  const actionLabel = isPreviu || (item.status === SUBMISSION_STATUS.SELESAI_REVIU && !asDisposisi) ? 'Reviu' : 'Disposisi';
+
+  const actionsHtml = isNewLayout
+    ? `
+      <div class="dp-card dp-actions">
+        <button class="dp-btn dp-btn--back" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
+        <button class="btn btn-dark dp-btn--aksi" type="button" id="btn-aksi">${actionLabel}</button>
+      </div>`
+    : `
+      <div class="card detail-actions">
+        <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
+        <button class="btn btn-dark" type="button" id="btn-aksi">${actionLabel}</button>
+      </div>`;
 
   root.innerHTML = `
-    <div class="review-page disposisi-page">
+    <div class="review-page disposisi-page${isNewLayout ? ' disposisi-page--baru' : ''}">
       <div class="review-page__intro">
         <h1 class="review-page__title">Detail Proposal</h1>
         <p class="review-page__subtitle">Rincian data pengajuan proposal beserta dokumen pendukung.</p>
       </div>
 
-      ${renderDetailCard(item, data)}
+      ${isNewLayout ? renderDetailCardBaru(item, data) : renderDetailCard(item, data)}
 
       ${item.status === SUBMISSION_STATUS.DIKIRIM ? renderDocPreviewGrid(item, data) : ''}
 
-      ${renderRiwayatDisposisiCard(data.riwayat)}
+      ${isNewLayout ? renderRiwayatBaru(data.riwayat) : renderRiwayatDisposisiCard(data.riwayat)}
 
       ${renderHasilReviuCard(data.hasilReviu, item.title, `/pages/${user?.role}/monitoring/reviu-proposal.html?id=${encodeURIComponent(item.id)}`)}
 
-      <div class="card detail-actions">
-        <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
-        <button class="btn btn-dark" type="button" id="btn-aksi">${actionLabel}</button>
-      </div>
+      ${actionsHtml}
     </div>
   `;
 

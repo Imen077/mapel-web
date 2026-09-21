@@ -34,25 +34,28 @@ const CLOSE_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
 // lagi login, soalnya tujuannya harus pejabat di LANGKAH BERIKUTNYA
 // di DISPOSISI_CHAIN (js/core/role.js), bukan diri sendiri. Masih
 // dummy (belum baca data pejabat beneran).
+// 6 pilihan pereviu Biro Organisasi dan Tata Laksana -- sesuai contoh
+// tampilan popup "Disposisi Proposal PL" yang dikasih. HANYA dipakai
+// Kepala Subbagian Ortala (lihat di bawah): boleh milih siapa aja dari
+// daftar ini buat diteruskan, bukan cuma 1 pejabat tetap di langkah
+// berikutnya kayak role lain.
+const DAFTAR_PEREVIU = [
+  { nama: 'Meilany Mona Riska', nip: '240004009', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
+  { nama: 'Kusmayanti Meilani', nip: '240002867', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
+  { nama: 'Arny Fitriana Satyawati', nip: '240003585', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
+  { nama: 'Mochammad Taufik', nip: '240007477', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
+  { nama: 'Ita Yuliana', nip: '240002781', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
+  { nama: 'Budiyekti Nugrahani', nip: '240004530', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' }
+];
+
 const DUMMY_PEJABAT_TUJUAN_BY_ROLE = {
   [ROLES.KEPALA_BIRO_ORTALA]: [
     { nama: 'Arny Fitriana Satyawati', nip: '240003585', jabatan: 'Kepala Subbagian - Biro Organisasi dan Tata Laksana' }
   ],
   [ROLES.KEPALA_BAGIAN_ORTALA]: [
-    { nama: 'Telviani Savitri', nip: '240002283', jabatan: 'Kepala Bagian - Biro Organisasi dan Tata Laksana' }
+    { nama: 'Arny Fitriana Stayawati', nip: '240003585', jabatan: 'Kepala Subbagian Organisasi dan Tatalaksana' }
   ],
-  // 6 pilihan pereviu (bukan 1 kayak role lain di atas) -- sesuai
-  // contoh tampilan yang dikasih: Kasubbag boleh milih siapa aja dari
-  // daftar pereviu Biro Organisasi dan Tata Laksana buat diteruskan,
-  // bukan cuma 1 pejabat tetap di langkah berikutnya.
-  [ROLES.KEPALA_SUBBAGIAN_ORTALA]: [
-    { nama: 'Meilany Mona Riska', nip: '240004009', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
-    { nama: 'Kusmayanti Meilani', nip: '240002867', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
-    { nama: 'Arny Fitriana Satyawati', nip: '240003585', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
-    { nama: 'Mochammad Taufik', nip: '240007477', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
-    { nama: 'Ita Yuliana', nip: '240002781', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' },
-    { nama: 'Budiyekti Nugrahani', nip: '240004530', jabatan: 'Pereviu - Biro Organisasi dan Tata Laksana' }
-  ]
+  [ROLES.KEPALA_SUBBAGIAN_ORTALA]: DAFTAR_PEREVIU
 };
 const DEFAULT_PEJABAT_TUJUAN = DUMMY_PEJABAT_TUJUAN_BY_ROLE[ROLES.KEPALA_BIRO_ORTALA];
 
@@ -227,15 +230,16 @@ function bindActions(root, pejabatTujuan, backTarget, { onDisposed } = {}) {
  * lama, lihat initDisposisiTujuanPage di atas -- masih dibiarin buat
  * kompatibilitas kalau halamannya dibuka langsung lewat URL).
  *
- * Isinya sengaja dipola SAMA PERSIS kayak initDisposisiTujuanPage di
- * atas (kartu "Detail Proposal" + bar biru tua "Disposisi Proposal PL"
- * + grid 2 kolom bertumpuk .disposisi-tujuan__grid/__col, BUKAN grid
- * flat .disposisi-modal__grid yang dipakai sebelumnya, dan TANPA
- * toggle "Prioritas") -- cuma dibungkus modal-dialog, sesuai contoh
- * tampilan yang dikasih. class .modal-dialog__body--flush (lihat
- * css/components/modal.css) yang bikin bar birunya bisa nempel ke
- * tepi modal, sama kayak .disposisi-tujuan-card { padding: 0 } di
- * versi halaman penuhnya.
+ * Tampilan BEDA per role:
+ * - Kepala Subbagian Ortala: mengikuti contoh popup terbaru -- judul +
+ *   tombol tutup di header modal, kartu info flat 2 kolom berbaris
+ *   belang (.disposisi-modal__grid: Judul Proposal | Satker Pengusul,
+ *   Tanggal Pengajuan | Nomor Pengajuan, Nomor Nota Dinas | Prioritas)
+ *   dengan toggle "Prioritas", lalu tabel 6 pereviu. Modal dilebarkan
+ *   lewat .modal-dialog--disposisi-wide (css/pages/review.css).
+ * - Role lain (Kepala Bagian, Kepala Biro): tampilan semula -- bar biru
+ *   tua "Disposisi Proposal PL" + grid 2 kolom bertumpuk
+ *   (.disposisi-tujuan__grid/__col), tanpa toggle "Prioritas".
  * @param {Object} item - hasil proposalService.getById(), WAJIB sudah
  *   dicek tidak null oleh pemanggil (disposisi.js sudah begitu).
  * @param {Session} user
@@ -252,30 +256,12 @@ export function openDisposisiTujuanModal(item, user, { onDisposed } = {}) {
   const { nomorPengajuan, nomorNotaDinas, pejabatTujuan } = buildDisposisiTujuanData(item, user);
   const rows = pejabatTujuan.map(renderPejabatRow).join('');
 
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.innerHTML = `
-    <div class="modal-dialog modal-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="disposisi-modal-title">
-      <button type="button" class="modal-dialog__close" data-modal-close aria-label="Tutup">${CLOSE_ICON}</button>
-      <div class="modal-dialog__header">
-        <h2 class="modal-dialog__header-title" id="disposisi-modal-title">Disposisi Proposal PL</h2>
-      </div>
-      <div class="modal-dialog__body modal-dialog__body--flush">
-        <div class="disposisi-tujuan__subheader">Disposisi Proposal PL</div>
+  // Kepala Subbagian Ortala pakai tampilan sesuai contoh popup terbaru;
+  // role lain (Kepala Bagian, Kepala Biro) tetap tampilan semula.
+  const isKasubbag = user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA;
 
-        <div class="disposisi-tujuan__grid">
-          <div class="disposisi-tujuan__col">
-            ${renderRingkasanItem('Judul Proposal', item.title)}
-            ${renderRingkasanItem('Tanggal Pengajuan', formatDateTimeFullID(item.createdAt))}
-            ${renderRingkasanItem('Nomor Nota Dinas', nomorNotaDinas)}
-          </div>
-          <div class="disposisi-tujuan__col">
-            ${renderRingkasanItem('Satker Pengusul', item.unit)}
-            ${renderRingkasanItem('Nomor Pengajuan', nomorPengajuan)}
-          </div>
-        </div>
-
-        <div class="data-table-wrap">
+  const renderTabelPejabat = (wrapClass) => `
+        <div class="${wrapClass}">
           <table class="data-table">
             <thead>
               <tr>
@@ -292,7 +278,57 @@ export function openDisposisiTujuanModal(item, user, { onDisposed } = {}) {
             </tbody>
           </table>
         </div>
+  `;
+
+  const bodyKasubbag = `
+      <div class="modal-dialog__body">
+        <div class="disposisi-modal__grid">
+          ${renderRingkasanItem('Judul Proposal', item.title)}
+          ${renderRingkasanItem('Satker Pengusul', item.unit)}
+          ${renderRingkasanItem('Tanggal Pengajuan', formatDateTimeFullID(item.createdAt))}
+          ${renderRingkasanItem('Nomor Pengajuan', nomorPengajuan)}
+          ${renderRingkasanItem('Nomor Nota Dinas', nomorNotaDinas)}
+          <div class="disposisi-tujuan__item">
+            <span class="disposisi-tujuan__label">Prioritas</span>
+            <span class="disposisi-tujuan__sep">:</span>
+            <label class="toggle">
+              <input type="checkbox" class="toggle__input" data-prioritas-toggle aria-label="Prioritas">
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+            </label>
+          </div>
+        </div>
+        ${renderTabelPejabat('data-table-wrap disposisi-modal__table')}
       </div>
+  `;
+
+  const bodySemula = `
+      <div class="modal-dialog__body modal-dialog__body--flush">
+        <div class="disposisi-tujuan__subheader">Disposisi Proposal PL</div>
+
+        <div class="disposisi-tujuan__grid">
+          <div class="disposisi-tujuan__col">
+            ${renderRingkasanItem('Judul Proposal', item.title)}
+            ${renderRingkasanItem('Tanggal Pengajuan', formatDateTimeFullID(item.createdAt))}
+            ${renderRingkasanItem('Nomor Nota Dinas', nomorNotaDinas)}
+          </div>
+          <div class="disposisi-tujuan__col">
+            ${renderRingkasanItem('Satker Pengusul', item.unit)}
+            ${renderRingkasanItem('Nomor Pengajuan', nomorPengajuan)}
+          </div>
+        </div>
+        ${renderTabelPejabat('data-table-wrap')}
+      </div>
+  `;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-dialog modal-dialog--wide${isKasubbag ? ' modal-dialog--disposisi-wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="disposisi-modal-title">
+      <button type="button" class="modal-dialog__close" data-modal-close aria-label="Tutup">${CLOSE_ICON}</button>
+      <div class="modal-dialog__header">
+        <h2 class="modal-dialog__header-title" id="disposisi-modal-title">Disposisi Proposal PL</h2>
+      </div>
+      ${isKasubbag ? bodyKasubbag : bodySemula}
     </div>
   `;
 

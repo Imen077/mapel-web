@@ -312,16 +312,240 @@
 .disposisi-modal__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-3) var(--space-6);
-  background: var(--color-paper);
+  gap: 0;
+  border: 1px solid var(--color-paper-line);
   border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-5);
+  overflow: hidden;
   margin-bottom: var(--space-5);
+}
+
+/* Tiap sel jadi "baris belang" (baris 1 & 3 berlatar kertas, baris 2
+   putih) sesuai contoh popup -- 6 item = 3 baris x 2 kolom, jadi
+   item ke 1-2 dan 5-6 yang diberi latar. */
+.disposisi-modal__grid > .disposisi-tujuan__item {
+  align-items: center;
+  min-height: 50px;
+  padding: var(--space-3) var(--space-5);
+}
+
+.disposisi-modal__grid > .disposisi-tujuan__item:nth-child(4n + 1),
+.disposisi-modal__grid > .disposisi-tujuan__item:nth-child(4n + 2) {
+  background: var(--color-paper);
+}
+
+.disposisi-modal__table .data-table tbody td {
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+  vertical-align: middle;
+}
+
+.disposisi-modal__table .disposisi-tujuan__input {
+  min-width: 260px;
+  height: 42px;
+}
+
+.disposisi-modal__table .btn {
+  height: 36px;
+  padding: 0 var(--space-5);
+}
+
+/* Nama pejabat ditebalkan (kolom ke-2) -- khusus modal Kepala Subbagian. */
+.disposisi-modal__table .data-table tbody td:nth-child(2) {
+  font-weight: 700;
+  color: var(--color-ink-900);
+}
+
+/* Lebar modal Disposisi Proposal PL khusus Kepala Subbagian (sesuai
+   contoh popup); role lain tetap pakai lebar .modal-dialog--wide
+   bawaan (css/components/modal.css). review.css di-import setelah
+   modal.css, jadi aturan ini yang menang. */
+.modal-dialog--disposisi-wide {
+  max-width: 1500px;
 }
 
 @media (max-width: 880px) {
   .disposisi-tujuan__grid,
   .disposisi-modal__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* 1 kolom: belang per item (ganjil berlatar), bukan per pasangan. */
+  .disposisi-modal__grid > .disposisi-tujuan__item:nth-child(4n + 2) {
+    background: transparent;
+  }
+
+  .disposisi-modal__grid > .disposisi-tujuan__item:nth-child(odd) {
+    background: var(--color-paper);
+  }
+}
+
+/* ---------- Detail Proposal versi baru (js/pages/disposisi.js) ---------- */
+/* Dipakai Kepala Bagian & Kepala Subbagian Ortala, sesuai contoh
+   "Detail Proposal Kepala Bagian Ortala": kartu putih, baris
+   label/nilai polos tanpa ikon, tabel riwayat berbingkai. */
+
+.disposisi-page--baru {
+  max-width: none;
+}
+
+.dp-card {
+  background: #ffffff;
+  border: 1px solid #eceef3;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(20, 32, 43, 0.04);
+  overflow: hidden;
+}
+
+.dp-card__header {
+  padding: 20px 26px;
+  border-bottom: 1px solid #e7e8ee;
+}
+
+.dp-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1c2333;
+}
+
+.dp-info {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  column-gap: 48px;
+  padding: 18px 26px 22px;
+}
+
+.dp-info__col {
+  display: flex;
+  flex-direction: column;
+}
+
+.dp-info__row {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  font-size: 14px;
+}
+
+.dp-info__label {
+  flex: 0 0 168px;
+  color: #8b909e;
+}
+
+.dp-info__value {
+  font-weight: 700;
+  color: #1c2333;
+}
+
+.dp-info__value a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: #143d65;
+  text-decoration: none;
+}
+
+.dp-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 14px;
+  border-radius: var(--radius-full);
+  background: #e6f2fb;
+  border: 1px solid #a9d4f0;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dp-table-wrap {
+  margin: 14px 26px 26px;
+  border: 1px solid #eceef3;
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.dp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #1c2333;
+}
+
+.dp-table th {
+  padding: 12px 14px;
+  background: #fafbfc;
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5d6373;
+}
+
+.dp-table td {
+  padding: 14px;
+  border-top: 1px solid #eceef3;
+  vertical-align: top;
+}
+
+.dp-table__title {
+  display: block;
+  font-weight: 700;
+  color: #1c2333;
+}
+
+.dp-table__sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #8b909e;
+}
+
+.dp-table__sub--mono {
+  font-family: var(--font-mono);
+}
+
+.dp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 26px;
+}
+
+.dp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dp-btn--back {
+  background: #f1f2f5;
+  color: #1c2333;
+}
+
+.dp-btn--back:hover {
+  background: #e7e9ee;
+}
+
+.dp-btn--aksi {
+  height: 42px;
+  padding: 0 24px;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px -6px rgba(20, 61, 101, 0.55);
+}
+
+@media (max-width: 880px) {
+  .dp-info {
     grid-template-columns: 1fr;
   }
 }
