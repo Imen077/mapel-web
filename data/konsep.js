@@ -321,11 +321,12 @@ SEED_KONSEP.unshift({
 // Satu dummy khusus Monitoring Konsep PL role Kepala Subbagian Ortala,
 // status PROSES_REVIU (= kartu "Disposisi", sama kayak punya Kepala
 // Bagian). testOnlyFor bikin item ini cuma kelihatan di role Kepala
-// Subbagian (tabel & kartu ringkasan). Lanjutan rantai demo yang sama
-// dengan KL-2026-036/038 (proposal PO-2026-048): sebelumnya Kepala
-// Bagian (Telviani) meneruskan ke Kepala Subbagian (Arny, user yang
-// lagi login). Badge tampil "Disposisi" (hijau) lewat
-// tableStatusOverride.
+// Subbagian (tabel & kartu ringkasan). Judul & nomor nota dinas sama
+// dengan dummy Proposal PL punya Kepala Subbagian (PO-2026-043 di
+// data/proposal.js), dan proposalId-nya nunjuk ke situ: klik baris ini
+// di Monitoring Konsep PL buka Detail Proposal yang sama (lihat
+// resolveRowActionRoute di js/pages/monitoring.js). Badge tampil
+// "Disposisi" (hijau) lewat tableStatusOverride.
 SEED_KONSEP.unshift(
   {
     id: 'KL-2026-039',
@@ -335,7 +336,7 @@ SEED_KONSEP.unshift(
     createdBy: 'Agustina Ratna Puspitasari',
     employeeId: '240004492',
     nomorPengajuan: 'PL-2026-031',
-    proposalId: 'PO-2026-048',
+    proposalId: 'PO-2026-043',
     nomorNotaDinas: '1532/ND/X.5/06/2026',
     koreksiKe: 0,
     createdAt: '2026-08-19T09:19:56',

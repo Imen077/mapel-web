@@ -65,17 +65,16 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
       return `/pages/kepala-bagian-ortala/monitoring/konsep-disposisi.html?id=${encodeURIComponent(itemId)}`;
     }
     // Kepala Subbagian Ortala + "Disposisi" (PROSES_REVIU): dummy khusus
-    // role itu (lihat KL-2026-039 di data/konsep.js). Pakai halaman
-    // Detail Proposal dan Konsep + Riwayat Disposisi yang sama kayak
-    // Kepala Bagian di atas (reuse js/pages/disposisi-konsep.js lewat
-    // key 'monitoring/konsep-disposisi' di PAGE_MODULES). Nama file
-    // HTML-nya ikut punya Kabag ("konsep-disposisi").
-    if (
-      role === ROLES.KEPALA_SUBBAGIAN_ORTALA &&
-      status === SUBMISSION_STATUS.PROSES_REVIU &&
-      konsepService.getById(itemId)?.testOnlyFor === role
-    ) {
-      return `/pages/kepala-subbagian-ortala/monitoring/konsep-disposisi.html?id=${encodeURIComponent(itemId)}`;
+    // role itu (KL-2026-039 di data/konsep.js). Ngikutin dummy Proposal PL
+    // punya Kasubbag (PO-2026-043, lihat di bawah): buka halaman Detail
+    // Proposal yang sudah ada (kepala-subbagian-ortala/monitoring/detail.html
+    // -> js/pages/disposisi.js) lewat proposalId konsepnya, jadi Riwayat
+    // Disposisi & tombol Disposisi (popup pereviu) langsung nyambung.
+    if (role === ROLES.KEPALA_SUBBAGIAN_ORTALA && status === SUBMISSION_STATUS.PROSES_REVIU) {
+      const konsep = konsepService.getById(itemId);
+      if (konsep?.testOnlyFor === role && konsep.proposalId) {
+        return `/pages/kepala-subbagian-ortala/monitoring/detail.html?id=${encodeURIComponent(konsep.proposalId)}`;
+      }
     }
     return null;
   }
