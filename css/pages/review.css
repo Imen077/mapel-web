@@ -273,6 +273,35 @@
   color: var(--color-paper-muted);
 }
 
+/* ---------- Halaman Disposisi Konsep PL (js/pages/disposisi-tujuan-konsep.js) ---------- */
+/* Reuse semua class .disposisi-tujuan__* di atas (kartu ringkasan +
+   tabel pejabat tujuan sama persis), cuma 2 hal yang beda dari versi
+   Proposal PL: warna bar subheader (hijau tua, bukan biru tua, biar
+   2 flow ini kebeda), dan kartu ringkasannya 3 kolom (Judul/Tanggal/
+   Nomor Nota Dinas, Satker Pengusul/Nomor Pengajuan, File Konsep PL/
+   File Nota Dinas) -- bukan 2 kolom, karena Konsep PL punya 2 file
+   sekaligus yang perlu ditampilkan di sini juga. Sesuai contoh
+   tampilan "Disposisi Kepala Biro" yang dikasih. */
+.disposisi-tujuan__subheader--konsep {
+  background: #173B2C;
+}
+
+.disposisi-tujuan__grid--3col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 1080px) {
+  .disposisi-tujuan__grid--3col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 880px) {
+  .disposisi-tujuan__grid--3col {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Grid info versi modal (openDisposisiTujuanModal di
    js/pages/disposisi-tujuan.js) -- beda dari .disposisi-tujuan__grid
    di atas (2 kolom, tiap kolom nge-stack sendiri-sendiri): di sini

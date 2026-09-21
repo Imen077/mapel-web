@@ -42,6 +42,10 @@ const PAGE_MODULES = {
   // "Diterima" role Kepala Biro Ortala -- lihat resolveRowActionRoute di
   // js/pages/monitoring.js & js/pages/disposisi-konsep.js.
   'monitoring/disposisi-konsep': () => import('../pages/disposisi-konsep.js'),
+  // "Disposisi Konsep PL" -- dibuka lewat tombol "Disposisi" di
+  // halaman di atas (monitoring/disposisi-konsep), lihat
+  // js/pages/disposisi-tujuan-konsep.js.
+  'monitoring/disposisi-tujuan-konsep': () => import('../pages/disposisi-tujuan-konsep.js'),
   // Halaman Detail Proposal (yang sudah Disetujui + tombol "Buat Konsep
   // PL") buat dummy PO-2026-048 di Monitoring Proposal PL role LO Biro
   // TI -- lihat resolveRowActionRoute di js/pages/monitoring.js &
@@ -76,6 +80,10 @@ const PAGE_BREADCRUMBS = {
   // Ngikutin contoh tampilan ("Monitoring > Monitoring Proposal").
   'monitoring/disposisi-konsep': ['Monitoring', 'Monitoring Proposal'],
   'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal'],
+  // Sama persis (breadcrumb-nya ngikutin contoh tampilan "Disposisi
+  // Kepala Biro" yang dikasih -- tetap "Monitoring Proposal", bukan
+  // "Monitoring Konsep").
+  'monitoring/disposisi-tujuan-konsep': ['Monitoring', 'Monitoring Proposal'],
   // Beda dari 'monitoring/detail' di atas -- breadcrumb Previu SENGAJA
   // "Antrian > Detail Proposal" (bukan "Monitoring > Monitoring
   // Proposal"), sesuai contoh tampilan yang dikasih, walau folder

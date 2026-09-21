@@ -269,6 +269,30 @@ SEED_KONSEP.unshift({
   tableStatusOverride: { label: 'Diterima', bg: '#E1EFE7', text: '#3C7A5C' }
 });
 
+// Satu dummy khusus Monitoring Konsep PL role Kepala Bagian Ortala,
+// status PROSES_REVIU (= kartu "Disposisi" di KONSEP_ORTALA_CHAIN_CARD_
+// GROUPS, dipakai bareng semua role rantai Ortala -- lihat
+// js/pages/monitoring.js). testOnlyFor bikin item ini cuma kelihatan
+// di role Kepala Bagian (tabel & kartu ringkasan).
+// TAHAP INI baris ini SENGAJA belum punya proposalId/nomorNotaDinas
+// (isinya kosongan dulu) -- baru dibikin bisa diklik (lihat
+// resolveRowActionRoute di js/pages/monitoring.js), halaman
+// tujuannya juga masih placeholder "sedang dalam pengembangan"
+// (belum didaftarkan di PAGE_MODULES, js/core/app.js).
+SEED_KONSEP.unshift({
+  id: 'KL-2026-038',
+  unit: 'Biro Organisasi dan Tatalaksana',
+  title: 'POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PL-2026-031',
+  koreksiKe: 0,
+  createdAt: '2026-08-20T10:05:12',
+  status: SUBMISSION_STATUS.PROSES_REVIU,
+  testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA
+});
+
 export const konsepService = createSubmissionService({
   statusMeta: KONSEP_STATUS_META,
   items: SEED_KONSEP

@@ -49,6 +49,21 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
     ) {
       return `/pages/kepala-biro-ortala/monitoring/disposisi-konsep.html?id=${encodeURIComponent(itemId)}`;
     }
+    // Kepala Bagian Ortala + "Disposisi" (PROSES_REVIU): dummy khusus
+    // role itu (lihat KL-2026-038 di data/konsep.js). Halaman
+    // tujuannya SENGAJA dikasih nama file beda ("konsep-disposisi",
+    // bukan "disposisi-konsep") dari punya Kabiro -- kalau sama
+    // persis, PAGE_MODULES (js/core/app.js) bakal keliru ngeload JS
+    // Kabiro (lihat komentar di file HTML-nya). Belum didaftarkan di
+    // PAGE_MODULES, jadi otomatis tampil "Halaman ini sedang dalam
+    // pengembangan." bawaan mountShell().
+    if (
+      role === ROLES.KEPALA_BAGIAN_ORTALA &&
+      status === SUBMISSION_STATUS.PROSES_REVIU &&
+      konsepService.getById(itemId)?.testOnlyFor === role
+    ) {
+      return `/pages/kepala-bagian-ortala/monitoring/konsep-disposisi.html?id=${encodeURIComponent(itemId)}`;
+    }
     return null;
   }
   if (type !== 'proposal-pl') return null;

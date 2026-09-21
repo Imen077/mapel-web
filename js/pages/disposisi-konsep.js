@@ -15,9 +15,10 @@
 // ("Diterima", hijau) biar sama dengan badge di tabel.
 //
 // TAHAP INI: Riwayat Disposisi masih selalu kosong (belum ada data
-// disposisi konsep) dan tombol "Disposisi" SENGAJA belum diarahkan ke
-// mana pun -- belum ada alur disposisi konsep (di Proposal PL, tombol
-// itu buka modal pilih tujuan, lihat js/pages/disposisi.js).
+// disposisi konsep). Tombol "Disposisi" sekarang navigate ke halaman
+// "Disposisi Konsep PL" (js/pages/disposisi-tujuan-konsep.js) buat
+// milih pejabat tujuan berikutnya -- beda dari Proposal PL yang
+// bukanya lewat modal (js/pages/disposisi.js), di sini full-page.
 // ============================================================
 
 import { router } from '../core/router.js';
@@ -141,5 +142,12 @@ export function initDisposisiKonsepPage(root, user) {
 
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
 
-  // "Disposisi" SENGAJA belum diarahkan ke mana pun -- lihat header file.
+  // "Disposisi" -> halaman "Disposisi Konsep PL" (js/pages/
+  // disposisi-tujuan-konsep.js), tempat pilih pejabat tujuan
+  // berikutnya. Beda dari Proposal PL yang bukanya lewat modal --
+  // di sini tetap full-page navigate, sesuai contoh tampilan yang
+  // dikasih ("Disposisi Kepala Biro").
+  root.querySelector('#btn-disposisi')?.addEventListener('click', () => {
+    router.navigate(`/pages/${user?.role}/monitoring/disposisi-tujuan-konsep.html?id=${encodeURIComponent(konsep.id)}`);
+  });
 }
