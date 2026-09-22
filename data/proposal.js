@@ -684,6 +684,27 @@ SEED_PROPOSALS.unshift({
   tableStatusOverride: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' }
 });
 
+// Proposal induk buat KL-2026-040 (data/konsep.js) -- dummy Monitoring
+// Konsep PL role Kepala Subbagian Ortala, status "Selesai Reviu".
+// id sengaja BUKAN PO-2026-030 (pola sama kayak PO-2026-048 di atas):
+// nomorPengajuan-nya di-pin manual ke "PO-2026-030" sesuai contoh
+// tampilan "Detail Proposal dan Konsep PL - Kepala SubBagian", testOnlyFor
+// biar cuma kelihatan di Monitoring Proposal PL Kepala Subbagian.
+SEED_PROPOSALS.unshift({
+  id: 'PO-2026-049',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Proposal IK Pengelolaan SDM',
+  jenis: 'IK',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PO-2026-030',
+  nomorNotaDinas: '583/ND/BiroTI/2026',
+  createdAt: '2026-06-29T10:26:42',
+  status: SUBMISSION_STATUS.FINAL,
+  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA,
+  tableStatusOverride: { label: 'Disetujui', bg: '#E1EFE7', text: '#3C7A5C' }
+});
+
 export const proposalService = createSubmissionService({
   statusMeta: PROPOSAL_STATUS_META,
   items: SEED_PROPOSALS

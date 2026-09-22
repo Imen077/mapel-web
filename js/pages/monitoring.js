@@ -79,6 +79,21 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
         return `/pages/kepala-subbagian-ortala/monitoring/konsep-disposisi.html?id=${encodeURIComponent(itemId)}`;
       }
     }
+    // Kepala Subbagian Ortala + "Selesai Reviu" (SELESAI_REVIU): dummy
+    // khusus role itu (KL-2026-040 di data/konsep.js). Halaman
+    // tujuannya SENGAJA dikasih nama file baru ("konsep-selesai-reviu"
+    // -- belum dipakai filename lain di folder monitoring/ mana pun,
+    // lihat PAGE_MODULES di js/core/app.js) supaya tidak nabrak
+    // pageKey yang sudah ada. Belum didaftarkan di PAGE_MODULES, jadi
+    // otomatis tampil "Halaman ini sedang dalam pengembangan." bawaan
+    // mountShell() -- isinya kosongan dulu sesuai permintaan.
+    if (
+      role === ROLES.KEPALA_SUBBAGIAN_ORTALA &&
+      status === SUBMISSION_STATUS.SELESAI_REVIU &&
+      konsepService.getById(itemId)?.testOnlyFor === role
+    ) {
+      return `/pages/kepala-subbagian-ortala/monitoring/konsep-selesai-reviu.html?id=${encodeURIComponent(itemId)}`;
+    }
     return null;
   }
   if (type !== 'proposal-pl') return null;

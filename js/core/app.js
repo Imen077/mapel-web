@@ -49,6 +49,12 @@ const PAGE_MODULES = {
   // komentar di pages/kepala-bagian-ortala/monitoring/konsep-disposisi.html)
   // biar tidak nabrak PAGE_MODULES punya Kepala Biro Ortala.
   'monitoring/konsep-disposisi': () => import('../pages/disposisi-konsep.js'),
+  // Sama persis lagi -- Kepala Subbagian Ortala, status "Selesai
+  // Reviu" (KL-2026-040), file HTML-nya "konsep-selesai-reviu" (lihat
+  // komentar di pages/kepala-subbagian-ortala/monitoring/
+  // konsep-selesai-reviu.html). initDisposisiKonsepPage sudah ngerti
+  // skenario ini lewat isKasubbagSelesaiReviu.
+  'monitoring/konsep-selesai-reviu': () => import('../pages/disposisi-konsep.js'),
   // "Disposisi Konsep PL" -- dibuka lewat tombol "Disposisi" di
   // halaman di atas (monitoring/disposisi-konsep), lihat
   // js/pages/disposisi-tujuan-konsep.js.
@@ -90,6 +96,13 @@ const PAGE_BREADCRUMBS = {
   // (Kepala Biro Ortala) -- ngikutin pola yang sama buat Kepala
   // Bagian Ortala.
   'monitoring/konsep-disposisi': ['Monitoring', 'Monitoring Proposal'],
+  // Beda dari 'monitoring/konsep-disposisi' di atas -- breadcrumb
+  // SENGAJA "Antrian > Detail Proposal" (bukan "Monitoring > Monitoring
+  // Proposal"), sesuai contoh tampilan "Detail Proposal dan Konsep PL -
+  // Kepala SubBagian", walau folder URL-nya tetap di bawah monitoring/
+  // (sama pola kayak breadcrumb 'monitoring/review' buat Previu di
+  // bawah).
+  'monitoring/konsep-selesai-reviu': ['Antrian', 'Detail Proposal'],
   'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal'],
   // Sama persis (breadcrumb-nya ngikutin contoh tampilan "Disposisi
   // Kepala Biro" yang dikasih -- tetap "Monitoring Proposal", bukan

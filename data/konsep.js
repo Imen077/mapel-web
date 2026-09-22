@@ -364,6 +364,65 @@ SEED_KONSEP.unshift(
   }
 );
 
+// Satu dummy lagi khusus Monitoring Konsep PL role Kepala Subbagian
+// Ortala, status SELESAI_REVIU (= kartu "Selesai Reviu"). testOnlyFor
+// bikin item ini cuma kelihatan di role Kepala Subbagian. proposalId
+// nunjuk ke PO-2026-049 (data/proposal.js). Sesuai contoh tampilan
+// "Detail Proposal dan Konsep PL - Kepala SubBagian": halaman
+// tujuannya (js/pages/disposisi-konsep.js, key PAGE_MODULES
+// 'monitoring/konsep-selesai-reviu') nampilin kartu Riwayat Disposisi
+// (3 baris, riwayatDisposisi di bawah) DAN kartu "Hasil Reviu"
+// (hasilReviu di bawah) -- beda dari KL-2026-038/039 yang cuma
+// Riwayat Disposisi tanpa Hasil Reviu. tableStatusOverride biru muda
+// (bukan warna default SELESAI_REVIU di data/status.js yang hijau
+// teal) biar sama kayak contoh tampilan.
+SEED_KONSEP.unshift({
+  id: 'KL-2026-040',
+  unit: 'Biro Teknologi Informasi',
+  title: 'Konsep PL Pengelolaan SDM',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PL-2026-017',
+  proposalId: 'PO-2026-049',
+  nomorNotaDinas: '325/ND/BiroTI/2026',
+  koreksiKe: 0,
+  createdAt: '2026-06-29T13:45:32',
+  status: SUBMISSION_STATUS.SELESAI_REVIU,
+  testOnlyFor: ROLES.KEPALA_SUBBAGIAN_ORTALA,
+  tableStatusOverride: { label: 'Selesai Reviu', bg: '#DCEEF7', text: '#2C7DA0' },
+  riwayatDisposisi: [
+    {
+      waktu: '2026-02-26T08:15:22',
+      dariNama: 'Agustina Ratna Puspitasari',
+      dariJabatan: 'Kepala Biro',
+      kepadaNama: 'Telviani Savitri',
+      kepadaJabatan: 'Kepala Bagian',
+      catatan: 'Mohon direviu kesesuaiannya dengan proses bisnis BPK.'
+    },
+    {
+      waktu: '2026-02-26T09:40:05',
+      dariNama: 'Telviani Savitri',
+      dariJabatan: 'Kepala Bagian',
+      kepadaNama: 'Arny Fitriana Stayawati',
+      kepadaJabatan: 'Kepala Subbagian',
+      catatan: 'Diteruskan untuk disposisi lebih lanjut, mohon segera ditindaklanjuti.'
+    },
+    {
+      waktu: '2026-02-26T09:40:05',
+      dariNama: 'Arny Fitriana Stayawati',
+      dariJabatan: 'Kepala Subbagian',
+      kepadaNama: 'Mochammad Taufik',
+      kepadaJabatan: 'Pereviu',
+      catatan: 'Diteruskan untuk direviu, mohon segera ditindaklanjuti.'
+    }
+  ],
+  // Ringkasan hasil kerja Previu -- masih "-"/"-" (Previu belum
+  // benar-benar ngisi form reviu Konsep PL-nya, sama kayak
+  // DUMMY_HASIL_REVIU punya Proposal PL di js/pages/disposisi.js).
+  hasilReviu: [{ tanggalReviu: '2026-06-29T13:45:32', hasilReviu: '-', kesimpulan: '-' }]
+});
+
 export const konsepService = createSubmissionService({
   statusMeta: KONSEP_STATUS_META,
   items: SEED_KONSEP

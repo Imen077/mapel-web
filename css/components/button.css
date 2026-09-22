@@ -24,6 +24,15 @@
   width: 100%;
 }
 
+/* Tombol ikon doang (mis. "Lihat Reviu" di kartu Hasil Reviu,
+   js/pages/disposisi-konsep.js) -- persegi, tanpa teks di sampingnya,
+   dipadu bareng class warna lain (mis. .btn-dark) buat background. */
+.btn-icon {
+  padding: var(--space-3);
+  width: 36px;
+  height: 36px;
+}
+
 .btn-primary {
   background: var(--color-stamp);
   color: #ffffff;
