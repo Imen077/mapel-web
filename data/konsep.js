@@ -336,7 +336,7 @@ SEED_KONSEP.unshift(
     createdBy: 'Agustina Ratna Puspitasari',
     employeeId: '240004492',
     nomorPengajuan: 'PL-2026-031',
-    proposalId: 'PO-2026-043',
+    proposalId: 'PO-2026-048',
     nomorNotaDinas: '1532/ND/X.5/06/2026',
     koreksiKe: 0,
     createdAt: '2026-08-19T09:19:56',

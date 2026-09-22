@@ -199,7 +199,7 @@
 .disposisi-page .card__title,
 .disposisi-page .review-grid__value,
 .disposisi-page .review-grid__value a {
-  color: #D9A441;
+  color: #143d65;
 }
 
 /* ---------- Halaman Disposisi Proposal PL (js/pages/disposisi-tujuan.js) ---------- */
@@ -434,7 +434,7 @@
 
 .dp-info__value {
   font-weight: 700;
-  color: #1c2333;
+  color: #143d65;
 }
 
 .dp-info__value a {

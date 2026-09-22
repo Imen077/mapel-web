@@ -25,6 +25,8 @@ import { router } from '../core/router.js';
 import { konsepService } from '../../data/konsep.js';
 import { proposalService } from '../../data/proposal.js';
 import { formatDateTimeFullID } from '../core/format.js';
+import { ROLES } from '../core/role.js';
+import { openDisposisiTujuanModal } from './disposisi-tujuan.js';
 import {
   renderBadge,
   renderCollapsibleCard,
@@ -108,6 +110,56 @@ function renderRiwayatDisposisiCard(entries = []) {
   `;
 }
 
+// Kartu pratinjau dokumen ("Detail Proposal dan Konsep Kasubbag") --
+// SAMA POLA-nya kayak renderDocPreview di js/pages/disposisi.js &
+// js/pages/review.js (nggak diexport dari sana, jadi disalin di sini),
+// tapi cuma dipakai buat Kepala Subbagian Ortala (lihat showFilePreview
+// di initDisposisiKonsepPage di bawah).
+const DOC_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 3.5H7a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8.5L13 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 3.5V8h4.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+function renderDocPreview({ headerTitle, headerSubtitle, docTitle }) {
+  const lines = Array.from({ length: 6 })
+    .map((_, i) => `<span class="doc-preview__line${i === 1 || i === 5 ? ' doc-preview__line--short' : ''}"></span>`)
+    .join('');
+
+  return `
+    <div class="card doc-preview">
+      <div class="doc-preview__header">
+        <span class="doc-preview__icon">${DOC_ICON}</span>
+        <div>
+          <p class="doc-preview__title">${headerTitle}</p>
+          <p class="doc-preview__subtitle">${headerSubtitle}</p>
+        </div>
+      </div>
+      <div class="doc-preview__body">
+        <div class="doc-preview__sheet">
+          <p class="doc-preview__letterhead">Badan Pemeriksa Keuangan Republik Indonesia</p>
+          <p class="doc-preview__doc-title">${docTitle}</p>
+          <div class="doc-preview__skeleton">${lines}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/** 2 kartu pratinjau (File Proposal + File Nota Dinas) punya PROPOSAL induk (bukan konsep). */
+function renderDocPreviewGrid(proposal) {
+  return `
+    <div class="review-preview-grid">
+      ${renderDocPreview({
+        headerTitle: 'Pedoman - PL_Proposal.pdf',
+        headerSubtitle: 'File Proposal &middot; Pratinjau dokumen',
+        docTitle: proposal.title
+      })}
+      ${renderDocPreview({
+        headerTitle: 'Pedoman - PL_ND.pdf',
+        headerSubtitle: 'File Nota Dinas &middot; Pratinjau dokumen',
+        docTitle: `Nota Dinas Pengajuan Proposal ${proposal.nomorPengajuan || proposal.id}`
+      })}
+    </div>
+  `;
+}
+
 /**
  * @param {HTMLElement} root
  * @param {Session} user
@@ -142,6 +194,15 @@ export function initDisposisiKonsepPage(root, user) {
     tanggalPengajuan: formatDateTimeFullID(konsep.createdAt)
   };
 
+  // Kepala Subbagian Ortala: kartu pratinjau dokumen di paling bawah
+  // (sesuai contoh tampilan "Detail Proposal dan Konsep Kasubbag"),
+  // dan tombol "Disposisi" buka modal 6 pereviu yang sama kayak
+  // dipakai buat Proposal PL (js/pages/disposisi-tujuan.js), BUKAN
+  // halaman "Disposisi Konsep PL" penuh punya Kabag/Kabiro di bawah --
+  // modul itu belum ngerti daftar pereviu Kasubbagian.
+  const isKasubbag = user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA;
+  const showFilePreview = isKasubbag;
+
   root.innerHTML = `
     <div class="detail-page">
       <div class="detail-page__intro">
@@ -152,6 +213,8 @@ export function initDisposisiKonsepPage(root, user) {
       ${renderCollapsibleCard({ id: 'panel-proposal', title: 'Detail Proposal Perangkat Lunak', bodyHtml: renderProposalBody(proposal), collapsible: false })}
       ${renderCollapsibleCard({ id: 'panel-konsep', title: 'Konsep Perangkat Lunak', bodyHtml: renderKonsepBody(konsepFields, renderBadge(statusMeta, statusMeta.label)) })}
       ${renderRiwayatDisposisiCard(konsep.riwayatDisposisi)}
+
+      ${showFilePreview ? renderDocPreviewGrid(proposal) : ''}
 
       <div class="card detail-actions">
         <button class="btn btn-ghost" type="button" id="btn-kembali">${BACK_ICON} Kembali</button>
@@ -172,12 +235,30 @@ export function initDisposisiKonsepPage(root, user) {
 
   root.querySelector('#btn-kembali')?.addEventListener('click', () => router.navigate(backTarget));
 
-  // "Disposisi" -> halaman "Disposisi Konsep PL" (js/pages/
-  // disposisi-tujuan-konsep.js), tempat pilih pejabat tujuan
-  // berikutnya. Beda dari Proposal PL yang bukanya lewat modal --
-  // di sini tetap full-page navigate, sesuai contoh tampilan yang
-  // dikasih ("Disposisi Kepala Biro").
+  // "Disposisi":
+  // - Kepala Subbagian Ortala -> modal 6 pereviu (sama kayak Proposal
+  //   PL punya Kasubbag), pakai data PROPOSAL induk biar nomor nota
+  //   dinas & nomor pengajuannya konsisten sama kartu "Detail Proposal
+  //   Perangkat Lunak" di atas. Sukses -> balik ke Monitoring Konsep PL
+  //   (bukan Monitoring Proposal PL, beda dari modal versi Proposal PL).
+  // - Kabag/Kabiro -> tetap halaman "Disposisi Konsep PL" penuh
+  //   (js/pages/disposisi-tujuan-konsep.js), sesuai contoh tampilan
+  //   "Disposisi Kepala Biro".
   root.querySelector('#btn-disposisi')?.addEventListener('click', () => {
+    if (isKasubbag) {
+      // Judul modal & baris pertama sengaja bilang \"Konsep\" (bukan
+      // \"Proposal\"), pakai judul KONSEP (konsep.title, \"POS Pengujian
+      // Website\") -- sisanya (Tanggal Pengajuan, Nomor Pengajuan, Nomor
+      // Nota Dinas, daftar pereviu) tetap dari PROPOSAL induk (`proposal`)
+      // apa adanya, sesuai contoh tampilan \"Disposisi Konsep PL\".
+      openDisposisiTujuanModal(proposal, user, {
+        modalTitle: 'Disposisi Konsep PL',
+        judulLabel: 'Judul Konsep',
+        judulValue: konsep.title,
+        onDisposed: () => router.navigate(backTarget)
+      });
+      return;
+    }
     router.navigate(`/pages/${user?.role}/monitoring/disposisi-tujuan-konsep.html?id=${encodeURIComponent(konsep.id)}`);
   });
 }

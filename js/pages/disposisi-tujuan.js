@@ -251,8 +251,16 @@ function bindActions(root, pejabatTujuan, backTarget, { onDisposed } = {}) {
  *   initDisposisiPage (js/pages/disposisi.js) manggil tanpa `options`,
  *   jadi tetap pakai perilaku default (navigate balik ke Monitoring).
  */
-export function openDisposisiTujuanModal(item, user, { onDisposed } = {}) {
+export function openDisposisiTujuanModal(item, user, { onDisposed, modalTitle, judulLabel, judulValue } = {}) {
   const backTarget = `/pages/${user?.role}/monitoring/proposal-pl.html`;
+  // Dipakai lagi buat konteks "Disposisi Konsep PL" (Kepala Subbagian,
+  // lihat js/pages/disposisi-konsep.js) -- judul modal & label baris
+  // pertama BISA ditimpa lewat opsi ini, sisanya (Tanggal Pengajuan,
+  // Nomor Pengajuan, dst) tetap dari `item` (proposal induknya) apa
+  // adanya, sesuai contoh tampilan "Disposisi Konsep PL".
+  const title = modalTitle ?? 'Disposisi Proposal PL';
+  const firstLabel = judulLabel ?? 'Judul Proposal';
+  const firstValue = judulValue ?? item.title;
   const { nomorPengajuan, nomorNotaDinas, pejabatTujuan } = buildDisposisiTujuanData(item, user);
   const rows = pejabatTujuan.map(renderPejabatRow).join('');
 
@@ -283,7 +291,7 @@ export function openDisposisiTujuanModal(item, user, { onDisposed } = {}) {
   const bodyKasubbag = `
       <div class="modal-dialog__body">
         <div class="disposisi-modal__grid">
-          ${renderRingkasanItem('Judul Proposal', item.title)}
+          ${renderRingkasanItem(firstLabel, firstValue)}
           ${renderRingkasanItem('Satker Pengusul', item.unit)}
           ${renderRingkasanItem('Tanggal Pengajuan', formatDateTimeFullID(item.createdAt))}
           ${renderRingkasanItem('Nomor Pengajuan', nomorPengajuan)}
@@ -326,7 +334,7 @@ export function openDisposisiTujuanModal(item, user, { onDisposed } = {}) {
     <div class="modal-dialog modal-dialog--wide${isKasubbag ? ' modal-dialog--disposisi-wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="disposisi-modal-title">
       <button type="button" class="modal-dialog__close" data-modal-close aria-label="Tutup">${CLOSE_ICON}</button>
       <div class="modal-dialog__header">
-        <h2 class="modal-dialog__header-title" id="disposisi-modal-title">Disposisi Proposal PL</h2>
+        <h2 class="modal-dialog__header-title" id="disposisi-modal-title">${title}</h2>
       </div>
       ${isKasubbag ? bodyKasubbag : bodySemula}
     </div>
