@@ -420,7 +420,70 @@ SEED_KONSEP.unshift({
   // Ringkasan hasil kerja Previu -- masih "-"/"-" (Previu belum
   // benar-benar ngisi form reviu Konsep PL-nya, sama kayak
   // DUMMY_HASIL_REVIU punya Proposal PL di js/pages/disposisi.js).
-  hasilReviu: [{ tanggalReviu: '2026-06-29T13:45:32', hasilReviu: '-', kesimpulan: '-' }]
+  hasilReviu: [{ tanggalReviu: '2026-06-29T13:45:32', hasilReviu: '-', kesimpulan: '-' }],
+  // Checklist reviu POS -- sama isinya dengan DUMMY_CHECKLIST_TEMPLATE_KONSEP
+  // di js/pages/reviu-konsep.js (masih kosong/belum dicek, sesuai contoh
+  // tampilan "Form reviu"), disalin manual ke sini karena data/ tidak
+  // boleh import dari js/pages/ (layering). Kalau template di
+  // reviu-konsep.js berubah, sinkronkan manual juga di sini.
+  checklistReviu: {
+    page: 1,
+    templateJawabanOptions: [
+      'Sudah sesuai dengan ketentuan yang berlaku.',
+      'Perlu perbaikan pada bagian substansi dokumen.',
+      'Dokumen belum lengkap, mohon dilengkapi.',
+      'Perlu penyesuaian redaksional.',
+      'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
+    ],
+    notaDinasPenyampaianFile: '',
+    notaDinasPenyampaianNomor: '',
+    notaDinasPengesahanFile: '',
+    notaDinasPengesahanNomor: '',
+    items: [
+      { type: 'group', letter: 'A', title: 'Kelengkapan POS' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Apabila memiliki kebijakan (policy) maka kebijakan (policy) bersinergi dengan prosedur, instruksi kerja, dan formulir.',
+        hasil: '',
+        checked: false
+      },
+      { type: 'group', letter: 'B', title: 'Tata cara/Sistematika Penulisan POS' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Bahasa Menggunakan bahasa Indonesia yang baik dan benar sesuai dengan Ejaan Yang Disempurnakan (EYD).',
+        hasil: '',
+        checked: false
+      },
+      { type: 'subsection', no: 2, label: 'Format Pengetikan' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Sampul Menggunakan sampul depan dan belakang sesuai pedoman POS.',
+        hasil: '',
+        checked: false,
+        indent: true
+      },
+      {
+        type: 'item',
+        no: 2,
+        label: 'Isi POS Memiliki format ukuran kertas, penggunaan huruf, spasi, dan format pengetikan lainnya sesuai dengan pedoman penulisan laporan (gaya selingkung) BPK RI.',
+        hasil: '',
+        checked: false,
+        indent: true
+      },
+      { type: 'group', letter: 'C', title: 'Kerangka POS' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Halaman Penetapan berisikan surat keputusan/pengesahan yang menetapkan berlakunya POS tersebut.',
+        hasil: '',
+        checked: false
+      },
+      { type: 'subsection', no: 2, label: 'Isi dokumen:' }
+    ]
+  }
 });
 
 export const konsepService = createSubmissionService({

@@ -38,6 +38,10 @@ const PAGE_MODULES = {
   // ngebedain lewat user.role (tombol "Reviu", bukan "Disposisi").
   'monitoring/review': () => import('../pages/disposisi.js'),
   'monitoring/reviu-proposal': () => import('../pages/review-proposal.js'),
+  // Versi Konsep PL dari 'monitoring/reviu-proposal' di atas -- dibuka
+  // lewat tombol "Reviu"/ikon mata di kartu Hasil Reviu
+  // (js/pages/disposisi-konsep.js). Lihat js/pages/reviu-konsep.js.
+  'monitoring/reviu-konsep-pl': () => import('../pages/reviu-konsep.js'),
   // Detail Proposal dan Konsep + Riwayat Disposisi buat dummy konsep
   // "Diterima" role Kepala Biro Ortala -- lihat resolveRowActionRoute di
   // js/pages/monitoring.js & js/pages/disposisi-konsep.js.
@@ -115,6 +119,10 @@ const PAGE_BREADCRUMBS = {
   // di js/pages/monitoring.js).
   'monitoring/review': ['Antrian', 'Detail Proposal'],
   'monitoring/reviu-proposal': ['Antrian', 'Reviu Proposal'],
+  // Sama persis (bukan salah ketik) -- breadcrumb-nya SENGAJA tetap
+  // "Reviu Proposal" buat halaman Reviu Konsep PL juga, sesuai contoh
+  // tampilan "Form reviu".
+  'monitoring/reviu-konsep-pl': ['Antrian', 'Reviu Proposal'],
   'monitoring/detail-konsep': ['Monitoring', 'Monitoring Proposal'],
   // Ngikutin contoh tampilan: breadcrumb-nya "Pengajuan Proposal PL"
   // walau folder URL-nya di bawah monitoring/ (menu Monitoring yang

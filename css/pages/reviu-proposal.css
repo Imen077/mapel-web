@@ -184,6 +184,16 @@
   background: var(--color-success-soft);
 }
 
+/* Header grup huruf (A/B/C, js/pages/reviu-konsep.js) -- background
+   sama kayak .reviu-proposal__section-row, tapi judulnya warna hijau
+   (bukan gelap) biar beda level sama subsection bernomor di
+   dalamnya (mis. "2. Format Pengetikan", tetap pakai
+   .reviu-proposal__section-label biasa). */
+.reviu-proposal__group-label {
+  font-weight: 700;
+  color: var(--color-success);
+}
+
 .reviu-proposal__section-label {
   font-weight: 700;
   color: var(--color-ink-900);
@@ -195,6 +205,18 @@
 
 .reviu-proposal__table td {
   vertical-align: top;
+}
+
+/* Input "Hasil Reviu" yang masih kosong (js/pages/reviu-konsep.js) --
+   tint merah muda, penanda visual kolom wajib (*) belum diisi. Hilang
+   otomatis begitu ada isinya (lihat renderChecklistRow: emptyClass). */
+.reviu-proposal__hasil-input--empty {
+  background: #FBE4E4;
+  border-color: #F0B8B8;
+}
+
+.reviu-proposal__hasil-input--empty::placeholder {
+  color: #C97A7A;
 }
 
 /* Sel "Hasil Reviu" -- input teks + tombol "Template Jawaban" di
