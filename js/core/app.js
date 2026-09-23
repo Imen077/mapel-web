@@ -59,6 +59,12 @@ const PAGE_MODULES = {
   // konsep-selesai-reviu.html). initDisposisiKonsepPage sudah ngerti
   // skenario ini lewat isKasubbagSelesaiReviu.
   'monitoring/konsep-selesai-reviu': () => import('../pages/disposisi-konsep.js'),
+  // Sama persis kayak 2 key 'monitoring/konsep-*' di atas (reuse modul
+  // yang sama, initDisposisiKonsepPage sudah ngerti role Previu lewat
+  // isPreviu) -- key beda karena file HTML Previu dikasih nama beda
+  // ("konsep-direviu", lihat pages/previu-biro-ortala/monitoring/
+  // konsep-direviu.html) biar tidak nabrak PAGE_MODULES role lain.
+  'monitoring/konsep-direviu': () => import('../pages/disposisi-konsep.js'),
   // "Disposisi Konsep PL" -- dibuka lewat tombol "Disposisi" di
   // halaman di atas (monitoring/disposisi-konsep), lihat
   // js/pages/disposisi-tujuan-konsep.js.
@@ -107,6 +113,10 @@ const PAGE_BREADCRUMBS = {
   // (sama pola kayak breadcrumb 'monitoring/review' buat Previu di
   // bawah).
   'monitoring/konsep-selesai-reviu': ['Antrian', 'Detail Proposal'],
+  // Sama kayak breadcrumb 'monitoring/konsep-disposisi' (Kepala
+  // Bagian) di atas -- dipakai buat halaman Previu yang reuse modul
+  // yang sama.
+  'monitoring/konsep-direviu': ['Monitoring', 'Monitoring Proposal'],
   'monitoring/disposisi-tujuan': ['Monitoring', 'Monitoring Proposal'],
   // Sama persis (breadcrumb-nya ngikutin contoh tampilan "Disposisi
   // Kepala Biro" yang dikasih -- tetap "Monitoring Proposal", bukan

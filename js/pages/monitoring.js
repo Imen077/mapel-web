@@ -94,6 +94,18 @@ function resolveRowActionRoute({ type, role, status, itemId }) {
     ) {
       return `/pages/kepala-subbagian-ortala/monitoring/konsep-selesai-reviu.html?id=${encodeURIComponent(itemId)}`;
     }
+    // Previu Biro Ortala + "Direviu" (DIREVIU): dummy khusus role itu
+    // (KL-2026-041 di data/konsep.js). Halaman tujuannya SENGAJA masih
+    // kosongan (shell placeholder, belum didaftarkan di PAGE_MODULES),
+    // jadi otomatis tampil "Halaman ini sedang dalam pengembangan."
+    // bawaan mountShell() -- nyusul begitu form reviu Previu digarap.
+    if (
+      role === ROLES.PREVIU_BIRO_ORTALA &&
+      status === SUBMISSION_STATUS.DIREVIU &&
+      konsepService.getById(itemId)?.testOnlyFor === role
+    ) {
+      return `/pages/previu-biro-ortala/monitoring/konsep-direviu.html?id=${encodeURIComponent(itemId)}`;
+    }
     return null;
   }
   if (type !== 'proposal-pl') return null;

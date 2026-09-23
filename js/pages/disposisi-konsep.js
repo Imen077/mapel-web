@@ -262,8 +262,15 @@ export function initDisposisiKonsepPage(root, user) {
   // PL - Kepala SubBagian".
   const isKasubbag = user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA;
   const isKasubbagSelesaiReviu = isKasubbag && konsep.status === SUBMISSION_STATUS.SELESAI_REVIU;
-  const showFilePreview = isKasubbag && !isKasubbagSelesaiReviu;
-  const actionLabel = isKasubbagSelesaiReviu ? 'Reviu' : 'Disposisi';
+  // Previu Biro Ortala, status DIREVIU (KL-2026-041): sama pola dengan
+  // isKasubbagSelesaiReviu di atas -- kartu pratinjau dokumen +
+  // tombol berlabel "Reviu" yang LANGSUNG navigate ke checklist Reviu
+  // Konsep PL (js/pages/reviu-konsep.js, sudah ngerti role ini lewat
+  // isPreviu di sana), BUKAN modal 6 pereviu -- sesuai contoh tampilan
+  // "Detail Proposal dan Konsep - Pereviu".
+  const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
+  const showFilePreview = (isKasubbag && !isKasubbagSelesaiReviu) || isPreviu;
+  const actionLabel = isKasubbagSelesaiReviu || isPreviu ? 'Reviu' : 'Disposisi';
   // Belum ada halaman checklist Reviu Konsep PL beneran (analog
   // js/pages/review-proposal.js buat Proposal PL) -- link ini masih
   // ngarah ke placeholder kosong dulu (belum didaftarkan di
@@ -331,7 +338,7 @@ export function initDisposisiKonsepPage(root, user) {
   //   (js/pages/disposisi-tujuan-konsep.js), sesuai contoh tampilan
   //   "Disposisi Kepala Biro".
   root.querySelector('#btn-disposisi')?.addEventListener('click', () => {
-    if (isKasubbagSelesaiReviu) {
+    if (isKasubbagSelesaiReviu || isPreviu) {
       router.navigate(reviuRoute);
       return;
     }

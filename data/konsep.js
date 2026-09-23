@@ -522,6 +522,162 @@ SEED_KONSEP.unshift({
   }
 });
 
+// Satu dummy lagi khusus Monitoring Konsep PL role Previu Biro
+// Ortala, status DIREVIU (= kartu "Direviu"). testOnlyFor bikin item
+// ini cuma kelihatan di role Previu. Kelanjutan chain demo yang sama
+// dengan KL-2026-035/036/038 (proposalId PO-2026-048, nomorPengajuan
+// PL-2026-031, nomorNotaDinas 1532/ND/X.5/06/2026) -- sesuai contoh
+// tampilan "Detail Proposal dan Konsep - Pereviu". riwayatDisposisi &
+// checklistReviu disalin dari template KL-2026-040 (Reviu Konsep PL
+// halaman tujuannya reuse js/pages/reviu-konsep.js, key PAGE_MODULES
+// 'monitoring/reviu-konsep-pl', yang sudah ngerti role Previu lewat
+// isPreviu -- lihat js/pages/reviu-konsep.js).
+SEED_KONSEP.unshift({
+  id: 'KL-2026-041',
+  unit: 'Biro Teknologi Informasi',
+  title: 'POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PL-2026-031',
+  proposalId: 'PO-2026-048',
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
+  koreksiKe: 0,
+  createdAt: '2026-08-19T09:19:56',
+  status: SUBMISSION_STATUS.DIREVIU,
+  testOnlyFor: ROLES.PREVIU_BIRO_ORTALA,
+  tableStatusOverride: { label: 'Disposisi', bg: '#E1EFE7', text: '#3C7A5C' },
+  riwayatDisposisi: [
+    {
+      waktu: '2026-02-26T08:15:22',
+      dariNama: 'Agustina Ratna Puspitasari',
+      dariJabatan: 'Kepala Biro',
+      kepadaNama: 'Telviani Savitri',
+      kepadaJabatan: 'Kepala Bagian',
+      catatan: 'Mohon direviu kesesuaiannya dengan proses bisnis BPK.'
+    },
+    {
+      waktu: '2026-02-26T09:40:05',
+      dariNama: 'Telviani Savitri',
+      dariJabatan: 'Kepala Bagian',
+      kepadaNama: 'Arny Fitriana Stayawati',
+      kepadaJabatan: 'Kepala Subbagian',
+      catatan: 'Diteruskan untuk disposisi lebih lanjut, mohon segera ditindaklanjuti.'
+    },
+    {
+      waktu: '2026-02-26T09:40:05',
+      dariNama: 'Arny Fitriana Stayawati',
+      dariJabatan: 'Kepala Subbagian',
+      kepadaNama: 'Mochammad Taufik',
+      kepadaJabatan: 'Pereviu',
+      catatan: 'Diteruskan untuk direviu, mohon segera ditindaklanjuti.'
+    }
+  ],
+  // Ringkasan hasil kerja Previu -- masih "-"/"-" (Previu belum
+  // benar-benar ngisi form reviu Konsep PL-nya, sama kayak
+  // DUMMY_HASIL_REVIU punya Proposal PL di js/pages/disposisi.js).
+  hasilReviu: [{ tanggalReviu: '2026-08-19T09:19:56', hasilReviu: '-', kesimpulan: '-' }],
+  // Checklist reviu POS -- sama isinya dengan DUMMY_CHECKLIST_TEMPLATE_KONSEP
+  // di js/pages/reviu-konsep.js (masih kosong/belum dicek, sesuai contoh
+  // tampilan "Form reviu"), disalin manual ke sini karena data/ tidak
+  // boleh import dari js/pages/ (layering). Kalau template di
+  // reviu-konsep.js berubah, sinkronkan manual juga di sini.
+  checklistReviu: {
+    page: 1,
+    templateJawabanOptions: [
+      'Sudah sesuai dengan ketentuan yang berlaku.',
+      'Perlu perbaikan pada bagian substansi dokumen.',
+      'Dokumen belum lengkap, mohon dilengkapi.',
+      'Perlu penyesuaian redaksional.',
+      'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
+    ],
+    notaDinasPenyampaianFiles: [],
+    notaDinasPenyampaianNomor: '',
+    notaDinasPengesahanFiles: [],
+    notaDinasPengesahanNomor: '',
+    items: [
+      { type: 'group', letter: 'A', title: 'Kelengkapan POS' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Apabila memiliki kebijakan (policy) maka kebijakan (policy) bersinergi dengan prosedur, instruksi kerja, dan formulir.',
+        hasil: '',
+        checked: false
+      },
+      { type: 'group', letter: 'B', title: 'Tata cara/Sistematika Penulisan POS' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Bahasa Menggunakan bahasa Indonesia yang baik dan benar sesuai dengan Ejaan Yang Disempurnakan (EYD).',
+        hasil: '',
+        checked: false
+      },
+      { type: 'subsection', no: 2, label: 'Format Pengetikan' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Sampul Menggunakan sampul depan dan belakang sesuai pedoman POS.',
+        hasil: '',
+        checked: false,
+        indent: true
+      },
+      {
+        type: 'item',
+        no: 2,
+        label: 'Isi POS Memiliki format ukuran kertas, penggunaan huruf, spasi, dan format pengetikan lainnya sesuai dengan pedoman penulisan laporan (gaya selingkung) BPK RI.',
+        hasil: '',
+        checked: false,
+        indent: true
+      },
+      { type: 'group', letter: 'C', title: 'Kerangka POS' },
+      {
+        type: 'item',
+        no: 1,
+        label: 'Halaman Penetapan berisikan surat keputusan/pengesahan yang menetapkan berlakunya POS tersebut.',
+        hasil: '',
+        checked: false
+      },
+      { type: 'subsection', no: 2, label: 'Isi dokumen:' },
+      // Sinkron sama js/pages/reviu-konsep.js (DUMMY_CHECKLIST_TEMPLATE_KONSEP)
+      // -- 32 butir generik biar pagination-nya kepakai beneran ("1 2 3 4 ...").
+      ...[
+        'Latar Belakang',
+        'Maksud dan Tujuan',
+        'Ruang Lingkup',
+        'Dasar Hukum',
+        'Pengertian dan Istilah',
+        'Pihak-Pihak yang Terkait/Melaksanakan',
+        'Kualifikasi Pelaksana',
+        'Peralatan/Perlengkapan yang Dibutuhkan',
+        'Peringatan/Ketentuan Khusus',
+        'Pencatatan dan Pendataan',
+        'Prosedur/Langkah-Langkah Kerja',
+        'Diagram Alir (Flowchart) Prosedur',
+        'Rincian Tugas dan Tanggung Jawab Tiap Pihak',
+        'Waktu Penyelesaian Tiap Tahapan',
+        'Output/Keluaran yang Dihasilkan',
+        'Indikator Keberhasilan Pelaksanaan',
+        'Dokumen/Formulir Terkait',
+        'Referensi/Rujukan Penyusunan',
+        'Ketentuan Peralihan (jika ada)',
+        'Lampiran Pendukung',
+        'Kesesuaian Istilah dengan Glosarium BPK',
+        'Konsistensi Penomoran Pasal/Ayat',
+        'Kejelasan Subjek pada Tiap Kalimat Prosedur',
+        'Kesesuaian Alur dengan Struktur Organisasi',
+        'Kejelasan Batas Waktu pada Tiap Tahapan',
+        'Kesesuaian dengan POS Terkait Lainnya',
+        'Kelengkapan Riwayat Perubahan Dokumen',
+        'Kejelasan Status Dokumen (Final/Draft)',
+        'Kesesuaian Format Tabel dan Gambar',
+        'Penulisan Singkatan dan Akronim yang Konsisten',
+        'Kejelasan Pihak yang Berwenang Melakukan Reviu Berkala',
+        'Kesesuaian Masa Berlaku POS dengan Ketentuan'
+      ].map((label, i) => ({ type: 'item', no: i + 1, label, hasil: '', checked: false, indent: true }))
+    ]
+  }
+});
+
 export const konsepService = createSubmissionService({
   statusMeta: KONSEP_STATUS_META,
   items: SEED_KONSEP
