@@ -693,7 +693,7 @@ SEED_PROPOSALS.unshift({
 SEED_PROPOSALS.unshift({
   id: 'PO-2026-049',
   unit: 'Biro Teknologi Informasi',
-  title: 'Proposal IK Pengelolaan SDM',
+  title: 'Proposal POS Pengujian Website',
   jenis: 'IK',
   createdBy: 'Agustina Ratna Puspitasari',
   employeeId: '240004492',

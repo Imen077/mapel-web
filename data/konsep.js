@@ -318,6 +318,59 @@ SEED_KONSEP.unshift({
   ]
 });
 
+// Satu dummy lagi khusus Monitoring Konsep PL role Kepala Bagian
+// Ortala, status SELESAI_REVIU (= kartu "Selesai Reviu"). Sama pola
+// dengan KL-2026-038 di atas (proposalId ke PO-2026-048 yang sama,
+// jadi masih dokumen/rantai yang sama, cuma tahapnya beda) --
+// bedanya cuma status, tableStatusOverride, dan riwayatDisposisi
+// ditambah 1 baris ke Previu (Mochammad Taufik), niru pola KL-2026-040
+// (Kepala Subbagian, status sama) yang riwayatnya juga berhenti di
+// baris "diteruskan ke Previu", BUKAN ditambah baris "balik" -- status
+// SELESAI_REVIU sendiri yang nunjukin proposal ini sudah balik dari
+// Previu. Kepala Bagian Ortala BUKAN final approver (lihat komentar di
+// resolveRowActionRoute versi Proposal PL, js/pages/monitoring.js),
+// jadi artinya sama: tinggal diteruskan lagi (disposisi) ke pejabat
+// berikutnya. Klik baris ini reuse halaman yang sama kayak KL-2026-038
+// (js/pages/disposisi-konsep.js, key PAGE_MODULES
+// 'monitoring/konsep-disposisi') -- initDisposisiKonsepPage belum
+// ngebedain status buat role ini, jadi tombol "Disposisi" tetap ke
+// halaman "Disposisi Konsep PL" penuh (js/pages/disposisi-tujuan-konsep.js),
+// sama kayak status "Disposisi"-nya.
+SEED_KONSEP.unshift({
+  id: 'KL-2026-042',
+  unit: 'Biro Teknologi Informasi',
+  title: 'POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PL-2026-031',
+  proposalId: 'PO-2026-048',
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
+  koreksiKe: 0,
+  createdAt: '2026-08-19T09:19:56',
+  status: SUBMISSION_STATUS.SELESAI_REVIU,
+  testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA,
+  tableStatusOverride: { label: 'Selesai Reviu', bg: '#DCEEF7', text: '#2C7DA0' },
+  riwayatDisposisi: [
+    {
+      waktu: '2026-08-20T08:15:22',
+      dariNama: 'Agustina Ratna Puspitasari',
+      dariJabatan: 'Kepala Biro',
+      kepadaNama: 'Telviani Savitri',
+      kepadaJabatan: 'Kepala Bagian',
+      catatan: 'Mohon direviu kesesuaiannya.'
+    },
+    {
+      waktu: '2026-08-21T10:00:00',
+      dariNama: 'Telviani Savitri',
+      dariJabatan: 'Kepala Bagian',
+      kepadaNama: 'Mochammad Taufik',
+      kepadaJabatan: 'Pereviu',
+      catatan: 'Diteruskan untuk direviu, mohon segera ditindaklanjuti.'
+    }
+  ]
+});
+
 // Satu dummy khusus Monitoring Konsep PL role Kepala Subbagian Ortala,
 // status PROSES_REVIU (= kartu "Disposisi", sama kayak punya Kepala
 // Bagian). testOnlyFor bikin item ini cuma kelihatan di role Kepala
@@ -379,7 +432,7 @@ SEED_KONSEP.unshift(
 SEED_KONSEP.unshift({
   id: 'KL-2026-040',
   unit: 'Biro Teknologi Informasi',
-  title: 'Konsep PL Pengelolaan SDM',
+  title: 'POS Pengujian Website',
   jenis: 'POS',
   createdBy: 'Agustina Ratna Puspitasari',
   employeeId: '240004492',

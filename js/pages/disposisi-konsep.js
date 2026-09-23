@@ -7,7 +7,14 @@
 //     tambahan, tombol "Disposisi" full-page ke js/pages/
 //     disposisi-tujuan-konsep.js.
 //   - Kepala Bagian Ortala, status "Disposisi" (PROSES_REVIU) -> kartu
-//     "Riwayat Disposisi", tombol "Disposisi" -> placeholder kosong.
+//     "Riwayat Disposisi", tombol "Disposisi" -> js/pages/
+//     disposisi-tujuan-konsep.js (halaman "Disposisi Konsep PL" penuh).
+//   - Kepala Bagian Ortala, status "Selesai Reviu" (SELESAI_REVIU,
+//     KL-2026-042) -> kartu "Riwayat Disposisi" yang sama (BUKAN
+//     pratinjau dokumen/Hasil Reviu kayak Kasubbag), tapi tombol
+//     berlabel "Reviu" (bukan "Disposisi") yang langsung navigate ke
+//     checklist Reviu Konsep PL, sama kayak isKasubbagSelesaiReviu --
+//     lihat isKabagSelesaiReviu di bawah.
 //   - Kepala Subbagian Ortala, status "Disposisi" (PROSES_REVIU) ->
 //     kartu pratinjau dokumen (bukan Riwayat Disposisi), tombol
 //     "Disposisi" buka modal 6 pereviu (js/pages/disposisi-tujuan.js).
@@ -262,6 +269,14 @@ export function initDisposisiKonsepPage(root, user) {
   // PL - Kepala SubBagian".
   const isKasubbag = user?.role === ROLES.KEPALA_SUBBAGIAN_ORTALA;
   const isKasubbagSelesaiReviu = isKasubbag && konsep.status === SUBMISSION_STATUS.SELESAI_REVIU;
+  // Kepala Bagian Ortala, status SELESAI_REVIU (KL-2026-042): sama pola
+  // persis dengan isKasubbagSelesaiReviu di atas (bukan Disposisi lagi,
+  // tapi lanjut ke checklist Reviu Konsep PL) -- prosesnya di tahap ini
+  // memang reviu, bukan disposisi. Beda dari isKasubbagSelesaiReviu cuma
+  // di showFilePreview: Kabag TETAP tampil kartu "Riwayat Disposisi"
+  // biasa (bukan pratinjau dokumen), sama kayak status "Disposisi"-nya
+  // dia di atas.
+  const isKabagSelesaiReviu = user?.role === ROLES.KEPALA_BAGIAN_ORTALA && konsep.status === SUBMISSION_STATUS.SELESAI_REVIU;
   // Previu Biro Ortala, status DIREVIU (KL-2026-041): sama pola dengan
   // isKasubbagSelesaiReviu di atas -- kartu pratinjau dokumen +
   // tombol berlabel "Reviu" yang LANGSUNG navigate ke checklist Reviu
@@ -270,7 +285,7 @@ export function initDisposisiKonsepPage(root, user) {
   // "Detail Proposal dan Konsep - Pereviu".
   const isPreviu = user?.role === ROLES.PREVIU_BIRO_ORTALA;
   const showFilePreview = (isKasubbag && !isKasubbagSelesaiReviu) || isPreviu;
-  const actionLabel = isKasubbagSelesaiReviu || isPreviu ? 'Reviu' : 'Disposisi';
+  const actionLabel = isKasubbagSelesaiReviu || isKabagSelesaiReviu || isPreviu ? 'Reviu' : 'Disposisi';
   // Belum ada halaman checklist Reviu Konsep PL beneran (analog
   // js/pages/review-proposal.js buat Proposal PL) -- link ini masih
   // ngarah ke placeholder kosong dulu (belum didaftarkan di
@@ -338,7 +353,7 @@ export function initDisposisiKonsepPage(root, user) {
   //   (js/pages/disposisi-tujuan-konsep.js), sesuai contoh tampilan
   //   "Disposisi Kepala Biro".
   root.querySelector('#btn-disposisi')?.addEventListener('click', () => {
-    if (isKasubbagSelesaiReviu || isPreviu) {
+    if (isKasubbagSelesaiReviu || isKabagSelesaiReviu || isPreviu) {
       router.navigate(reviuRoute);
       return;
     }

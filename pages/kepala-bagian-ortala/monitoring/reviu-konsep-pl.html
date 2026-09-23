@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAPEL - Reviu Konsep PL</title>
+<link rel="stylesheet" href="../../../css/main.css">
+</head>
+<body>
+<!-- MAPEL: Reviu Konsep PL (Kepala Bagian Ortala) -->
+<!-- Sama persis kayak file punya Kepala Subbagian Ortala di folder
+     sebelah -- reuse modul yang sama (js/pages/reviu-konsep.js,
+     initReviuKonsepPage sudah generik lewat user.role), pageKey-nya
+     ('monitoring/reviu-konsep-pl') sudah terdaftar di PAGE_MODULES
+     (js/core/app.js). File ini WAJIB ada di folder role-nya sendiri
+     (bukan cukup 1 file dipakai lintas role) karena router.js ngecek
+     akses per-folder (roleService.canAccessPath) -- Kepala Bagian
+     Ortala navigate ke path di folder kepala-subbagian-ortala/ bakal
+     ke-block. Dipakai lewat tombol "Reviu" (status SELESAI_REVIU,
+     dummy KL-2026-042 di data/konsep.js), lihat isKabagSelesaiReviu di
+     js/pages/disposisi-konsep.js. -->
+<main id="app"></main>
+<script type="module" src="../../../js/main.js"></script>
+</body>
+</html>
