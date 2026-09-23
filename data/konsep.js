@@ -435,9 +435,9 @@ SEED_KONSEP.unshift({
       'Perlu penyesuaian redaksional.',
       'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
     ],
-    notaDinasPenyampaianFile: '',
+    notaDinasPenyampaianFiles: [],
     notaDinasPenyampaianNomor: '',
-    notaDinasPengesahanFile: '',
+    notaDinasPengesahanFiles: [],
     notaDinasPengesahanNomor: '',
     items: [
       { type: 'group', letter: 'A', title: 'Kelengkapan POS' },
@@ -481,7 +481,43 @@ SEED_KONSEP.unshift({
         hasil: '',
         checked: false
       },
-      { type: 'subsection', no: 2, label: 'Isi dokumen:' }
+      { type: 'subsection', no: 2, label: 'Isi dokumen:' },
+      // Sinkron sama js/pages/reviu-konsep.js (DUMMY_CHECKLIST_TEMPLATE_KONSEP)
+      // -- 32 butir generik biar pagination-nya kepakai beneran ("1 2 3 4 ...").
+      ...[
+        'Latar Belakang',
+        'Maksud dan Tujuan',
+        'Ruang Lingkup',
+        'Dasar Hukum',
+        'Pengertian dan Istilah',
+        'Pihak-Pihak yang Terkait/Melaksanakan',
+        'Kualifikasi Pelaksana',
+        'Peralatan/Perlengkapan yang Dibutuhkan',
+        'Peringatan/Ketentuan Khusus',
+        'Pencatatan dan Pendataan',
+        'Prosedur/Langkah-Langkah Kerja',
+        'Diagram Alir (Flowchart) Prosedur',
+        'Rincian Tugas dan Tanggung Jawab Tiap Pihak',
+        'Waktu Penyelesaian Tiap Tahapan',
+        'Output/Keluaran yang Dihasilkan',
+        'Indikator Keberhasilan Pelaksanaan',
+        'Dokumen/Formulir Terkait',
+        'Referensi/Rujukan Penyusunan',
+        'Ketentuan Peralihan (jika ada)',
+        'Lampiran Pendukung',
+        'Kesesuaian Istilah dengan Glosarium BPK',
+        'Konsistensi Penomoran Pasal/Ayat',
+        'Kejelasan Subjek pada Tiap Kalimat Prosedur',
+        'Kesesuaian Alur dengan Struktur Organisasi',
+        'Kejelasan Batas Waktu pada Tiap Tahapan',
+        'Kesesuaian dengan POS Terkait Lainnya',
+        'Kelengkapan Riwayat Perubahan Dokumen',
+        'Kejelasan Status Dokumen (Final/Draft)',
+        'Kesesuaian Format Tabel dan Gambar',
+        'Penulisan Singkatan dan Akronim yang Konsisten',
+        'Kejelasan Pihak yang Berwenang Melakukan Reviu Berkala',
+        'Kesesuaian Masa Berlaku POS dengan Ketentuan'
+      ].map((label, i) => ({ type: 'item', no: i + 1, label, hasil: '', checked: false, indent: true }))
     ]
   }
 });

@@ -79,9 +79,9 @@ const DUMMY_CHECKLIST_TEMPLATE_KONSEP = {
     'Perlu penyesuaian redaksional.',
     'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
   ],
-  notaDinasPenyampaianFile: '',
+  notaDinasPenyampaianFiles: [],
   notaDinasPenyampaianNomor: '',
-  notaDinasPengesahanFile: '',
+  notaDinasPengesahanFiles: [],
   notaDinasPengesahanNomor: '',
   items: [
     { type: 'group', letter: 'A', title: 'Kelengkapan POS' },
@@ -125,7 +125,46 @@ const DUMMY_CHECKLIST_TEMPLATE_KONSEP = {
       hasil: '',
       checked: false
     },
-    { type: 'subsection', no: 2, label: 'Isi dokumen:' }
+    { type: 'subsection', no: 2, label: 'Isi dokumen:' },
+    // 32 butir generik "Isi dokumen" -- SEKEDAR biar jumlah baris
+    // checklist lewat 40 (>4 halaman), jadi pagination-nya kepakai
+    // beneran (nampilin "1 2 3 4 ...", bukan cuma "1"), sesuai
+    // permintaan "sesuaikan gambar saja". Isinya belum dikonfirmasi
+    // ke dokumen POS asli -- ganti kalau nanti ada daftar resminya.
+    ...[
+      'Latar Belakang',
+      'Maksud dan Tujuan',
+      'Ruang Lingkup',
+      'Dasar Hukum',
+      'Pengertian dan Istilah',
+      'Pihak-Pihak yang Terkait/Melaksanakan',
+      'Kualifikasi Pelaksana',
+      'Peralatan/Perlengkapan yang Dibutuhkan',
+      'Peringatan/Ketentuan Khusus',
+      'Pencatatan dan Pendataan',
+      'Prosedur/Langkah-Langkah Kerja',
+      'Diagram Alir (Flowchart) Prosedur',
+      'Rincian Tugas dan Tanggung Jawab Tiap Pihak',
+      'Waktu Penyelesaian Tiap Tahapan',
+      'Output/Keluaran yang Dihasilkan',
+      'Indikator Keberhasilan Pelaksanaan',
+      'Dokumen/Formulir Terkait',
+      'Referensi/Rujukan Penyusunan',
+      'Ketentuan Peralihan (jika ada)',
+      'Lampiran Pendukung',
+      'Kesesuaian Istilah dengan Glosarium BPK',
+      'Konsistensi Penomoran Pasal/Ayat',
+      'Kejelasan Subjek pada Tiap Kalimat Prosedur',
+      'Kesesuaian Alur dengan Struktur Organisasi',
+      'Kejelasan Batas Waktu pada Tiap Tahapan',
+      'Kesesuaian dengan POS Terkait Lainnya',
+      'Kelengkapan Riwayat Perubahan Dokumen',
+      'Kejelasan Status Dokumen (Final/Draft)',
+      'Kesesuaian Format Tabel dan Gambar',
+      'Penulisan Singkatan dan Akronim yang Konsisten',
+      'Kejelasan Pihak yang Berwenang Melakukan Reviu Berkala',
+      'Kesesuaian Masa Berlaku POS dengan Ketentuan'
+    ].map((label, i) => ({ type: 'item', no: i + 1, label, hasil: '', checked: false, indent: true }))
   ]
 };
 
@@ -282,12 +321,18 @@ function renderChecklistCard(checklist) {
   const pageItems = checklist.items.slice(startIndex, startIndex + CHECKLIST_PAGE_SIZE);
   const rows = pageItems.map((entry, i) => renderChecklistRow(entry, startIndex + i, checklist.templateJawabanOptions || [])).join('');
 
-  const pageButtons = Array.from({ length: totalPages }, (_, i) => i + 1)
-    .map(
-      (p) =>
-        `<button class="pagination__page${p === page ? ' pagination__page--active' : ''}" type="button" data-checklist-page="${p}">${p}</button>`
-    )
-    .join('');
+  // Maks 4 tombol nomor kelihatan, sisanya "..." (bukan expand semua
+  // nomor halaman) -- sesuai contoh tampilan "1 2 3 4 ...". "..."
+  // cuma dekorasi (bukan tombol beneran) begitu totalPages > 4.
+  const MAX_VISIBLE_PAGES = 4;
+  const visiblePages = Math.min(totalPages, MAX_VISIBLE_PAGES);
+  const pageButtons =
+    Array.from({ length: visiblePages }, (_, i) => i + 1)
+      .map(
+        (p) =>
+          `<button class="pagination__page${p === page ? ' pagination__page--active' : ''}" type="button" data-checklist-page="${p}">${p}</button>`
+      )
+      .join('') + (totalPages > MAX_VISIBLE_PAGES ? '<span class="pagination__ellipsis">...</span>' : '');
 
   return `
     <div class="card review-card reviu-proposal__checklist">
@@ -335,31 +380,46 @@ function renderChecklistCard(checklist) {
   `;
 }
 
+/** Satu file yang sudah dipilih -- chip nama file + tombol hapus (x). */
+function renderFileChip(name, idPrefix, index) {
+  return `
+    <span class="reviu-proposal__file-chip">
+      <a class="reviu-proposal__file-link-inline" href="#" data-file-link>${CLIP_ICON} ${name}</a>
+      <button type="button" class="reviu-proposal__file-chip-remove" data-file-remove="${idPrefix}:${index}" aria-label="Hapus file">&times;</button>
+    </span>
+  `;
+}
+
 /**
  * Satu seksi Nota Dinas (nomor + file) -- dipanggil 2x (Penyampaian &
- * Permintaan Pengesahan), beda dari Proposal PL yang cuma 1.
+ * Permintaan Pengesahan), beda dari Proposal PL yang cuma 1. File-nya
+ * BISA lebih dari satu (lihat renderFileChip): begitu ada file
+ * pertama, tombolnya berubah jadi "+ Tambah File" buat nambah lagi,
+ * tiap file kelihatan sebagai chip dengan tombol hapus (x) sendiri.
  * @param {string} title - "Nota Dinas Penyampaian" / "Nota Dinas Permintaan Pengesahan"
  * @param {string} nomorLabel - "No. Nota Dinas Penyampaian:" / "No. Nota Dinas Permintaan Pengesahan:"
+ * @param {string} nomorPlaceholder - contoh nomor beda per seksi ("ND-118" / "ND-119", sesuai contoh tampilan)
  * @param {string} idPrefix - dipakai buat id elemen & data-attr per seksi
- * @param {{nomor:string, file:string}} value
+ * @param {{nomor:string, files:string[]}} value
  * @param {boolean} isReadOnly
  */
-function renderNotaDinasSection(title, nomorLabel, idPrefix, value, isReadOnly) {
+function renderNotaDinasSection(title, nomorLabel, nomorPlaceholder, idPrefix, value, isReadOnly) {
+  const files = value.files || [];
   const nomorField = isReadOnly
     ? `<div class="reviu-proposal__text-input reviu-proposal__text-input--display">${value.nomor || '-'}</div>`
-    : `<input type="text" class="reviu-proposal__text-input" id="${idPrefix}-nomor" placeholder="cth. ND-118/BTI/07/2026" value="${value.nomor || ''}">`;
+    : `<input type="text" class="reviu-proposal__text-input" id="${idPrefix}-nomor" placeholder="${nomorPlaceholder}" value="${value.nomor || ''}">`;
 
   const fileField = isReadOnly
     ? `<div class="reviu-proposal__text-input reviu-proposal__text-input--display">${
-        value.file ? `<a class="reviu-proposal__file-link-inline" href="#" data-file-link>${CLIP_ICON} ${value.file}</a>` : '-'
+        files.length ? files.map((name) => `<a class="reviu-proposal__file-link-inline" href="#" data-file-link>${CLIP_ICON} ${name}</a>`).join(', ') : '-'
       }</div>`
     : `
+      ${files.length ? `<div class="reviu-proposal__file-chips">${files.map((name, i) => renderFileChip(name, idPrefix, i)).join('')}</div>` : ''}
       <div class="reviu-proposal__file-row">
-        <button class="btn btn-ghost" type="button" id="btn-pilih-file-${idPrefix}">${UPLOAD_ICON} Pilih File</button>
-        <span class="reviu-proposal__file-hint" id="file-hint-${idPrefix}">Tidak ada file yang dipilih</span>
+        <button class="btn btn-ghost" type="button" id="btn-pilih-file-${idPrefix}">${UPLOAD_ICON} ${files.length ? 'Tambah File' : 'Pilih File'}</button>
+        ${!files.length ? `<span class="reviu-proposal__file-hint" id="file-hint-${idPrefix}">Tidak ada file yang dipilih</span>` : ''}
         <input type="file" id="input-file-${idPrefix}" hidden>
       </div>
-      ${value.file ? `<a class="reviu-proposal__file-link" href="#" data-file-link>${CLIP_ICON} ${value.file}</a>` : ''}
     `;
 
   return `
@@ -480,8 +540,9 @@ export function initReviuKonsepPage(root, user) {
           ? renderNotaDinasSection(
               'Nota Dinas Penyampaian',
               'No. Nota Dinas Penyampaian:',
+              'cth. ND-118/BTI/07/2026',
               'nota-dinas-penyampaian',
-              { nomor: checklist.notaDinasPenyampaianNomor, file: checklist.notaDinasPenyampaianFile },
+              { nomor: checklist.notaDinasPenyampaianNomor, files: checklist.notaDinasPenyampaianFiles },
               !isPreviu
             )
           : ''
@@ -491,8 +552,9 @@ export function initReviuKonsepPage(root, user) {
           ? renderNotaDinasSection(
               'Nota Dinas Permintaan Pengesahan',
               'No. Nota Dinas Permintaan Pengesahan:',
+              'cth. ND-119/BTI/07/2026',
               'nota-dinas-pengesahan',
-              { nomor: checklist.notaDinasPengesahanNomor, file: checklist.notaDinasPengesahanFile },
+              { nomor: checklist.notaDinasPengesahanNomor, files: checklist.notaDinasPengesahanFiles },
               !isPreviu
             )
           : ''
@@ -595,13 +657,36 @@ function bindActions(root, backTarget, konsep, user) {
     });
   });
 
-  // "Pilih File" -- 2x (Penyampaian & Pengesahan), masing-masing punya id sendiri (lihat idPrefix di renderNotaDinasSection).
+  // "Pilih File"/"+ Tambah File" -- tiap file yang dipilih DITAMBAHKAN
+  // ke array notaDinasXFiles (bukan diganti), lalu render ulang
+  // seluruh halaman biar chip barunya kelihatan & tombolnya berubah
+  // jadi "+ Tambah File". syncChecklistInputs dulu SEBELUM render
+  // ulang, biar isian Hasil Reviu yang lagi diketik nggak ke-reset
+  // (sama alasannya kayak render ulang pas ganti halaman checklist).
   ['nota-dinas-penyampaian', 'nota-dinas-pengesahan'].forEach((idPrefix) => {
     const fileInput = root.querySelector(`#input-file-${idPrefix}`);
     root.querySelector(`#btn-pilih-file-${idPrefix}`)?.addEventListener('click', () => fileInput?.click());
     fileInput?.addEventListener('change', () => {
-      const hint = root.querySelector(`#file-hint-${idPrefix}`);
-      if (hint) hint.textContent = fileInput.files?.[0]?.name || 'Tidak ada file yang dipilih';
+      const name = fileInput.files?.[0]?.name;
+      if (!name || !konsep.checklistReviu) return;
+      const key = idPrefix === 'nota-dinas-penyampaian' ? 'notaDinasPenyampaianFiles' : 'notaDinasPengesahanFiles';
+      if (!konsep.checklistReviu[key]) konsep.checklistReviu[key] = [];
+      konsep.checklistReviu[key].push(name);
+      syncChecklistInputs(root, konsep.checklistReviu);
+      initReviuKonsepPage(root, user);
+    });
+  });
+
+  // Tombol hapus (x) per chip file -- data-file-remove="idPrefix:index".
+  root.querySelectorAll('[data-file-remove]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const [idPrefix, indexRaw] = btn.getAttribute('data-file-remove').split(':');
+      const key = idPrefix === 'nota-dinas-penyampaian' ? 'notaDinasPenyampaianFiles' : 'notaDinasPengesahanFiles';
+      const list = konsep.checklistReviu?.[key];
+      if (!list) return;
+      list.splice(Number(indexRaw), 1);
+      syncChecklistInputs(root, konsep.checklistReviu);
+      initReviuKonsepPage(root, user);
     });
   });
 
