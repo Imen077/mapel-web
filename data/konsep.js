@@ -240,6 +240,37 @@ SEED_KONSEP.unshift({
   testOnlyFor: ROLES.KEPALA_SATKER_BIRO_TI
 });
 
+// JUDUL SAMA PERSIS dengan KL-2026-036 di bawah ("POS Pengujian
+// Website"), status Final -- buat testing role Kepala Biro Ortala
+// ngeliat tampilan item yang SUDAH disetujui (keputusan akhir sudah
+// diambil).
+// Belum ada halaman detail/route khusus buat status Final di role
+// manapun (lihat resolveRowActionRoute di js/pages/monitoring.js) --
+// baris ini cuma numpang tampil di tabel & kartu ringkasan "Final",
+// klik "Lihat"-nya masih tooltip "segera hadir" bawaan, sama kayak
+// item Final lain yang bukan dummy testOnlyFor.
+//
+// SENGAJA ditaruh SEBELUM unshift KL-2026-036 (bukan sesudahnya) --
+// unshift menaruh elemen baru paling depan array, jadi taruh di sini
+// biar hasil akhirnya KL-2026-036 (Diterima) tetap di depan,
+// KL-2026-036C (Final) pas di bawahnya.
+SEED_KONSEP.unshift({
+  id: 'KL-2026-036C',
+  unit: 'Biro Teknologi Informasi',
+  title: 'POS Pengujian Website',
+  jenis: 'POS',
+  createdBy: 'Agustina Ratna Puspitasari',
+  employeeId: '240004492',
+  nomorPengajuan: 'PL-2026-031',
+  proposalId: 'PO-2026-048',
+  nomorNotaDinas: '1532/ND/X.5/06/2026',
+  koreksiKe: 0,
+  createdAt: '2026-08-28T09:19:56',
+  status: SUBMISSION_STATUS.FINAL,
+  testOnlyFor: ROLES.KEPALA_BIRO_ORTALA
+});
+
+
 // Satu dummy khusus Monitoring Konsep PL role Kepala Biro Ortala, status
 // "Diterima" (= kartu "Diterima" di Kabiro, isinya status DIKIRIM: konsep
 // yang baru masuk ke rantai Ortala). testOnlyFor bikin item ini cuma
@@ -351,6 +382,73 @@ SEED_KONSEP.unshift({
   status: SUBMISSION_STATUS.SELESAI_REVIU,
   testOnlyFor: ROLES.KEPALA_BAGIAN_ORTALA,
   tableStatusOverride: { label: 'Selesai Reviu', bg: '#DCEEF7', text: '#2C7DA0' },
+  // checklistReviu ditempel langsung di sini (sama pola-nya kayak
+  // PO-2026-045B punya Kabag di data/proposal.js) -- biar begitu
+  // halaman Reviu Konsep PL dibuka, formnya LANGSUNG kelihatan terisi
+  // (hasChecklist = true di js/pages/reviu-konsep.js), TANPA harus
+  // klik tombol "Tambah Reviu" dulu. Bentuknya ngikutin persis shape
+  // DUMMY_CHECKLIST_TEMPLATE_KONSEP di reviu-konsep.js (grup A/B/C +
+  // subsection + 32 butir "Isi dokumen"), cuma field hasil/checked-nya
+  // sudah keisi (beberapa item sengaja dibiarin unchecked biar
+  // variatif, sama kayak contoh tampilan Proposal PL).
+  checklistReviu: {
+    page: 1,
+    templateJawabanOptions: [
+      'Sudah sesuai dengan ketentuan yang berlaku.',
+      'Perlu perbaikan pada bagian substansi dokumen.',
+      'Dokumen belum lengkap, mohon dilengkapi.',
+      'Perlu penyesuaian redaksional.',
+      'Sudah sesuai, dapat dilanjutkan ke tahap berikutnya.'
+    ],
+    notaDinasPenyampaianFiles: ['13408019557224317.pdf'],
+    notaDinasPenyampaianNomor: '7163/ND.X.8/07/2026',
+    notaDinasPengesahanFiles: ['13408019557224318.pdf'],
+    notaDinasPengesahanNomor: '7201/ND.X.8/08/2026',
+    items: [
+      { type: 'group', letter: 'A', title: 'Kelengkapan POS' },
+      { type: 'item', no: 1, label: 'Apabila memiliki kebijakan (policy) maka kebijakan (policy) bersinergi dengan prosedur, instruksi kerja, dan formulir.', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { type: 'group', letter: 'B', title: 'Tata cara/Sistematika Penulisan POS' },
+      { type: 'item', no: 1, label: 'Bahasa Menggunakan bahasa Indonesia yang baik dan benar sesuai dengan Ejaan Yang Disempurnakan (EYD).', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false },
+      { type: 'subsection', no: 2, label: 'Format Pengetikan' },
+      { type: 'item', no: 1, label: 'Sampul Menggunakan sampul depan dan belakang sesuai pedoman POS.', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 2, label: 'Isi POS Memiliki format ukuran kertas, penggunaan huruf, spasi, dan format pengetikan lainnya sesuai dengan pedoman penulisan laporan (gaya selingkung) BPK RI.', hasil: 'Perlu penyesuaian redaksional.', checked: false, indent: true },
+      { type: 'group', letter: 'C', title: 'Kerangka POS' },
+      { type: 'item', no: 1, label: 'Halaman Penetapan berisikan surat keputusan/pengesahan yang menetapkan berlakunya POS tersebut.', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true },
+      { type: 'subsection', no: 2, label: 'Isi dokumen:' },
+      { type: 'item', no: 1, label: 'Latar Belakang', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 2, label: 'Maksud dan Tujuan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false, indent: true },
+      { type: 'item', no: 3, label: 'Ruang Lingkup', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 4, label: 'Dasar Hukum', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 5, label: 'Pengertian dan Istilah', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 6, label: 'Pihak-Pihak yang Terkait/Melaksanakan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 7, label: 'Kualifikasi Pelaksana', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false, indent: true },
+      { type: 'item', no: 8, label: 'Peralatan/Perlengkapan yang Dibutuhkan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 9, label: 'Peringatan/Ketentuan Khusus', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 10, label: 'Pencatatan dan Pendataan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 11, label: 'Prosedur/Langkah-Langkah Kerja', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 12, label: 'Diagram Alir (Flowchart) Prosedur', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 13, label: 'Rincian Tugas dan Tanggung Jawab Tiap Pihak', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 14, label: 'Waktu Penyelesaian Tiap Tahapan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 15, label: 'Output/Keluaran yang Dihasilkan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 16, label: 'Indikator Keberhasilan Pelaksanaan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 17, label: 'Dokumen/Formulir Terkait', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 18, label: 'Referensi/Rujukan Penyusunan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 19, label: 'Ketentuan Peralihan (jika ada)', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false, indent: true },
+      { type: 'item', no: 20, label: 'Lampiran Pendukung', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 21, label: 'Kesesuaian Istilah dengan Glosarium BPK', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 22, label: 'Konsistensi Penomoran Pasal/Ayat', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 23, label: 'Kejelasan Subjek pada Tiap Kalimat Prosedur', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 24, label: 'Kesesuaian Alur dengan Struktur Organisasi', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 25, label: 'Kejelasan Batas Waktu pada Tiap Tahapan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 26, label: 'Kesesuaian dengan POS Terkait Lainnya', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 27, label: 'Kelengkapan Riwayat Perubahan Dokumen', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 28, label: 'Kejelasan Status Dokumen (Final/Draft)', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: false, indent: true },
+      { type: 'item', no: 29, label: 'Kesesuaian Format Tabel dan Gambar', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 30, label: 'Penulisan Singkatan dan Akronim yang Konsisten', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 31, label: 'Kejelasan Pihak yang Berwenang Melakukan Reviu Berkala', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true },
+      { type: 'item', no: 32, label: 'Kesesuaian Masa Berlaku POS dengan Ketentuan', hasil: 'Sudah sesuai dengan ketentuan yang berlaku.', checked: true, indent: true }
+    ]
+  },
   riwayatDisposisi: [
     {
       waktu: '2026-08-20T08:15:22',
